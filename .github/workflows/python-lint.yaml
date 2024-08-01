@@ -1,0 +1,47 @@
+name: python-lint
+
+on:
+  pull_request:
+    paths:
+      - '**.py'
+
+jobs:
+  python-lint:
+    name: format and lint
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: '.python-version'
+
+      - name: Install rye
+        uses: eifinger/setup-rye@v4
+          with:
+            version: '0.37.0'
+            enable-cache: true
+
+      - name: Sync dependencies
+        run: rye sync
+
+      - name: Format
+        run: rye fmt
+
+      - name: Lint
+        run: rye lint
+
+      - name: Cache mypy
+        uses: actions/cache@v4
+        id: mypy-cache
+        with:
+          path: .mypy_cache
+          key: mypy-cache-${{ runner.os }}-${{ runner.arch }}-pull${{ github.event.pull_request.number }}
+
+      - name: Lint for type
+        run: rye run mypy
