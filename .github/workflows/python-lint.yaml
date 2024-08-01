@@ -23,9 +23,9 @@ jobs:
 
       - name: Install rye
         uses: eifinger/setup-rye@v4
-          with:
-            version: '0.37.0'
-            enable-cache: true
+        with:
+          version: '0.37.0'
+          enable-cache: true
 
       - name: Sync dependencies
         run: rye sync
