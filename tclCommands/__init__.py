@@ -95,12 +95,13 @@ def register_all_commands(app, commands):
     :return: None
     """
 
-    tcl_modules = {k: v for k, v in list(
-        sys.modules.items()) if k.startswith('tclCommands.TclCommand')}
+    tcl_modules = {
+        k: v for k, v in list(sys.modules.items()) if k.startswith("tclCommands.TclCommand")
+    }
 
     for key, mod in list(tcl_modules.items()):
-        if key != 'tclCommands.TclCommand':
-            class_name = key.split('.')[1]
+        if key != "tclCommands.TclCommand":
+            class_name = key.split(".")[1]
             class_type = getattr(mod, class_name)
             command_instance = class_type(app)
 
@@ -108,9 +109,9 @@ def register_all_commands(app, commands):
                 try:
                     description = command_instance.description
                 except AttributeError:
-                    description = ''
+                    description = ""
                 commands[alias] = {
-                    'fcn': command_instance.execute_wrapper,
-                    'help': command_instance.get_decorated_help(),
-                    'description': description
+                    "fcn": command_instance.execute_wrapper,
+                    "help": command_instance.get_decorated_help(),
+                    "description": description,
                 }

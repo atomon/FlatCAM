@@ -15,7 +15,7 @@ import math
 
 import logging
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 preprocessors = {}
 
 
@@ -25,7 +25,7 @@ class ABCPreProcRegister(ABCMeta):
         newclass = super(ABCPreProcRegister, cls).__new__(cls, clsname, bases, attrs)
         if object not in bases:
             if newclass.__name__ in preprocessors:
-                log.warning('Preprocessor %s has been overriden' % newclass.__name__)
+                log.warning("Preprocessor %s has been overriden" % newclass.__name__)
             preprocessors[newclass.__name__] = newclass()  # here is your register function
         return newclass
 
@@ -148,14 +148,15 @@ class AppPreProcTools(object, metaclass=ABCPreProcRegister):
 
 def load_preprocessors(app):
     preprocessors_path_search = [
-        os.path.join(app.data_path, 'preprocessors', '*.py'),
-        os.path.join('preprocessors', '*.py')
+        os.path.join(app.data_path, "preprocessors", "*.py"),
+        os.path.join("preprocessors", "*.py"),
     ]
     import glob
+
     for path_search in preprocessors_path_search:
         for file in glob.glob(path_search):
             try:
-                SourceFileLoader('FlatCAMPostProcessor', file).load_module()
+                SourceFileLoader("FlatCAMPostProcessor", file).load_module()
             except Exception as e:
                 app.log.error(str(e))
     return preprocessors

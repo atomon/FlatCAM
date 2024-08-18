@@ -12,32 +12,29 @@ class TclCommandGetNames(TclCommand):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['get_names']
+    aliases = ["get_names"]
 
-    description = '%s %s' % ("--", "Return to TCL the list of the project objects names "
-                                   "as a string with names separated by the '\\n' char.")
+    description = "%s %s" % (
+        "--",
+        "Return to TCL the list of the project objects names "
+        "as a string with names separated by the '\\n' char.",
+    )
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-
-    ])
+    arg_names = collections.OrderedDict([])
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-
-    ])
+    option_types = collections.OrderedDict([])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
     required = []
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': 'Lists the names of objects in the project. '
-                'It returns a string with names separated by "\\n" character',
-        'args': collections.OrderedDict([
-
-        ]),
-        'examples': ['get_names']
+        "main": "Lists the names of objects in the project. "
+        'It returns a string with names separated by "\\n" character',
+        "args": collections.OrderedDict([]),
+        "examples": ["get_names"],
     }
 
     def execute(self, args, unnamed_args):
@@ -48,4 +45,4 @@ class TclCommandGetNames(TclCommand):
         :return:
         """
 
-        return '\n'.join(self.app.collection.get_names())
+        return "\n".join(self.app.collection.get_names())

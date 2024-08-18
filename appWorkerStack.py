@@ -5,7 +5,7 @@ import multiprocessing
 
 class WorkerStack(QtCore.QObject):
 
-    worker_task = QtCore.pyqtSignal(dict)               # 'worker_name', 'func', 'params'
+    worker_task = QtCore.pyqtSignal(dict)  # 'worker_name', 'func', 'params'
     thread_exception = QtCore.pyqtSignal(object)
 
     def __init__(self, workers_number):
@@ -13,11 +13,11 @@ class WorkerStack(QtCore.QObject):
 
         self.workers = []
         self.threads = []
-        self.load = {}                                  # {'worker_name': tasks_count}
+        self.load = {}  # {'worker_name': tasks_count}
 
         # Create workers crew
         for i in range(0, workers_number):
-            worker = Worker(self, 'Slogger-' + str(i))
+            worker = Worker(self, "Slogger-" + str(i))
             thread = QtCore.QThread()
 
             worker.moveToThread(thread)
@@ -38,7 +38,9 @@ class WorkerStack(QtCore.QObject):
     def add_task(self, task):
         worker_name = min(self.load, key=self.load.get)
         self.load[worker_name] += 1
-        self.worker_task.emit({'worker_name': worker_name, 'fcn': task['fcn'], 'params': task['params']})
+        self.worker_task.emit(
+            {"worker_name": worker_name, "fcn": task["fcn"], "params": task["params"]}
+        )
 
     def on_task_completed(self, worker_name):
         self.load[str(worker_name)] -= 1

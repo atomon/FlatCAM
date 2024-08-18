@@ -67,13 +67,13 @@ class GLUTess:
         GLU.gluTessBeginPolygon(tess, None)
 
         def define_contour(contour):
-            vertices = list(contour.coords)             # Get vertices coordinates
-            if vertices[0] == vertices[-1]:             # Open ring
+            vertices = list(contour.coords)  # Get vertices coordinates
+            if vertices[0] == vertices[-1]:  # Open ring
                 vertices = vertices[:-1]
 
             self.pts += vertices
 
-            GLU.gluTessBeginContour(tess)               # Start contour
+            GLU.gluTessBeginContour(tess)  # Start contour
 
             # Set vertices
             for vertex in vertices:
@@ -81,7 +81,7 @@ class GLUTess:
                 GLU.gluTessVertex(tess, point, self.vertex_index)
                 self.vertex_index += 1
 
-            GLU.gluTessEndContour(tess)                 # End contour
+            GLU.gluTessEndContour(tess)  # End contour
 
         # Polygon exterior
         define_contour(polygon.exterior)

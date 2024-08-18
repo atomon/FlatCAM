@@ -29,7 +29,7 @@ def apply_patches():
     }
     """
 
-    markers._marker_dict['++'] = cross_lines
+    markers._marker_dict["++"] = cross_lines
     markers.marker_types = tuple(sorted(list(markers._marker_dict.copy().keys())))
 
     # # Add clear_data method to LineVisual to have possibility of clearing data
@@ -63,8 +63,7 @@ def apply_patches():
         GL = None
         from vispy.app._default_app import default_app
 
-        if default_app is not None and \
-                default_app.backend_name != 'ipynb_webgl':
+        if default_app is not None and default_app.backend_name != "ipynb_webgl":
             try:
                 import OpenGL.GL as GL
             except Exception:  # can be other than ImportError sometimes
@@ -74,13 +73,13 @@ def apply_patches():
             GL.glDisable(GL.GL_LINE_SMOOTH)
             GL.glLineWidth(2.0)
 
-        if self._changed['pos']:
+        if self._changed["pos"]:
             self.pos_buf.set_data(self._pos)
-            self._changed['pos'] = False
+            self._changed["pos"] = False
 
-        if self._changed['color']:
-            self._program.vert['color'] = self._color
-            self._changed['color'] = False
+        if self._changed["color"]:
+            self._program.vert["color"] = self._color
+            self._changed["color"] = False
 
     InfiniteLineVisual._prepare_draw = _prepare_draw
 
@@ -88,7 +87,7 @@ def apply_patches():
     def _get_tick_frac_labels(self):
         """Get the major ticks, minor ticks, and major labels"""
         minor_num = 4  # number of minor ticks per major division
-        if self.axis.scale_type == 'linear':
+        if self.axis.scale_type == "linear":
             domain = self.axis.domain
             if domain[1] < domain[0]:
                 flip = True
@@ -100,13 +99,13 @@ def apply_patches():
 
             transforms = self.axis.transforms
             length = self.axis.pos[1] - self.axis.pos[0]  # in logical coords
-            n_inches = np.sqrt(np.sum(length ** 2)) / transforms.dpi
+            n_inches = np.sqrt(np.sum(length**2)) / transforms.dpi
 
             # major = np.linspace(domain[0], domain[1], num=11)
             # major = MaxNLocator(10).tick_values(*domain)
             major = _get_ticks_talbot(domain[0], domain[1], n_inches, 1)
 
-            labels = ['%g' % x for x in major]
+            labels = ["%g" % x for x in major]
             majstep = major[1] - major[0]
             minor = []
             minstep = majstep / (minor_num + 1)
@@ -114,9 +113,7 @@ def apply_patches():
             minstop = -1 if self.axis._stop_at_major[1] else 0
             for i in range(minstart, len(major) + minstop):
                 maj = major[0] + i * majstep
-                minor.extend(np.linspace(maj + minstep,
-                                         maj + majstep - minstep,
-                                         minor_num))
+                minor.extend(np.linspace(maj + minstep, maj + majstep - minstep, minor_num))
 
             major_frac = (major - offset) / scale
             major_frac = major_frac[::-1] if flip else major_frac
@@ -129,9 +126,9 @@ def apply_patches():
             minor_frac = minor_frac[use_minor_mask]
 
             return major_frac, minor_frac, labels
-        elif self.axis.scale_type == 'logarithmic':
+        elif self.axis.scale_type == "logarithmic":
             return NotImplementedError
-        elif self.axis.scale_type == 'power':
+        elif self.axis.scale_type == "power":
             return NotImplementedError
 
     Ticker._get_tick_frac_labels = _get_tick_frac_labels

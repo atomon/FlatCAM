@@ -6,7 +6,8 @@ Created on Sun Jan 05 13:30:47 2014
 """
 
 import os
-os.chdir('../')
+
+os.chdir("../")
 
 from flatcamParsers.ParseGerber import *
 from flatcamParsers.ParseExcellon import *
@@ -25,7 +26,7 @@ ex = Excellon()
 ex.parse_file(excellon_filename)
 ex.create_geometry()
 
-#fig = Figure()
+# fig = Figure()
 fig = pyplot.figure()
 ax = fig.add_subplot(111)
 ax.set_aspect(1)
@@ -33,17 +34,17 @@ ax.set_aspect(1)
 # Plot gerber
 for geo in g.solid_geometry:
     x, y = geo.exterior.coords.xy
-    pyplot.plot(x, y, 'k-')
+    pyplot.plot(x, y, "k-")
     for ints in geo.interiors:
         x, y = ints.coords.xy
-        ax.plot(x, y, 'k-')
-        
+        ax.plot(x, y, "k-")
+
 # Plot excellon
 for geo in ex.solid_geometry:
     x, y = geo.exterior.coords.xy
-    pyplot.plot(x, y, 'r-')
+    pyplot.plot(x, y, "r-")
     for ints in geo.interiors:
         x, y = ints.coords.xy
-        ax.plot(x, y, 'g-')
-        
+        ax.plot(x, y, "g-")
+
 fig.show()

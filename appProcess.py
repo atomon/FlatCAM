@@ -14,8 +14,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 # import logging
@@ -35,9 +35,7 @@ class FCProcess(object):
     app = None
 
     def __init__(self, descr):
-        self.callbacks = {
-            "done": []
-        }
+        self.callbacks = {"done": []}
         self.descr = descr
         self.status = "Active"
 
@@ -132,16 +130,17 @@ class FCVisibleProcessContainer(QtCore.QObject, FCProcessContainer):
     idle_flag = QtCore.pyqtSignal()
 
     def __init__(self, view):
-        assert isinstance(view, FlatCAMActivityView), \
-            "Expected a FlatCAMActivityView, got %s" % type(view)
+        assert isinstance(
+            view, FlatCAMActivityView
+        ), "Expected a FlatCAMActivityView, got %s" % type(view)
 
         FCProcessContainer.__init__(self)
         QtCore.QObject.__init__(self)
 
         self.view = view
 
-        self.text_to_display_in_activity = ''
-        self.new_text = ' '
+        self.text_to_display_in_activity = ""
+        self.new_text = " "
 
         self.something_changed.connect(self.update_view)
 
@@ -162,7 +161,7 @@ class FCVisibleProcessContainer(QtCore.QObject, FCProcessContainer):
 
     def update_view(self):
         if len(self.procs) == 0:
-            self.new_text = ''
+            self.new_text = ""
             self.view.set_idle()
             self.idle_flag.emit()
 

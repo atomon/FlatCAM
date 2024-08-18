@@ -23,8 +23,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -47,27 +47,26 @@ class ExcellonObject(FlatCAMObj, Excellon):
 
         self.kind = "excellon"
 
-        self.options.update({
-            "plot": True,
-            "solid": False,
-            "multicolored": False,
-            "merge_fuse_tools": True,
-
-            "tooldia": 0.1,
-            "milling_dia": 0.04,
-            "slot_tooldia": 0.1,
-
-            "format_upper_in": 2,
-            "format_lower_in": 4,
-            "format_upper_mm": 3,
-            "lower_mm": 3,
-            "zeros": "T",
-            "units": "INCH",
-            "update": True,
-
-            "optimization_type": "B",
-            "search_time": 3
-        })
+        self.options.update(
+            {
+                "plot": True,
+                "solid": False,
+                "multicolored": False,
+                "merge_fuse_tools": True,
+                "tooldia": 0.1,
+                "milling_dia": 0.04,
+                "slot_tooldia": 0.1,
+                "format_upper_in": 2,
+                "format_lower_in": 4,
+                "format_upper_mm": 3,
+                "lower_mm": 3,
+                "zeros": "T",
+                "units": "INCH",
+                "update": True,
+                "optimization_type": "B",
+                "search_time": 3,
+            }
+        )
 
         # TODO: Document this.
         self.tool_cbs = {}
@@ -95,11 +94,11 @@ class ExcellonObject(FlatCAMObj, Excellon):
         self.source_file = ""
 
         self.multigeo = False
-        self.units_found = self.app.defaults['units']
+        self.units_found = self.app.defaults["units"]
 
-        self.fill_color = self.app.defaults['excellon_plot_fill']
-        self.outline_color = self.app.defaults['excellon_plot_line']
-        self.alpha_level = 'bf'
+        self.fill_color = self.app.defaults["excellon_plot_fill"]
+        self.outline_color = self.app.defaults["excellon_plot_line"]
+        self.alpha_level = "bf"
 
         # the key is the tool id and the value is a list of shapes keys (indexes)
         self.shape_indexes_dict = {}
@@ -107,7 +106,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         # Attributes to be included in serialization
         # Always append to it because it carries contents
         # from predecessors.
-        self.ser_attrs += ['options', 'kind', 'fill_color', 'outline_color', 'alpha_level']
+        self.ser_attrs += ["options", "kind", "fill_color", "outline_color", "alpha_level"]
 
     def set_ui(self, ui):
         """
@@ -122,33 +121,34 @@ class ExcellonObject(FlatCAMObj, Excellon):
 
         log.debug("ExcellonObject.set_ui()")
 
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         # fill in self.options values  for the Drilling Tool from self.app.options
         for opt_key, opt_val in self.app.options.items():
-            if opt_key.find('tools_drill_') == 0:
+            if opt_key.find("tools_drill_") == 0:
                 self.options[opt_key] = deepcopy(opt_val)
 
         # fill in self.default_data values from self.options
         for opt_key, opt_val in self.app.options.items():
-            if opt_key.find('excellon_') == 0 or opt_key.find('tools_drill_') == 0:
+            if opt_key.find("excellon_") == 0 or opt_key.find("tools_drill_") == 0:
                 self.default_data[opt_key] = deepcopy(opt_val)
 
-        self.form_fields.update({
-            "plot":             self.ui.plot_cb,
-            "solid":            self.ui.solid_cb,
-            "multicolored":     self.ui.multicolored_cb,
-
-            "autoload_db":      self.ui.autoload_db_cb,
-            "tooldia":          self.ui.tooldia_entry,
-            "slot_tooldia":     self.ui.slot_tooldia_entry,
-        })
+        self.form_fields.update(
+            {
+                "plot": self.ui.plot_cb,
+                "solid": self.ui.solid_cb,
+                "multicolored": self.ui.multicolored_cb,
+                "autoload_db": self.ui.autoload_db_cb,
+                "tooldia": self.ui.tooldia_entry,
+                "slot_tooldia": self.ui.slot_tooldia_entry,
+            }
+        )
 
         self.to_form()
 
         # Show/Hide Advanced Options
-        if self.app.defaults["global_app_level"] == 'b':
-            self.ui.level.setText('<span style="color:green;"><b>%s</b></span>' % _('Basic'))
+        if self.app.defaults["global_app_level"] == "b":
+            self.ui.level.setText('<span style="color:green;"><b>%s</b></span>' % _("Basic"))
 
             self.ui.tools_table.setColumnHidden(4, True)
             self.ui.tools_table.setColumnHidden(5, True)
@@ -157,14 +157,15 @@ class ExcellonObject(FlatCAMObj, Excellon):
             self.ui.autoload_db_cb.set_value(False)
             self.ui.autoload_db_cb.hide()
         else:
-            self.ui.level.setText('<span style="color:red;"><b>%s</b></span>' % _('Advanced'))
+            self.ui.level.setText('<span style="color:red;"><b>%s</b></span>' % _("Advanced"))
             self.ui.table_visibility_cb.show()
             self.ui.table_visibility_cb.set_value(self.app.defaults["excellon_tools_table_display"])
             self.on_table_visibility_toggle(state=self.app.defaults["excellon_tools_table_display"])
             self.ui.autoload_db_cb.show()
 
-        assert isinstance(self.ui, ExcellonObjectUI), \
-            "Expected a ExcellonObjectUI, got %s" % type(self.ui)
+        assert isinstance(self.ui, ExcellonObjectUI), "Expected a ExcellonObjectUI, got %s" % type(
+            self.ui
+        )
 
         self.ui.plot_cb.stateChanged.connect(self.on_plot_cb_click)
         self.ui.solid_cb.stateChanged.connect(self.on_solid_cb_click)
@@ -185,16 +186,20 @@ class ExcellonObject(FlatCAMObj, Excellon):
         # self.ui.milling_button.clicked.connect(lambda: self.app.milling_tool.run(toggle=True))
 
         # UTILITIES
-        self.ui.util_button.clicked.connect(lambda st: self.ui.util_frame.show() if st else self.ui.util_frame.hide())
+        self.ui.util_button.clicked.connect(
+            lambda st: self.ui.util_frame.show() if st else self.ui.util_frame.hide()
+        )
         self.ui.generate_milling_button.clicked.connect(self.on_generate_milling_button_click)
-        self.ui.generate_milling_slots_button.clicked.connect(self.on_generate_milling_slots_button_click)
+        self.ui.generate_milling_slots_button.clicked.connect(
+            self.on_generate_milling_slots_button_click
+        )
 
         # Toggle all Table rows
         self.ui.tools_table.horizontalHeader().sectionClicked.connect(self.on_toggle_rows)
 
         self.ui.table_visibility_cb.stateChanged.connect(self.on_table_visibility_toggle)
 
-        self.units_found = self.app.defaults['units']
+        self.units_found = self.app.defaults["units"]
 
     def build_ui(self):
         """
@@ -205,7 +210,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         """
         FlatCAMObj.build_ui(self)
 
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         for row in range(self.ui.tools_table.rowCount()):
             try:
@@ -227,10 +232,10 @@ class ExcellonObject(FlatCAMObj, Excellon):
         sort = []
         for k, v in list(self.tools.items()):
             try:
-                sort.append((k, v['tooldia']))
+                sort.append((k, v["tooldia"]))
             except KeyError:
                 # for old projects to be opened
-                sort.append((k, v['C']))
+                sort.append((k, v["C"]))
 
         sorted_tools = sorted(sort, key=lambda t1: t1[1])
         tools = [i[0] for i in sorted_tools]
@@ -241,69 +246,76 @@ class ExcellonObject(FlatCAMObj, Excellon):
 
         for tool_no in tools:
             try:
-                dia_val = self.tools[tool_no]['tooldia']
+                dia_val = self.tools[tool_no]["tooldia"]
             except KeyError:
                 # for old projects to be opened
-                dia_val = self.tools[tool_no]['C']
+                dia_val = self.tools[tool_no]["C"]
 
             # add the data dictionary for each tool with the default values
-            self.tools[tool_no]['data'] = deepcopy(new_options)
+            self.tools[tool_no]["data"] = deepcopy(new_options)
 
             drill_cnt = 0  # variable to store the nr of drills per tool
             slot_cnt = 0  # variable to store the nr of slots per tool
 
             # Find no of drills for the current tool
             try:
-                drill_cnt = len(self.tools[tool_no]['drills'])
+                drill_cnt = len(self.tools[tool_no]["drills"])
             except KeyError:
                 drill_cnt = 0
             self.tot_drill_cnt += drill_cnt
 
             # Find no of slots for the current tool
             try:
-                slot_cnt = len(self.tools[tool_no]['slots'])
+                slot_cnt = len(self.tools[tool_no]["slots"])
             except KeyError:
                 slot_cnt = 0
             self.tot_slot_cnt += slot_cnt
 
             # Tool ID
-            exc_id_item = QtWidgets.QTableWidgetItem('%d' % int(tool_no))
+            exc_id_item = QtWidgets.QTableWidgetItem("%d" % int(tool_no))
             exc_id_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.tools_table.setItem(self.tool_row, 0, exc_id_item)  # Tool name/id
 
             # Diameter
-            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, dia_val))
+            dia_item = QtWidgets.QTableWidgetItem("%.*f" % (self.decimals, dia_val))
             dia_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.tools_table.setItem(self.tool_row, 1, dia_item)  # Diameter
 
             # Drill count
-            drill_count_item = QtWidgets.QTableWidgetItem('%d' % drill_cnt)
+            drill_count_item = QtWidgets.QTableWidgetItem("%d" % drill_cnt)
             drill_count_item.setFlags(QtCore.Qt.ItemIsEnabled)
-            self.ui.tools_table.setItem(self.tool_row, 2, drill_count_item)  # Number of drills per tool
+            self.ui.tools_table.setItem(
+                self.tool_row, 2, drill_count_item
+            )  # Number of drills per tool
 
             # Slot Count
             # if the slot number is zero is better to not clutter the GUI with zero's so we print a space
-            slot_count_str = '%d' % slot_cnt if slot_cnt > 0 else ''
+            slot_count_str = "%d" % slot_cnt if slot_cnt > 0 else ""
             slot_count_item = QtWidgets.QTableWidgetItem(slot_count_str)
             slot_count_item.setFlags(QtCore.Qt.ItemIsEnabled)
-            self.ui.tools_table.setItem(self.tool_row, 3, slot_count_item)  # Number of drills per tool
+            self.ui.tools_table.setItem(
+                self.tool_row, 3, slot_count_item
+            )  # Number of drills per tool
 
             # Empty Plot Item
-            empty_plot_item = QtWidgets.QTableWidgetItem('')
+            empty_plot_item = QtWidgets.QTableWidgetItem("")
             empty_plot_item.setFlags(QtCore.Qt.NoItemFlags)
             self.ui.tools_table.setItem(self.tool_row, 4, empty_plot_item)
 
-            if 'multicolor' in self.tools[tool_no] and self.tools[tool_no]['multicolor'] is not None:
-                red = self.tools[tool_no]['multicolor'][0] * 255
-                green = self.tools[tool_no]['multicolor'][1] * 255
-                blue = self.tools[tool_no]['multicolor'][2] * 255
-                alpha = self.tools[tool_no]['multicolor'][3] * 255
+            if (
+                "multicolor" in self.tools[tool_no]
+                and self.tools[tool_no]["multicolor"] is not None
+            ):
+                red = self.tools[tool_no]["multicolor"][0] * 255
+                green = self.tools[tool_no]["multicolor"][1] * 255
+                blue = self.tools[tool_no]["multicolor"][2] * 255
+                alpha = self.tools[tool_no]["multicolor"][3] * 255
                 h_color = QtGui.QColor(red, green, blue, alpha)
                 self.ui.tools_table.item(self.tool_row, 4).setBackground(h_color)
             else:
                 h1 = self.app.defaults["excellon_plot_fill"][1:7]
                 h2 = self.app.defaults["excellon_plot_fill"][7:9]
-                h_color = QtGui.QColor('#' + h2 + h1)
+                h_color = QtGui.QColor("#" + h2 + h1)
                 self.ui.tools_table.item(self.tool_row, 4).setBackground(h_color)
 
             # Plot Item
@@ -316,19 +328,19 @@ class ExcellonObject(FlatCAMObj, Excellon):
             self.tool_row += 1
 
         # add a last row with the Total number of drills
-        empty_1 = QtWidgets.QTableWidgetItem('')
+        empty_1 = QtWidgets.QTableWidgetItem("")
         empty_1.setFlags(QtCore.Qt.NoItemFlags)
-        empty_1_1 = QtWidgets.QTableWidgetItem('')
+        empty_1_1 = QtWidgets.QTableWidgetItem("")
         empty_1_1.setFlags(QtCore.Qt.NoItemFlags)
-        empty_1_2 = QtWidgets.QTableWidgetItem('')
+        empty_1_2 = QtWidgets.QTableWidgetItem("")
         empty_1_2.setFlags(QtCore.Qt.NoItemFlags)
-        empty_1_3 = QtWidgets.QTableWidgetItem('')
+        empty_1_3 = QtWidgets.QTableWidgetItem("")
         empty_1_3.setFlags(QtCore.Qt.NoItemFlags)
-        empty_1_4 = QtWidgets.QTableWidgetItem('')
+        empty_1_4 = QtWidgets.QTableWidgetItem("")
         empty_1_4.setFlags(QtCore.Qt.NoItemFlags)
 
-        label_tot_drill_count = QtWidgets.QTableWidgetItem(_('Total Drills'))
-        tot_drill_count = QtWidgets.QTableWidgetItem('%d' % self.tot_drill_cnt)
+        label_tot_drill_count = QtWidgets.QTableWidgetItem(_("Total Drills"))
+        tot_drill_count = QtWidgets.QTableWidgetItem("%d" % self.tot_drill_cnt)
         label_tot_drill_count.setFlags(QtCore.Qt.ItemIsEnabled)
         tot_drill_count.setFlags(QtCore.Qt.ItemIsEnabled)
 
@@ -350,19 +362,19 @@ class ExcellonObject(FlatCAMObj, Excellon):
         self.tool_row += 1
 
         # add a last row with the Total number of slots
-        empty_2 = QtWidgets.QTableWidgetItem('')
+        empty_2 = QtWidgets.QTableWidgetItem("")
         empty_2.setFlags(QtCore.Qt.NoItemFlags)
-        empty_2_1 = QtWidgets.QTableWidgetItem('')
+        empty_2_1 = QtWidgets.QTableWidgetItem("")
         empty_2_1.setFlags(QtCore.Qt.NoItemFlags)
-        empty_2_2 = QtWidgets.QTableWidgetItem('')
+        empty_2_2 = QtWidgets.QTableWidgetItem("")
         empty_2_2.setFlags(QtCore.Qt.NoItemFlags)
-        empty_2_3 = QtWidgets.QTableWidgetItem('')
+        empty_2_3 = QtWidgets.QTableWidgetItem("")
         empty_2_3.setFlags(QtCore.Qt.NoItemFlags)
-        empty_2_4 = QtWidgets.QTableWidgetItem('')
+        empty_2_4 = QtWidgets.QTableWidgetItem("")
         empty_2_4.setFlags(QtCore.Qt.NoItemFlags)
 
-        label_tot_slot_count = QtWidgets.QTableWidgetItem(_('Total Slots'))
-        tot_slot_count = QtWidgets.QTableWidgetItem('%d' % self.tot_slot_cnt)
+        label_tot_slot_count = QtWidgets.QTableWidgetItem(_("Total Slots"))
+        tot_slot_count = QtWidgets.QTableWidgetItem("%d" % self.tot_slot_cnt)
         label_tot_slot_count.setFlags(QtCore.Qt.ItemIsEnabled)
         tot_slot_count.setFlags(QtCore.Qt.ItemIsEnabled)
 
@@ -421,7 +433,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         # find if we have drills:
         has_drills = None
         for tt in self.tools:
-            if 'drills' in self.tools[tt] and self.tools[tt]['drills']:
+            if "drills" in self.tools[tt] and self.tools[tt]["drills"]:
                 has_drills = True
                 break
         if has_drills is None:
@@ -434,7 +446,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         # find if we have slots
         has_slots = None
         for tt in self.tools:
-            if 'slots' in self.tools[tt] and self.tools[tt]['slots']:
+            if "slots" in self.tools[tt] and self.tools[tt]["slots"]:
                 has_slots = True
                 break
         if has_slots is None:
@@ -522,17 +534,19 @@ class ExcellonObject(FlatCAMObj, Excellon):
             has_drills = True
             has_slots = True
             for row in sel_rows:
-                row_dia = self.app.dec_format(float(self.ui.tools_table.item(row, 1).text()), self.decimals)
+                row_dia = self.app.dec_format(
+                    float(self.ui.tools_table.item(row, 1).text()), self.decimals
+                )
 
                 for tt in self.tools:
-                    tool_dia = self.app.dec_format(float(self.tools[tt]['tooldia']), self.decimals)
+                    tool_dia = self.app.dec_format(float(self.tools[tt]["tooldia"]), self.decimals)
                     if tool_dia == row_dia:
                         # find if we have drills:
-                        if 'drills' not in self.tools[tt] or not self.tools[tt]['drills']:
+                        if "drills" not in self.tools[tt] or not self.tools[tt]["drills"]:
                             has_drills = None
 
                         # find if we have slots
-                        if 'slots' not in self.tools[tt] or not self.tools[tt]['slots']:
+                        if "slots" not in self.tools[tt] or not self.tools[tt]["slots"]:
                             has_slots = None
 
             if has_drills is None:
@@ -597,7 +611,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         for x in self.ui.tools_table.selectedItems():
             # from the columnCount we subtract a value of 1 which represent the last column (plot column)
             # which does not have text
-            txt = ''
+            txt = ""
             elem = []
 
             for column in range(0, self.ui.tools_table.columnCount() - 1):
@@ -632,7 +646,9 @@ class ExcellonObject(FlatCAMObj, Excellon):
         # make sure that the FCTree widget columns are resized to content
         self.ui.treeWidget.resize_sig.emit()
 
-    def export_excellon(self, whole, fract, e_zeros=None, form='dec', factor=1, slot_type='routing'):
+    def export_excellon(
+        self, whole, fract, e_zeros=None, form="dec", factor=1, slot_type="routing"
+    ):
         """
         Returns two values, first is a boolean , if 1 then the file has slots and second contain the Excellon code
 
@@ -652,7 +668,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         :rtype:             tuple
         """
 
-        excellon_code = ''
+        excellon_code = ""
 
         # store here if the file has slots, return 1 if any slots, 0 if only drills
         slots_in_file = 0
@@ -660,13 +676,13 @@ class ExcellonObject(FlatCAMObj, Excellon):
         # find if we have drills:
         has_drills = None
         for tt in self.tools:
-            if 'drills' in self.tools[tt] and self.tools[tt]['drills']:
+            if "drills" in self.tools[tt] and self.tools[tt]["drills"]:
                 has_drills = True
                 break
         # find if we have slots:
         has_slots = None
         for tt in self.tools:
-            if 'slots' in self.tools[tt] and self.tools[tt]['slots']:
+            if "slots" in self.tools[tt] and self.tools[tt]["slots"]:
                 has_slots = True
                 slots_in_file = 1
                 break
@@ -676,14 +692,16 @@ class ExcellonObject(FlatCAMObj, Excellon):
             if has_drills:
                 length = whole + fract
                 for tool in self.tools:
-                    excellon_code += 'T0%s\n' % str(tool) if int(tool) < 10 else 'T%s\n' % str(tool)
+                    excellon_code += "T0%s\n" % str(tool) if int(tool) < 10 else "T%s\n" % str(tool)
 
-                    for drill in self.tools[tool]['drills']:
-                        if form == 'dec':
+                    for drill in self.tools[tool]["drills"]:
+                        if form == "dec":
                             drill_x = drill.x * factor
                             drill_y = drill.y * factor
-                            excellon_code += "X{:.{dec}f}Y{:.{dec}f}\n".format(drill_x, drill_y, dec=fract)
-                        elif e_zeros == 'LZ':
+                            excellon_code += "X{:.{dec}f}Y{:.{dec}f}\n".format(
+                                drill_x, drill_y, dec=fract
+                            )
+                        elif e_zeros == "LZ":
                             drill_x = drill.x * factor
                             drill_y = drill.y * factor
 
@@ -691,33 +709,39 @@ class ExcellonObject(FlatCAMObj, Excellon):
                             exc_y_formatted = "{:.{dec}f}".format(drill_y, dec=fract)
 
                             # extract whole part and decimal part
-                            exc_x_formatted = exc_x_formatted.partition('.')
-                            exc_y_formatted = exc_y_formatted.partition('.')
+                            exc_x_formatted = exc_x_formatted.partition(".")
+                            exc_y_formatted = exc_y_formatted.partition(".")
 
                             # left padd the 'whole' part with zeros
-                            x_whole = exc_x_formatted[0].rjust(whole, '0')
-                            y_whole = exc_y_formatted[0].rjust(whole, '0')
+                            x_whole = exc_x_formatted[0].rjust(whole, "0")
+                            y_whole = exc_y_formatted[0].rjust(whole, "0")
 
                             # restore the coordinate padded in the left with 0 and added the decimal part
                             # without the decinal dot
                             exc_x_formatted = x_whole + exc_x_formatted[2]
                             exc_y_formatted = y_whole + exc_y_formatted[2]
 
-                            excellon_code += "X{xform}Y{yform}\n".format(xform=exc_x_formatted,
-                                                                         yform=exc_y_formatted)
+                            excellon_code += "X{xform}Y{yform}\n".format(
+                                xform=exc_x_formatted, yform=exc_y_formatted
+                            )
                         else:
                             drill_x = drill.x * factor
                             drill_y = drill.y * factor
 
-                            exc_x_formatted = "{:.{dec}f}".format(drill_x, dec=fract).replace('.', '')
-                            exc_y_formatted = "{:.{dec}f}".format(drill_y, dec=fract).replace('.', '')
+                            exc_x_formatted = "{:.{dec}f}".format(drill_x, dec=fract).replace(
+                                ".", ""
+                            )
+                            exc_y_formatted = "{:.{dec}f}".format(drill_y, dec=fract).replace(
+                                ".", ""
+                            )
 
                             # pad with rear zeros
-                            exc_x_formatted.ljust(length, '0')
-                            exc_y_formatted.ljust(length, '0')
+                            exc_x_formatted.ljust(length, "0")
+                            exc_y_formatted.ljust(length, "0")
 
-                            excellon_code += "X{xform}Y{yform}\n".format(xform=exc_x_formatted,
-                                                                         yform=exc_y_formatted)
+                            excellon_code += "X{xform}Y{yform}\n".format(
+                                xform=exc_x_formatted, yform=exc_y_formatted
+                            )
         except Exception as e:
             log.debug(str(e))
 
@@ -725,53 +749,67 @@ class ExcellonObject(FlatCAMObj, Excellon):
         try:
             if has_slots:
                 for tool in self.tools:
-                    excellon_code += 'G05\n'
+                    excellon_code += "G05\n"
 
                     if int(tool) < 10:
-                        excellon_code += 'T0' + str(tool) + '\n'
+                        excellon_code += "T0" + str(tool) + "\n"
                     else:
-                        excellon_code += 'T' + str(tool) + '\n'
+                        excellon_code += "T" + str(tool) + "\n"
 
-                    for slot in self.tools[tool]['slots']:
-                        if form == 'dec':
+                    for slot in self.tools[tool]["slots"]:
+                        if form == "dec":
                             start_slot_x = slot.x * factor
                             start_slot_y = slot.y * factor
                             stop_slot_x = slot.x * factor
                             stop_slot_y = slot.y * factor
-                            if slot_type == 'routing':
-                                excellon_code += "G00X{:.{dec}f}Y{:.{dec}f}\nM15\n".format(start_slot_x,
-                                                                                           start_slot_y,
-                                                                                           dec=fract)
-                                excellon_code += "G01X{:.{dec}f}Y{:.{dec}f}\nM16\n".format(stop_slot_x,
-                                                                                           stop_slot_y,
-                                                                                           dec=fract)
-                            elif slot_type == 'drilling':
-                                excellon_code += "X{:.{dec}f}Y{:.{dec}f}G85X{:.{dec}f}Y{:.{dec}f}\nG05\n".format(
-                                    start_slot_x, start_slot_y, stop_slot_x, stop_slot_y, dec=fract
+                            if slot_type == "routing":
+                                excellon_code += "G00X{:.{dec}f}Y{:.{dec}f}\nM15\n".format(
+                                    start_slot_x, start_slot_y, dec=fract
+                                )
+                                excellon_code += "G01X{:.{dec}f}Y{:.{dec}f}\nM16\n".format(
+                                    stop_slot_x, stop_slot_y, dec=fract
+                                )
+                            elif slot_type == "drilling":
+                                excellon_code += (
+                                    "X{:.{dec}f}Y{:.{dec}f}G85X{:.{dec}f}Y{:.{dec}f}\nG05\n".format(
+                                        start_slot_x,
+                                        start_slot_y,
+                                        stop_slot_x,
+                                        stop_slot_y,
+                                        dec=fract,
+                                    )
                                 )
 
-                        elif e_zeros == 'LZ':
+                        elif e_zeros == "LZ":
                             start_slot_x = slot.x * factor
                             start_slot_y = slot.y * factor
                             stop_slot_x = slot.x * factor
                             stop_slot_y = slot.y * factor
 
-                            start_slot_x_formatted = "{:.{dec}f}".format(start_slot_x, dec=fract).replace('.', '')
-                            start_slot_y_formatted = "{:.{dec}f}".format(start_slot_y, dec=fract).replace('.', '')
-                            stop_slot_x_formatted = "{:.{dec}f}".format(stop_slot_x, dec=fract).replace('.', '')
-                            stop_slot_y_formatted = "{:.{dec}f}".format(stop_slot_y, dec=fract).replace('.', '')
+                            start_slot_x_formatted = "{:.{dec}f}".format(
+                                start_slot_x, dec=fract
+                            ).replace(".", "")
+                            start_slot_y_formatted = "{:.{dec}f}".format(
+                                start_slot_y, dec=fract
+                            ).replace(".", "")
+                            stop_slot_x_formatted = "{:.{dec}f}".format(
+                                stop_slot_x, dec=fract
+                            ).replace(".", "")
+                            stop_slot_y_formatted = "{:.{dec}f}".format(
+                                stop_slot_y, dec=fract
+                            ).replace(".", "")
 
                             # extract whole part and decimal part
-                            start_slot_x_formatted = start_slot_x_formatted.partition('.')
-                            start_slot_y_formatted = start_slot_y_formatted.partition('.')
-                            stop_slot_x_formatted = stop_slot_x_formatted.partition('.')
-                            stop_slot_y_formatted = stop_slot_y_formatted.partition('.')
+                            start_slot_x_formatted = start_slot_x_formatted.partition(".")
+                            start_slot_y_formatted = start_slot_y_formatted.partition(".")
+                            stop_slot_x_formatted = stop_slot_x_formatted.partition(".")
+                            stop_slot_y_formatted = stop_slot_y_formatted.partition(".")
 
                             # left padd the 'whole' part with zeros
-                            start_x_whole = start_slot_x_formatted[0].rjust(whole, '0')
-                            start_y_whole = start_slot_y_formatted[0].rjust(whole, '0')
-                            stop_x_whole = stop_slot_x_formatted[0].rjust(whole, '0')
-                            stop_y_whole = stop_slot_y_formatted[0].rjust(whole, '0')
+                            start_x_whole = start_slot_x_formatted[0].rjust(whole, "0")
+                            start_y_whole = start_slot_y_formatted[0].rjust(whole, "0")
+                            stop_x_whole = stop_slot_x_formatted[0].rjust(whole, "0")
+                            stop_y_whole = stop_slot_y_formatted[0].rjust(whole, "0")
 
                             # restore the coordinate padded in the left with 0 and added the decimal part
                             # without the decinal dot
@@ -780,15 +818,21 @@ class ExcellonObject(FlatCAMObj, Excellon):
                             stop_slot_x_formatted = stop_x_whole + stop_slot_x_formatted[2]
                             stop_slot_y_formatted = stop_y_whole + stop_slot_y_formatted[2]
 
-                            if slot_type == 'routing':
-                                excellon_code += "G00X{xstart}Y{ystart}\nM15\n".format(xstart=start_slot_x_formatted,
-                                                                                       ystart=start_slot_y_formatted)
-                                excellon_code += "G01X{xstop}Y{ystop}\nM16\n".format(xstop=stop_slot_x_formatted,
-                                                                                     ystop=stop_slot_y_formatted)
-                            elif slot_type == 'drilling':
-                                excellon_code += "{xstart}Y{ystart}G85X{xstop}Y{ystop}\nG05\n".format(
-                                    xstart=start_slot_x_formatted, ystart=start_slot_y_formatted,
+                            if slot_type == "routing":
+                                excellon_code += "G00X{xstart}Y{ystart}\nM15\n".format(
+                                    xstart=start_slot_x_formatted, ystart=start_slot_y_formatted
+                                )
+                                excellon_code += "G01X{xstop}Y{ystop}\nM16\n".format(
                                     xstop=stop_slot_x_formatted, ystop=stop_slot_y_formatted
+                                )
+                            elif slot_type == "drilling":
+                                excellon_code += (
+                                    "{xstart}Y{ystart}G85X{xstop}Y{ystop}\nG05\n".format(
+                                        xstart=start_slot_x_formatted,
+                                        ystart=start_slot_y_formatted,
+                                        xstop=stop_slot_x_formatted,
+                                        ystop=stop_slot_y_formatted,
+                                    )
                                 )
                         else:
                             start_slot_x = slot.x * factor
@@ -797,37 +841,55 @@ class ExcellonObject(FlatCAMObj, Excellon):
                             stop_slot_y = slot.y * factor
                             length = whole + fract
 
-                            start_slot_x_formatted = "{:.{dec}f}".format(start_slot_x, dec=fract).replace('.', '')
-                            start_slot_y_formatted = "{:.{dec}f}".format(start_slot_y, dec=fract).replace('.', '')
-                            stop_slot_x_formatted = "{:.{dec}f}".format(stop_slot_x, dec=fract).replace('.', '')
-                            stop_slot_y_formatted = "{:.{dec}f}".format(stop_slot_y, dec=fract).replace('.', '')
+                            start_slot_x_formatted = "{:.{dec}f}".format(
+                                start_slot_x, dec=fract
+                            ).replace(".", "")
+                            start_slot_y_formatted = "{:.{dec}f}".format(
+                                start_slot_y, dec=fract
+                            ).replace(".", "")
+                            stop_slot_x_formatted = "{:.{dec}f}".format(
+                                stop_slot_x, dec=fract
+                            ).replace(".", "")
+                            stop_slot_y_formatted = "{:.{dec}f}".format(
+                                stop_slot_y, dec=fract
+                            ).replace(".", "")
 
                             # pad with rear zeros
-                            start_slot_x_formatted.ljust(length, '0')
-                            start_slot_y_formatted.ljust(length, '0')
-                            stop_slot_x_formatted.ljust(length, '0')
-                            stop_slot_y_formatted.ljust(length, '0')
+                            start_slot_x_formatted.ljust(length, "0")
+                            start_slot_y_formatted.ljust(length, "0")
+                            stop_slot_x_formatted.ljust(length, "0")
+                            stop_slot_y_formatted.ljust(length, "0")
 
-                            if slot_type == 'routing':
-                                excellon_code += "G00X{xstart}Y{ystart}\nM15\n".format(xstart=start_slot_x_formatted,
-                                                                                       ystart=start_slot_y_formatted)
-                                excellon_code += "G01X{xstop}Y{ystop}\nM16\n".format(xstop=stop_slot_x_formatted,
-                                                                                     ystop=stop_slot_y_formatted)
-                            elif slot_type == 'drilling':
-                                excellon_code += "{xstart}Y{ystart}G85X{xstop}Y{ystop}\nG05\n".format(
-                                    xstart=start_slot_x_formatted, ystart=start_slot_y_formatted,
+                            if slot_type == "routing":
+                                excellon_code += "G00X{xstart}Y{ystart}\nM15\n".format(
+                                    xstart=start_slot_x_formatted, ystart=start_slot_y_formatted
+                                )
+                                excellon_code += "G01X{xstop}Y{ystop}\nM16\n".format(
                                     xstop=stop_slot_x_formatted, ystop=stop_slot_y_formatted
+                                )
+                            elif slot_type == "drilling":
+                                excellon_code += (
+                                    "{xstart}Y{ystart}G85X{xstop}Y{ystop}\nG05\n".format(
+                                        xstart=start_slot_x_formatted,
+                                        ystart=start_slot_y_formatted,
+                                        xstop=stop_slot_x_formatted,
+                                        ystop=stop_slot_y_formatted,
+                                    )
                                 )
         except Exception as e:
             log.debug(str(e))
 
         if not has_drills and not has_slots:
-            log.debug("FlatCAMObj.ExcellonObject.export_excellon() --> Excellon Object is empty: no drills, no slots.")
-            return 'fail'
+            log.debug(
+                "FlatCAMObj.ExcellonObject.export_excellon() --> Excellon Object is empty: no drills, no slots."
+            )
+            return "fail"
 
         return slots_in_file, excellon_code
 
-    def generate_milling_drills(self, tools=None, outname=None, tooldia=None, plot=False, use_thread=False):
+    def generate_milling_drills(
+        self, tools=None, outname=None, tooldia=None, plot=False, use_thread=False
+    ):
         """
         Will generate an Geometry Object allowing to cut a drill hole instead of drilling it.
 
@@ -866,7 +928,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
 
         sort = []
         for k, v in self.tools.items():
-            sort.append((k, v['tooldia']))
+            sort.append((k, v["tooldia"]))
         sorted_tools = sorted(sort, key=lambda t1: t1[1])
 
         if tools == "all":
@@ -874,16 +936,21 @@ class ExcellonObject(FlatCAMObj, Excellon):
             log.debug("Tools 'all' and sorted are: %s" % str(tools))
 
         if len(tools) == 0:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Please select one or more tools from the list and try again."))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s"
+                % _("Please select one or more tools from the list and try again.")
+            )
             return False, "Error: No tools."
 
         for tool in tools:
             if tooldia > self.tools[tool]["tooldia"]:
-                mseg = '[ERROR_NOTCL] %s %s: %s (tool = %s, hole = %s)' % (_("Milling tool for DRILLS is larger than hole size. Cancelled."),
-                                                    _("Tool"),
-                                                    str(tool),
-						    str(tooldia),
-						    str(self.tools[tool]["tooldia"]))
+                mseg = "[ERROR_NOTCL] %s %s: %s (tool = %s, hole = %s)" % (
+                    _("Milling tool for DRILLS is larger than hole size. Cancelled."),
+                    _("Tool"),
+                    str(tool),
+                    str(tooldia),
+                    str(self.tools[tool]["tooldia"]),
+                )
                 self.app.inform.emit(mseg)
                 return False, "Error: Milling tool is larger than hole."
 
@@ -897,7 +964,9 @@ class ExcellonObject(FlatCAMObj, Excellon):
             :return:
             :rtype:
             """
-            assert geo_obj.kind == 'geometry', "Initializer expected a GeometryObject, got %s" % type(geo_obj)
+            assert (
+                geo_obj.kind == "geometry"
+            ), "Initializer expected a GeometryObject, got %s" % type(geo_obj)
 
             # ## Add properties to the object
 
@@ -906,8 +975,8 @@ class ExcellonObject(FlatCAMObj, Excellon):
             # insert an information only element in the front
             tool_table_items.insert(0, [_("Tool_nr"), _("Diameter"), _("Drills_Nr"), _("Slots_Nr")])
 
-            geo_obj.options['Tools_in_use'] = tool_table_items
-            geo_obj.options['type'] = 'Excellon Geometry'
+            geo_obj.options["Tools_in_use"] = tool_table_items
+            geo_obj.options["type"] = "Excellon Geometry"
             geo_obj.options["cnctooldia"] = str(tooldia)
             geo_obj.options["multidepth"] = self.app.defaults["geometry_multidepth"]
             geo_obj.solid_geometry = []
@@ -916,13 +985,15 @@ class ExcellonObject(FlatCAMObj, Excellon):
             # for FlatCAM is 6 decimals,
             # we add a tenth of the minimum value, meaning 0.0000001, which from our point of view is "almost zero"
             for etool in tools:
-                for drill in self.tools[etool]['drills']:
-                    buffer_value = self.tools[etool]['tooldia'] / 2 - tooldia / 2
+                for drill in self.tools[etool]["drills"]:
+                    buffer_value = self.tools[etool]["tooldia"] / 2 - tooldia / 2
                     if buffer_value == 0:
                         geo_obj.solid_geometry.append(drill.buffer(0.0000001).exterior)
                     else:
                         geo_obj.solid_geometry.append(drill.buffer(buffer_value).exterior)
+
         if use_thread:
+
             def geo_thread(a_obj):
                 a_obj.app_obj.new_object("geometry", outname, geo_init, plot=plot)
 
@@ -930,13 +1001,15 @@ class ExcellonObject(FlatCAMObj, Excellon):
             self.app.collection.promise(outname)
 
             # Send to worker
-            self.app.worker_task.emit({'fcn': geo_thread, 'params': [self.app]})
+            self.app.worker_task.emit({"fcn": geo_thread, "params": [self.app]})
         else:
             self.app.app_obj.new_object("geometry", outname, geo_init, plot=plot)
 
         return True, ""
 
-    def generate_milling_slots(self, tools=None, outname=None, tooldia=None, plot=False, use_thread=False):
+    def generate_milling_slots(
+        self, tools=None, outname=None, tooldia=None, plot=False, use_thread=False
+    ):
         """
         Will generate an Geometry Object allowing to cut/mill a slot hole.
 
@@ -975,7 +1048,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
 
         sort = []
         for k, v in self.tools.items():
-            sort.append((k, v['tooldia']))
+            sort.append((k, v["tooldia"]))
         sorted_tools = sorted(sort, key=lambda t1: t1[1])
 
         if tools == "all":
@@ -983,20 +1056,27 @@ class ExcellonObject(FlatCAMObj, Excellon):
             log.debug("Tools 'all' and sorted are: %s" % str(tools))
 
         if len(tools) == 0:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Please select one or more tools from the list and try again."))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s"
+                % _("Please select one or more tools from the list and try again.")
+            )
             return False, "Error: No tools."
 
         for tool in tools:
             # I add the 0.0001 value to account for the rounding error in converting from IN to MM and reverse
-            adj_toolstable_tooldia = float('%.*f' % (self.decimals, float(tooldia)))
-            adj_file_tooldia = float('%.*f' % (self.decimals, float(self.tools[tool]["tooldia"])))
+            adj_toolstable_tooldia = float("%.*f" % (self.decimals, float(tooldia)))
+            adj_file_tooldia = float("%.*f" % (self.decimals, float(self.tools[tool]["tooldia"])))
             if adj_toolstable_tooldia > adj_file_tooldia + 0.0001:
-                self.app.inform.emit('[ERROR_NOTCL] %s' %
-                                     _("Milling tool for SLOTS is larger than hole size. Cancelled."))
+                self.app.inform.emit(
+                    "[ERROR_NOTCL] %s"
+                    % _("Milling tool for SLOTS is larger than hole size. Cancelled.")
+                )
                 return False, "Error: Milling tool is larger than hole."
 
         def geo_init(geo_obj, app_obj):
-            assert geo_obj.kind == 'geometry', "Initializer expected a GeometryObject, got %s" % type(geo_obj)
+            assert (
+                geo_obj.kind == "geometry"
+            ), "Initializer expected a GeometryObject, got %s" % type(geo_obj)
 
             # ## Add properties to the object
 
@@ -1005,8 +1085,8 @@ class ExcellonObject(FlatCAMObj, Excellon):
             # insert an information only element in the front
             tool_table_items.insert(0, [_("Tool_nr"), _("Diameter"), _("Drills_Nr"), _("Slots_Nr")])
 
-            geo_obj.options['Tools_in_use'] = tool_table_items
-            geo_obj.options['type'] = 'Excellon Geometry'
+            geo_obj.options["Tools_in_use"] = tool_table_items
+            geo_obj.options["type"] = "Excellon Geometry"
             geo_obj.options["cnctooldia"] = str(tooldia)
             geo_obj.options["multidepth"] = self.app.defaults["geometry_multidepth"]
             geo_obj.solid_geometry = []
@@ -1015,9 +1095,11 @@ class ExcellonObject(FlatCAMObj, Excellon):
             # for FlatCAM is 6 decimals,
             # we add a tenth of the minimum value, meaning 0.0000001, which from our point of view is "almost zero"
             for m_tool in tools:
-                for slot in self.tools[m_tool]['slots']:
-                    toolstable_tool = float('%.*f' % (self.decimals, float(tooldia)))
-                    file_tool = float('%.*f' % (self.decimals, float(self.tools[m_tool]["tooldia"])))
+                for slot in self.tools[m_tool]["slots"]:
+                    toolstable_tool = float("%.*f" % (self.decimals, float(tooldia)))
+                    file_tool = float(
+                        "%.*f" % (self.decimals, float(self.tools[m_tool]["tooldia"]))
+                    )
 
                     # I add the 0.0001 value to account for the rounding error in converting from IN to MM and reverse
                     # for the file_tool (tooldia actually)
@@ -1027,17 +1109,22 @@ class ExcellonObject(FlatCAMObj, Excellon):
                         stop = slot[1]
 
                         lines_string = LineString([start, stop])
-                        poly = lines_string.buffer(0.0000001, int(self.geo_steps_per_circle)).exterior
+                        poly = lines_string.buffer(
+                            0.0000001, int(self.geo_steps_per_circle)
+                        ).exterior
                         geo_obj.solid_geometry.append(poly)
                     else:
                         start = slot[0]
                         stop = slot[1]
 
                         lines_string = LineString([start, stop])
-                        poly = lines_string.buffer(buffer_value, int(self.geo_steps_per_circle)).exterior
+                        poly = lines_string.buffer(
+                            buffer_value, int(self.geo_steps_per_circle)
+                        ).exterior
                         geo_obj.solid_geometry.append(poly)
 
         if use_thread:
+
             def geo_thread(a_obj):
                 a_obj.app_obj.new_object("geometry", outname, geo_init, plot=plot)
 
@@ -1045,7 +1132,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
             self.app.collection.promise(outname)
 
             # Send to worker
-            self.app.worker_task.emit({'fcn': geo_thread, 'params': [self.app]})
+            self.app.worker_task.emit({"fcn": geo_thread, "params": [self.app]})
         else:
             self.app.app_obj.new_object("geometry", outname, geo_init, plot=plot)
 
@@ -1095,13 +1182,13 @@ class ExcellonObject(FlatCAMObj, Excellon):
     def on_solid_cb_click(self, *args):
         if self.muted_ui:
             return
-        self.read_form_item('solid')
+        self.read_form_item("solid")
         self.plot()
 
     def on_multicolored_cb_click(self, val):
         if self.muted_ui:
             return
-        self.read_form_item('multicolored')
+        self.read_form_item("multicolored")
         self.plot()
         if not val:
             self.build_ui()
@@ -1113,7 +1200,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
         if self.muted_ui:
             return
         # self.plot()
-        self.read_form_item('plot')
+        self.read_form_item("plot")
 
         self.ui_disconnect()
         cb_flag = self.ui.plot_cb.isChecked()
@@ -1151,19 +1238,22 @@ class ExcellonObject(FlatCAMObj, Excellon):
             return
 
         if self.app.is_legacy is False:
+
             def random_color():
                 r_color = np.random.rand(4)
                 r_color[3] = 1
                 return r_color
+
         else:
+
             def random_color():
                 while True:
                     r_color = np.random.rand(4)
                     r_color[3] = 1
 
-                    new_color = '#'
+                    new_color = "#"
                     for idx_c in range(len(r_color)):
-                        new_color += '%x' % int(r_color[idx_c] * 255)
+                        new_color += "%x" % int(r_color[idx_c] * 255)
                     # do it until a valid color is generated
                     # a valid color has the # symbol, another 6 chars for the color and the last 2 chars for alpha
                     # for a total of 9 chars
@@ -1187,31 +1277,33 @@ class ExcellonObject(FlatCAMObj, Excellon):
                     # set the color here so we have one color for each tool
                     geo_color = random_color()
                     if multicolored:
-                        self.tools[tool]['multicolor'] = geo_color
+                        self.tools[tool]["multicolor"] = geo_color
                     else:
-                        self.tools[tool]['multicolor'] = None
+                        self.tools[tool]["multicolor"] = None
 
                     # tool is a dict also
                     for geo in self.tools[tool]["solid_geometry"]:
-                        idx = self.add_shape(shape=geo,
-                                             color=geo_color if multicolored else self.outline_color,
-                                             face_color=geo_color if multicolored else self.fill_color,
-                                             visible=visible,
-                                             layer=2)
+                        idx = self.add_shape(
+                            shape=geo,
+                            color=geo_color if multicolored else self.outline_color,
+                            face_color=geo_color if multicolored else self.fill_color,
+                            visible=visible,
+                            layer=2,
+                        )
                         try:
                             self.shape_indexes_dict[tool].append(idx)
                         except KeyError:
                             self.shape_indexes_dict[tool] = [idx]
             else:
                 for tool in self.tools:
-                    for geo in self.tools[tool]['solid_geometry']:
-                        idx = self.add_shape(shape=geo.exterior, color='red', visible=visible)
+                    for geo in self.tools[tool]["solid_geometry"]:
+                        idx = self.add_shape(shape=geo.exterior, color="red", visible=visible)
                         try:
                             self.shape_indexes_dict[tool].append(idx)
                         except KeyError:
                             self.shape_indexes_dict[tool] = [idx]
                         for ints in geo.interiors:
-                            idx = self.add_shape(shape=ints, color='orange', visible=visible)
+                            idx = self.add_shape(shape=ints, color="orange", visible=visible)
                             try:
                                 self.shape_indexes_dict[tool].append(idx)
                             except KeyError:
@@ -1274,7 +1366,7 @@ class ExcellonObject(FlatCAMObj, Excellon):
             # copy options of the current excellon obj to the final excellon obj
             # only the last object options will survive
             for option in exc.options:
-                if option != 'name':
+                if option != "name":
                     try:
                         exc_final.options[option] = deepcopy(exc.options[option])
                     except Exception:
@@ -1296,30 +1388,32 @@ class ExcellonObject(FlatCAMObj, Excellon):
         if exc_final.tools and fuse_tools:
             toolid = 0
             for tool, tool_dict in exc_final.tools.items():
-                current_tooldia = float('%.*f' % (decimals_exc, tool_dict['tooldia']))
+                current_tooldia = float("%.*f" % (decimals_exc, tool_dict["tooldia"]))
                 toolid += 1
 
                 # calculate all diameters in fused_tools_dict
                 all_dia = []
                 if fused_tools_dict:
                     for f_tool in fused_tools_dict:
-                        all_dia.append(float('%.*f' % (decimals_exc, fused_tools_dict[f_tool]['tooldia'])))
+                        all_dia.append(
+                            float("%.*f" % (decimals_exc, fused_tools_dict[f_tool]["tooldia"]))
+                        )
 
                 if current_tooldia in all_dia:
                     # find tool for current_tooldia in fuse_tools
                     t = None
                     for f_tool in fused_tools_dict:
-                        if fused_tools_dict[f_tool]['tooldia'] == current_tooldia:
+                        if fused_tools_dict[f_tool]["tooldia"] == current_tooldia:
                             t = f_tool
                             break
                     if t:
-                        fused_tools_dict[t]['drills'] += tool_dict['drills']
-                        if 'slots' in tool_dict and tool_dict['slots']:
-                                fused_tools_dict[t]['slots'] += tool_dict['slots']
-                        fused_tools_dict[t]['solid_geometry'] += tool_dict['solid_geometry']
+                        fused_tools_dict[t]["drills"] += tool_dict["drills"]
+                        if "slots" in tool_dict and tool_dict["slots"]:
+                            fused_tools_dict[t]["slots"] += tool_dict["slots"]
+                        fused_tools_dict[t]["solid_geometry"] += tool_dict["solid_geometry"]
                 else:
                     fused_tools_dict[toolid] = tool_dict
-                    fused_tools_dict[toolid]['tooldia'] = current_tooldia
+                    fused_tools_dict[toolid]["tooldia"] = current_tooldia
 
             exc_final.tools = fused_tools_dict
 

@@ -25,11 +25,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolCalibration(AppTool):
@@ -49,7 +49,7 @@ class ToolCalibration(AppTool):
         self.toolName = self.ui.toolName
 
         self.mr = None
-        self.units = ''
+        self.units = ""
 
         # here store 4 points to be used for calibration
         self.click_points = [[], [], [], []]
@@ -115,10 +115,10 @@ class ToolCalibration(AppTool):
         self.app.ui.notebook.setTabText(2, _("Calibration Tool"))
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+E', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+E", **kwargs)
 
     def set_tool_ui(self):
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         if self.local_connected is True:
             self.disconnect_cal_events()
@@ -128,14 +128,14 @@ class ToolCalibration(AppTool):
 
         self.reset_calibration_points()
 
-        self.ui.cal_source_radio.set_value(self.app.defaults['tools_cal_calsource'])
-        self.ui.travelz_entry.set_value(self.app.defaults['tools_cal_travelz'])
-        self.ui.verz_entry.set_value(self.app.defaults['tools_cal_verz'])
-        self.ui.zeroz_cb.set_value(self.app.defaults['tools_cal_zeroz'])
-        self.ui.toolchangez_entry.set_value(self.app.defaults['tools_cal_toolchangez'])
-        self.ui.toolchange_xy_entry.set_value(self.app.defaults['tools_cal_toolchange_xy'])
+        self.ui.cal_source_radio.set_value(self.app.defaults["tools_cal_calsource"])
+        self.ui.travelz_entry.set_value(self.app.defaults["tools_cal_travelz"])
+        self.ui.verz_entry.set_value(self.app.defaults["tools_cal_verz"])
+        self.ui.zeroz_cb.set_value(self.app.defaults["tools_cal_zeroz"])
+        self.ui.toolchangez_entry.set_value(self.app.defaults["tools_cal_toolchangez"])
+        self.ui.toolchange_xy_entry.set_value(self.app.defaults["tools_cal_toolchange_xy"])
 
-        self.ui.second_point_radio.set_value(self.app.defaults['tools_cal_sec_point'])
+        self.ui.second_point_radio.set_value(self.app.defaults["tools_cal_sec_point"])
 
         self.ui.scalex_entry.set_value(1.0)
         self.ui.scaley_entry.set_value(1.0)
@@ -153,26 +153,32 @@ class ToolCalibration(AppTool):
         # calibrated object
         self.cal_object = None
 
-        self.app.inform.emit('%s...' % _("Tool initialized"))
+        self.app.inform.emit("%s..." % _("Tool initialized"))
 
     def on_obj_type_combo(self):
         obj_type = self.ui.obj_type_combo.currentIndex()
-        self.ui.object_combo.setRootModelIndex(self.app.collection.index(obj_type, 0, QtCore.QModelIndex()))
+        self.ui.object_combo.setRootModelIndex(
+            self.app.collection.index(obj_type, 0, QtCore.QModelIndex())
+        )
         # self.object_combo.setCurrentIndex(0)
-        self.ui.object_combo.obj_type = {
-            _("Gerber"): "Gerber", _("Excellon"): "Excellon"
-        }[self.ui.obj_type_combo.get_value()]
+        self.ui.object_combo.obj_type = {_("Gerber"): "Gerber", _("Excellon"): "Excellon"}[
+            self.ui.obj_type_combo.get_value()
+        ]
 
     def on_adj_obj_type_combo(self):
         obj_type = self.ui.adj_object_type_combo.currentIndex()
-        self.ui.adj_object_combo.setRootModelIndex(self.app.collection.index(obj_type, 0, QtCore.QModelIndex()))
+        self.ui.adj_object_combo.setRootModelIndex(
+            self.app.collection.index(obj_type, 0, QtCore.QModelIndex())
+        )
         # self.adj_object_combo.setCurrentIndex(0)
         self.ui.adj_object_combo.obj_type = {
-            _("Gerber"): "Gerber", _("Excellon"): "Excellon", _("Geometry"): "Geometry"
+            _("Gerber"): "Gerber",
+            _("Excellon"): "Excellon",
+            _("Geometry"): "Geometry",
         }[self.ui.adj_object_type_combo.get_value()]
 
     def on_cal_source_radio(self, val):
-        if val == 'object':
+        if val == "object":
             self.ui.obj_type_label.setDisabled(False)
             self.ui.obj_type_combo.setDisabled(False)
             self.ui.object_label.setDisabled(False)
@@ -185,13 +191,17 @@ class ToolCalibration(AppTool):
 
     def on_start_collect_points(self):
 
-        if self.ui.cal_source_radio.get_value() == 'object':
+        if self.ui.cal_source_radio.get_value() == "object":
             selection_index = self.ui.object_combo.currentIndex()
-            model_index = self.app.collection.index(selection_index, 0, self.ui.object_combo.rootModelIndex())
+            model_index = self.app.collection.index(
+                selection_index, 0, self.ui.object_combo.rootModelIndex()
+            )
             try:
                 self.target_obj = model_index.internalPointer().obj
             except AttributeError:
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no source FlatCAM object selected..."))
+                self.app.inform.emit(
+                    "[WARNING_NOTCL] %s" % _("There is no source FlatCAM object selected...")
+                )
                 return
 
         # disengage the grid snapping since it will be hard to find the drills on grid
@@ -201,10 +211,12 @@ class ToolCalibration(AppTool):
         else:
             self.grid_status_memory = False
 
-        self.mr = self.canvas.graph_event_connect('mouse_release', self.on_mouse_click_release)
+        self.mr = self.canvas.graph_event_connect("mouse_release", self.on_mouse_click_release)
 
         if self.app.is_legacy is False:
-            self.canvas.graph_event_disconnect('mouse_release', self.app.on_mouse_click_release_over_plot)
+            self.canvas.graph_event_disconnect(
+                "mouse_release", self.app.on_mouse_click_release_over_plot
+            )
         else:
             self.canvas.graph_event_disconnect(self.app.mr)
 
@@ -234,38 +246,38 @@ class ToolCalibration(AppTool):
                 self.app.delete_selection_shape()
                 self.app.selection_type = None
             else:
-                if self.ui.cal_source_radio.get_value() == 'object':
-                    if self.target_obj.kind.lower() == 'excellon':
+                if self.ui.cal_source_radio.get_value() == "object":
+                    if self.target_obj.kind.lower() == "excellon":
                         for tool, tool_dict in self.target_obj.tools.items():
-                            for geo in tool_dict['solid_geometry']:
+                            for geo in tool_dict["solid_geometry"]:
                                 if click_pt.within(geo):
                                     center_pt = geo.centroid
                                     self.click_points.append(
                                         [
-                                            float('%.*f' % (self.decimals, center_pt.x)),
-                                            float('%.*f' % (self.decimals, center_pt.y))
+                                            float("%.*f" % (self.decimals, center_pt.x)),
+                                            float("%.*f" % (self.decimals, center_pt.y)),
                                         ]
                                     )
                                     self.check_points()
                     else:
                         for apid, apid_val in self.target_obj.apertures.items():
-                            for geo_el in apid_val['geometry']:
-                                if 'solid' in geo_el:
-                                    if click_pt.within(geo_el['solid']):
-                                        if isinstance(geo_el['follow'], Point):
-                                            center_pt = geo_el['solid'].centroid
+                            for geo_el in apid_val["geometry"]:
+                                if "solid" in geo_el:
+                                    if click_pt.within(geo_el["solid"]):
+                                        if isinstance(geo_el["follow"], Point):
+                                            center_pt = geo_el["solid"].centroid
                                             self.click_points.append(
                                                 [
-                                                    float('%.*f' % (self.decimals, center_pt.x)),
-                                                    float('%.*f' % (self.decimals, center_pt.y))
+                                                    float("%.*f" % (self.decimals, center_pt.x)),
+                                                    float("%.*f" % (self.decimals, center_pt.y)),
                                                 ]
                                             )
                                             self.check_points()
                 else:
                     self.click_points.append(
                         [
-                            float('%.*f' % (self.decimals, click_pt.x)),
-                            float('%.*f' % (self.decimals, click_pt.y))
+                            float("%.*f" % (self.decimals, click_pt.x)),
+                            float("%.*f" % (self.decimals, click_pt.y)),
                         ]
                     )
                     self.check_points()
@@ -273,7 +285,7 @@ class ToolCalibration(AppTool):
             if len(self.click_points) != 4:
                 self.reset_calibration_points()
                 self.disconnect_cal_events()
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled by user request."))
+                self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled by user request."))
 
     def check_points(self):
         if len(self.click_points) == 1:
@@ -291,45 +303,48 @@ class ToolCalibration(AppTool):
         elif len(self.click_points) == 4:
             self.ui.top_right_coordx_tgt.set_value(self.click_points[3][0])
             self.ui.top_right_coordy_tgt.set_value(self.click_points[3][1])
-            self.app.inform.emit('[success] %s' % _("Done."))
+            self.app.inform.emit("[success] %s" % _("Done."))
             self.disconnect_cal_events()
 
     def reset_calibration_points(self):
         self.click_points = []
 
-        self.ui.bottom_left_coordx_tgt.set_value('')
-        self.ui.bottom_left_coordy_tgt.set_value('')
+        self.ui.bottom_left_coordx_tgt.set_value("")
+        self.ui.bottom_left_coordy_tgt.set_value("")
 
-        self.ui.bottom_right_coordx_tgt.set_value('')
-        self.ui.bottom_right_coordy_tgt.set_value('')
+        self.ui.bottom_right_coordx_tgt.set_value("")
+        self.ui.bottom_right_coordy_tgt.set_value("")
 
-        self.ui.top_left_coordx_tgt.set_value('')
-        self.ui.top_left_coordy_tgt.set_value('')
+        self.ui.top_left_coordx_tgt.set_value("")
+        self.ui.top_left_coordy_tgt.set_value("")
 
-        self.ui.top_right_coordx_tgt.set_value('')
-        self.ui.top_right_coordy_tgt.set_value('')
+        self.ui.top_right_coordx_tgt.set_value("")
+        self.ui.top_right_coordy_tgt.set_value("")
 
-        self.ui.bottom_right_coordx_found.set_value('')
-        self.ui.bottom_right_coordy_found.set_value('')
+        self.ui.bottom_right_coordx_found.set_value("")
+        self.ui.bottom_right_coordy_found.set_value("")
 
-        self.ui.top_left_coordx_found.set_value('')
-        self.ui.top_left_coordy_found.set_value('')
+        self.ui.top_left_coordx_found.set_value("")
+        self.ui.top_left_coordy_found.set_value("")
 
     def gcode_header(self):
         log.debug("ToolCalibration.gcode_header()")
         time_str = "{:%A, %d %B %Y at %H:%M}".format(datetime.now())
 
-        gcode = '(G-CODE GENERATED BY FLATCAM v%s - www.flatcam.org - Version Date: %s)\n' % \
-                (str(self.app.version), str(self.app.version_date)) + '\n'
+        gcode = (
+            "(G-CODE GENERATED BY FLATCAM v%s - www.flatcam.org - Version Date: %s)\n"
+            % (str(self.app.version), str(self.app.version_date))
+            + "\n"
+        )
 
-        gcode += '(Name: ' + _('Verification GCode for FlatCAM Calibration Tool') + ')\n'
+        gcode += "(Name: " + _("Verification GCode for FlatCAM Calibration Tool") + ")\n"
 
-        gcode += '(Units: ' + self.units.upper() + ')\n\n'
-        gcode += '(Created on ' + time_str + ')\n\n'
-        gcode += 'G20\n' if self.units.upper() == 'IN' else 'G21\n'
-        gcode += 'G90\n'
-        gcode += 'G17\n'
-        gcode += 'G94\n\n'
+        gcode += "(Units: " + self.units.upper() + ")\n\n"
+        gcode += "(Created on " + time_str + ")\n\n"
+        gcode += "G20\n" if self.units.upper() == "IN" else "G21\n"
+        gcode += "G90\n"
+        gcode += "G17\n"
+        gcode += "G94\n\n"
         return gcode
 
     def close_tab(self):
@@ -342,86 +357,88 @@ class ToolCalibration(AppTool):
     def generate_verification_gcode(self):
         sec_point = self.ui.second_point_radio.get_value()
 
-        travel_z = '%.*f' % (self.decimals, self.ui.travelz_entry.get_value())
-        toolchange_z = '%.*f' % (self.decimals, self.ui.toolchangez_entry.get_value())
+        travel_z = "%.*f" % (self.decimals, self.ui.travelz_entry.get_value())
+        toolchange_z = "%.*f" % (self.decimals, self.ui.toolchangez_entry.get_value())
         toolchange_xy_temp = self.ui.toolchange_xy_entry.get_value().split(",")
-        toolchange_xy = [float(eval(a)) for a in toolchange_xy_temp if a != '']
+        toolchange_xy = [float(eval(a)) for a in toolchange_xy_temp if a != ""]
 
-        verification_z = '%.*f' % (self.decimals, self.ui.verz_entry.get_value())
+        verification_z = "%.*f" % (self.decimals, self.ui.verz_entry.get_value())
 
         if len(self.click_points) != 4:
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled. Four points are needed for GCode generation."))
-            return 'fail'
+            self.app.inform.emit(
+                "[WARNING_NOTCL] %s" % _("Cancelled. Four points are needed for GCode generation.")
+            )
+            return "fail"
 
         gcode = self.gcode_header()
         if self.ui.zeroz_cb.get_value():
-            gcode += 'M5\n'
-            gcode += 'G00 Z%s\n' % toolchange_z
+            gcode += "M5\n"
+            gcode += "G00 Z%s\n" % toolchange_z
             if toolchange_xy:
-                gcode += 'G00 X%s Y%s\n' % (toolchange_xy[0], toolchange_xy[1])
-            gcode += 'M0\n'
-            gcode += 'G01 Z0\n'
-            gcode += 'M0\n'
-            gcode += 'G00 Z%s\n' % toolchange_z
-            gcode += 'M0\n'
+                gcode += "G00 X%s Y%s\n" % (toolchange_xy[0], toolchange_xy[1])
+            gcode += "M0\n"
+            gcode += "G01 Z0\n"
+            gcode += "M0\n"
+            gcode += "G00 Z%s\n" % toolchange_z
+            gcode += "M0\n"
 
         # first point: bottom - left -> ORIGIN set
-        gcode += 'G00 Z%s\n' % travel_z
-        gcode += 'G00 X%s Y%s\n' % (self.click_points[0][0], self.click_points[0][1])
-        gcode += 'G01 Z%s\n' % verification_z
-        gcode += 'M0\n'
+        gcode += "G00 Z%s\n" % travel_z
+        gcode += "G00 X%s Y%s\n" % (self.click_points[0][0], self.click_points[0][1])
+        gcode += "G01 Z%s\n" % verification_z
+        gcode += "M0\n"
 
-        if sec_point == 'tl':
+        if sec_point == "tl":
             # second point: top - left -> align the PCB to this point
-            gcode += 'G00 Z%s\n' % travel_z
-            gcode += 'G00 X%s Y%s\n' % (self.click_points[2][0], self.click_points[2][1])
-            gcode += 'G01 Z%s\n' % verification_z
-            gcode += 'M0\n'
+            gcode += "G00 Z%s\n" % travel_z
+            gcode += "G00 X%s Y%s\n" % (self.click_points[2][0], self.click_points[2][1])
+            gcode += "G01 Z%s\n" % verification_z
+            gcode += "M0\n"
 
             # third point: bottom - right -> check for scale on X axis or for skew on Y axis
-            gcode += 'G00 Z%s\n' % travel_z
-            gcode += 'G00 X%s Y%s\n' % (self.click_points[1][0], self.click_points[1][1])
-            gcode += 'G01 Z%s\n' % verification_z
-            gcode += 'M0\n'
+            gcode += "G00 Z%s\n" % travel_z
+            gcode += "G00 X%s Y%s\n" % (self.click_points[1][0], self.click_points[1][1])
+            gcode += "G01 Z%s\n" % verification_z
+            gcode += "M0\n"
 
             # forth point: top - right -> verification point
-            gcode += 'G00 Z%s\n' % travel_z
-            gcode += 'G00 X%s Y%s\n' % (self.click_points[3][0], self.click_points[3][1])
-            gcode += 'G01 Z%s\n' % verification_z
-            gcode += 'M0\n'
+            gcode += "G00 Z%s\n" % travel_z
+            gcode += "G00 X%s Y%s\n" % (self.click_points[3][0], self.click_points[3][1])
+            gcode += "G01 Z%s\n" % verification_z
+            gcode += "M0\n"
         else:
             # second point: bottom - right -> align the PCB to this point
-            gcode += 'G00 Z%s\n' % travel_z
-            gcode += 'G00 X%s Y%s\n' % (self.click_points[1][0], self.click_points[1][1])
-            gcode += 'G01 Z%s\n' % verification_z
-            gcode += 'M0\n'
+            gcode += "G00 Z%s\n" % travel_z
+            gcode += "G00 X%s Y%s\n" % (self.click_points[1][0], self.click_points[1][1])
+            gcode += "G01 Z%s\n" % verification_z
+            gcode += "M0\n"
 
             # third point: top - left -> check for scale on Y axis or for skew on X axis
-            gcode += 'G00 Z%s\n' % travel_z
-            gcode += 'G00 X%s Y%s\n' % (self.click_points[2][0], self.click_points[2][1])
-            gcode += 'G01 Z%s\n' % verification_z
-            gcode += 'M0\n'
+            gcode += "G00 Z%s\n" % travel_z
+            gcode += "G00 X%s Y%s\n" % (self.click_points[2][0], self.click_points[2][1])
+            gcode += "G01 Z%s\n" % verification_z
+            gcode += "M0\n"
 
             # forth point: top - right -> verification point
-            gcode += 'G00 Z%s\n' % travel_z
-            gcode += 'G00 X%s Y%s\n' % (self.click_points[3][0], self.click_points[3][1])
-            gcode += 'G01 Z%s\n' % verification_z
-            gcode += 'M0\n'
+            gcode += "G00 Z%s\n" % travel_z
+            gcode += "G00 X%s Y%s\n" % (self.click_points[3][0], self.click_points[3][1])
+            gcode += "G01 Z%s\n" % verification_z
+            gcode += "M0\n"
 
         # return to (toolchange_xy[0], toolchange_xy[1], toolchange_z) point for toolchange event
-        gcode += 'G00 Z%s\n' % travel_z
-        gcode += 'G00 X0 Y0\n'
-        gcode += 'G00 Z%s\n' % toolchange_z
+        gcode += "G00 Z%s\n" % travel_z
+        gcode += "G00 X0 Y0\n"
+        gcode += "G00 Z%s\n" % toolchange_z
         if toolchange_xy:
-            gcode += 'G00 X%s Y%s\n' % (toolchange_xy[0], toolchange_xy[1])
+            gcode += "G00 X%s Y%s\n" % (toolchange_xy[0], toolchange_xy[1])
 
-        gcode += 'M2'
+        gcode += "M2"
 
         self.gcode_editor_tab = AppTextEditor(app=self.app, plain_text=True)
 
         # add the tab if it was closed
-        self.app.ui.plot_tab_area.addTab(self.gcode_editor_tab, '%s' % _("Gcode Viewer"))
-        self.gcode_editor_tab.setObjectName('gcode_viewer_tab')
+        self.app.ui.plot_tab_area.addTab(self.gcode_editor_tab, "%s" % _("Gcode Viewer"))
+        self.gcode_editor_tab.setObjectName("gcode_viewer_tab")
 
         # delete the absolute and relative position and messages in the infobar
         self.app.ui.position_label.setText("")
@@ -438,18 +455,21 @@ class ToolCalibration(AppTool):
         try:
             self.gcode_editor_tab.load_text(gcode, move_to_start=True, clear_text=True)
         except Exception as e:
-            self.app.inform.emit('[ERROR] %s %s' % ('ERROR -->', str(e)))
+            self.app.inform.emit("[ERROR] %s %s" % ("ERROR -->", str(e)))
             return
 
         self.gcode_editor_tab.t_frame.show()
         self.app.proc_container.view.set_idle()
 
-        self.app.inform.emit('[success] %s...' % _('Loaded Machine Code into Code Editor'))
+        self.app.inform.emit("[success] %s..." % _("Loaded Machine Code into Code Editor"))
 
         _filter_ = "G-Code Files (*.nc);;All Files (*.*)"
         self.gcode_editor_tab.buttonSave.clicked.disconnect()
         self.gcode_editor_tab.buttonSave.clicked.connect(
-            lambda: self.gcode_editor_tab.handleSaveGCode(name='fc_ver_gcode', filt=_filter_, callback=self.close_tab))
+            lambda: self.gcode_editor_tab.handleSaveGCode(
+                name="fc_ver_gcode", filt=_filter_, callback=self.close_tab
+            )
+        )
 
     def calculate_factors(self):
         origin_x = self.click_points[0][0]
@@ -484,24 +504,24 @@ class ToolCalibration(AppTool):
         # ------------------------------------------------------------------------------- #
         # --------------------------- FACTORS CALCULUS ---------------------------------- #
         # ------------------------------------------------------------------------------- #
-        if bot_right_dx != float('%.*f' % (self.decimals, bot_right_x)):
+        if bot_right_dx != float("%.*f" % (self.decimals, bot_right_x)):
             # we have scale on X
             scale_x = (bot_right_dx / (bot_right_x - origin_x)) + 1
             self.ui.scalex_entry.set_value(scale_x)
 
-        if top_left_dy != float('%.*f' % (self.decimals, top_left_y)):
+        if top_left_dy != float("%.*f" % (self.decimals, top_left_y)):
             # we have scale on Y
             scale_y = (top_left_dy / (top_left_y - origin_y)) + 1
             self.ui.scaley_entry.set_value(scale_y)
 
-        if top_left_dx != float('%.*f' % (self.decimals, top_left_x)):
+        if top_left_dx != float("%.*f" % (self.decimals, top_left_x)):
             # we have skew on X
             dx = top_left_dx
             dy = top_left_y - origin_y
             skew_angle_x = math.degrees(math.atan(dx / dy))
             self.ui.skewx_entry.set_value(skew_angle_x)
 
-        if bot_right_dy != float('%.*f' % (self.decimals, bot_right_y)):
+        if bot_right_dy != float("%.*f" % (self.decimals, bot_right_y)):
             # we have skew on Y
             dx = bot_right_x - origin_x
             dy = bot_right_dy + origin_y
@@ -533,17 +553,17 @@ class ToolCalibration(AppTool):
         self.click_points[2] = [tl_pt[0], tl_pt[1]]
         self.click_points[3] = [tr_pt[0], tr_pt[1]]
 
-        self.ui.bottom_left_coordx_tgt.set_value(float('%.*f' % (self.decimals, bl_pt[0])))
-        self.ui.bottom_left_coordy_tgt.set_value(float('%.*f' % (self.decimals, bl_pt[1])))
+        self.ui.bottom_left_coordx_tgt.set_value(float("%.*f" % (self.decimals, bl_pt[0])))
+        self.ui.bottom_left_coordy_tgt.set_value(float("%.*f" % (self.decimals, bl_pt[1])))
 
-        self.ui.bottom_right_coordx_tgt.set_value(float('%.*f' % (self.decimals, br_pt[0])))
-        self.ui.bottom_right_coordy_tgt.set_value(float('%.*f' % (self.decimals, br_pt[1])))
+        self.ui.bottom_right_coordx_tgt.set_value(float("%.*f" % (self.decimals, br_pt[0])))
+        self.ui.bottom_right_coordy_tgt.set_value(float("%.*f" % (self.decimals, br_pt[1])))
 
-        self.ui.top_left_coordx_tgt.set_value(float('%.*f' % (self.decimals, tl_pt[0])))
-        self.ui.top_left_coordy_tgt.set_value(float('%.*f' % (self.decimals, tl_pt[1])))
+        self.ui.top_left_coordx_tgt.set_value(float("%.*f" % (self.decimals, tl_pt[0])))
+        self.ui.top_left_coordy_tgt.set_value(float("%.*f" % (self.decimals, tl_pt[1])))
 
-        self.ui.top_right_coordx_tgt.set_value(float('%.*f' % (self.decimals, tr_pt[0])))
-        self.ui.top_right_coordy_tgt.set_value(float('%.*f' % (self.decimals, tr_pt[1])))
+        self.ui.top_right_coordx_tgt.set_value(float("%.*f" % (self.decimals, tr_pt[0])))
+        self.ui.top_right_coordy_tgt.set_value(float("%.*f" % (self.decimals, tr_pt[1])))
 
     def on_scale_button(self):
         scalex_fact = self.ui.scalex_entry.get_value()
@@ -564,7 +584,7 @@ class ToolCalibration(AppTool):
             [bl_scaled.x, bl_scaled.y],
             [br_scaled.x, br_scaled.y],
             [tl_scaled.x, tl_scaled.y],
-            [tr_scaled.x, tr_scaled.y]
+            [tr_scaled.x, tr_scaled.y],
         ]
         self.target_values_in_table = scaled_values
 
@@ -587,25 +607,27 @@ class ToolCalibration(AppTool):
             [bl_skewed.x, bl_skewed.y],
             [br_skewed.x, br_skewed.y],
             [tl_skewed.x, tl_skewed.y],
-            [tr_skewed.x, tr_skewed.y]
+            [tr_skewed.x, tr_skewed.y],
         ]
         self.target_values_in_table = skewed_values
 
     def on_cal_button_click(self):
         # get the FlatCAM object to calibrate
         selection_index = self.ui.adj_object_combo.currentIndex()
-        model_index = self.app.collection.index(selection_index, 0, self.ui.adj_object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.adj_object_combo.rootModelIndex()
+        )
 
         try:
             self.cal_object = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolCalibration.on_cal_button_click() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("No object is selected."))
-            return 'fail'
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("No object is selected."))
+            return "fail"
 
         obj_name = self.cal_object.options["name"] + "_calibrated"
 
-        self.app.worker_task.emit({'fcn': self.new_calibrated_object, 'params': [obj_name]})
+        self.app.worker_task.emit({"fcn": self.new_calibrated_object, "params": [obj_name]})
 
     def new_calibrated_object(self, obj_name):
 
@@ -614,7 +636,7 @@ class ToolCalibration(AppTool):
             origin_y = self.click_points[0][1]
         except IndexError as e:
             log.debug("ToolCalibration.new_calibrated_object() --> %s" % str(e))
-            return 'fail'
+            return "fail"
 
         scalex = self.ui.scalex_entry.get_value()
         scaley = self.ui.scaley_entry.get_value()
@@ -639,7 +661,9 @@ class ToolCalibration(AppTool):
                 if obj.tools:
                     obj_init.tools = deepcopy(obj.tools)
             except Exception as ee:
-                app.log.debug("ToolCalibration.new_calibrated_object.initialize_geometry() --> %s" % str(ee))
+                app.log.debug(
+                    "ToolCalibration.new_calibrated_object.initialize_geometry() --> %s" % str(ee)
+                )
 
             obj_init.scale(xfactor=scalex, yfactor=scaley, point=(origin_x, origin_y))
             obj_init.skew(angle_x=skewx, angle_y=skewy, point=(origin_x, origin_y))
@@ -665,14 +689,17 @@ class ToolCalibration(AppTool):
                 if obj.tools:
                     obj_init.tools = deepcopy(obj.tools)
             except Exception as err:
-                log.debug("ToolCalibration.new_calibrated_object.initialize_gerber() --> %s" % str(err))
+                log.debug(
+                    "ToolCalibration.new_calibrated_object.initialize_gerber() --> %s" % str(err)
+                )
 
             obj_init.scale(xfactor=scalex, yfactor=scaley, point=(origin_x, origin_y))
             obj_init.skew(angle_x=skewx, angle_y=skewy, point=(origin_x, origin_y))
 
             try:
-                obj_init.source_file = app_obj.f_handlers.export_gerber(obj_name=obj_name, filename=None,
-                                                                        local_use=obj_init, use_thread=False)
+                obj_init.source_file = app_obj.f_handlers.export_gerber(
+                    obj_name=obj_name, filename=None, local_use=obj_init, use_thread=False
+                )
             except (AttributeError, TypeError):
                 pass
 
@@ -689,23 +716,24 @@ class ToolCalibration(AppTool):
 
             obj_init.create_geometry()
 
-            obj_init.source_file = app_obj.f_handlers.export_excellon(obj_name=obj_name, local_use=obj, filename=None,
-                                                                      use_thread=False)
+            obj_init.source_file = app_obj.f_handlers.export_excellon(
+                obj_name=obj_name, local_use=obj, filename=None, use_thread=False
+            )
 
         obj = self.cal_object
         obj_name = obj_name
 
         if obj is None:
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("No object is selected."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("No object is selected."))
             log.debug("ToolCalibration.new_calibrated_object() --> No object to calibrate")
-            return 'fail'
+            return "fail"
 
         try:
-            if obj.kind.lower() == 'excellon':
+            if obj.kind.lower() == "excellon":
                 self.app.app_obj.new_object("excellon", str(obj_name), initialize_excellon)
-            elif obj.kind.lower() == 'gerber':
+            elif obj.kind.lower() == "gerber":
                 self.app.app_obj.new_object("gerber", str(obj_name), initialize_gerber)
-            elif obj.kind.lower() == 'geometry':
+            elif obj.kind.lower() == "geometry":
                 self.app.app_obj.new_object("geometry", str(obj_name), initialize_geometry)
         except Exception as e:
             log.debug("ToolCalibration.new_calibrated_object() --> %s" % str(e))
@@ -716,18 +744,24 @@ class ToolCalibration(AppTool):
         if self.grid_status_memory is True:
             self.app.ui.grid_snap_btn.trigger()
 
-        self.app.mr = self.canvas.graph_event_connect('mouse_release', self.app.on_mouse_click_release_over_plot)
+        self.app.mr = self.canvas.graph_event_connect(
+            "mouse_release", self.app.on_mouse_click_release_over_plot
+        )
 
         if self.app.is_legacy is False:
-            self.canvas.graph_event_disconnect('mouse_release', self.on_mouse_click_release)
+            self.canvas.graph_event_disconnect("mouse_release", self.on_mouse_click_release)
         else:
             self.canvas.graph_event_disconnect(self.mr)
 
         self.local_connected = False
 
     def reset_fields(self):
-        self.ui.object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
-        self.ui.adj_object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.ui.object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
+        self.ui.adj_object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
 
 
 class CalibUI:
@@ -741,13 +775,15 @@ class CalibUI:
 
         # ## Title
         title_label = QtWidgets.QLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
 
         self.layout.addWidget(QtWidgets.QLabel(""))
@@ -759,17 +795,15 @@ class CalibUI:
         grid_lay.setColumnStretch(1, 1)
         grid_lay.setColumnStretch(2, 0)
 
-        self.gcode_title_label = QtWidgets.QLabel('<b>%s:</b>' % _('Parameters'))
+        self.gcode_title_label = QtWidgets.QLabel("<b>%s:</b>" % _("Parameters"))
         self.gcode_title_label.setToolTip(
             _("Parameters used when creating the GCode in this tool.")
         )
         grid_lay.addWidget(self.gcode_title_label, 0, 0, 1, 3)
 
         # Travel Z entry
-        travelz_lbl = QtWidgets.QLabel('%s:' % _("Travel Z"))
-        travelz_lbl.setToolTip(
-            _("Height (Z) for travelling between the points.")
-        )
+        travelz_lbl = QtWidgets.QLabel("%s:" % _("Travel Z"))
+        travelz_lbl.setToolTip(_("Height (Z) for travelling between the points."))
 
         self.travelz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.travelz_entry.set_range(-10000.0000, 10000.0000)
@@ -780,10 +814,8 @@ class CalibUI:
         grid_lay.addWidget(self.travelz_entry, 1, 1, 1, 2)
 
         # Verification Z entry
-        verz_lbl = QtWidgets.QLabel('%s:' % _("Verification Z"))
-        verz_lbl.setToolTip(
-            _("Height (Z) for checking the point.")
-        )
+        verz_lbl = QtWidgets.QLabel("%s:" % _("Verification Z"))
+        verz_lbl.setToolTip(_("Height (Z) for checking the point."))
 
         self.verz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.verz_entry.set_range(-10000.0000, 10000.0000)
@@ -794,19 +826,16 @@ class CalibUI:
         grid_lay.addWidget(self.verz_entry, 2, 1, 1, 2)
 
         # Zero the Z of the verification tool
-        self.zeroz_cb = FCCheckBox('%s' % _("Zero Z tool"))
+        self.zeroz_cb = FCCheckBox("%s" % _("Zero Z tool"))
         self.zeroz_cb.setToolTip(
-            _("Include a sequence to zero the height (Z)\n"
-              "of the verification tool.")
+            _("Include a sequence to zero the height (Z)\n" "of the verification tool.")
         )
 
         grid_lay.addWidget(self.zeroz_cb, 3, 0, 1, 3)
 
         # Toolchange Z entry
-        toolchangez_lbl = QtWidgets.QLabel('%s:' % _("Toolchange Z"))
-        toolchangez_lbl.setToolTip(
-            _("Height (Z) for mounting the verification probe.")
-        )
+        toolchangez_lbl = QtWidgets.QLabel("%s:" % _("Toolchange Z"))
+        toolchangez_lbl.setToolTip(_("Height (Z) for mounting the verification probe."))
 
         self.toolchangez_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.toolchangez_entry.set_range(0.0000, 10000.0000)
@@ -817,11 +846,13 @@ class CalibUI:
         grid_lay.addWidget(self.toolchangez_entry, 4, 1, 1, 2)
 
         # Toolchange X-Y entry
-        toolchangexy_lbl = QtWidgets.QLabel('%s:' % _('Toolchange X-Y'))
+        toolchangexy_lbl = QtWidgets.QLabel("%s:" % _("Toolchange X-Y"))
         toolchangexy_lbl.setToolTip(
-            _("Toolchange X,Y position.\n"
-              "If no value is entered then the current\n"
-              "(x, y) point will be used,")
+            _(
+                "Toolchange X,Y position.\n"
+                "If no value is entered then the current\n"
+                "(x, y) point will be used,"
+            )
         )
 
         self.toolchange_xy_entry = FCEntry()
@@ -831,12 +862,7 @@ class CalibUI:
 
         self.z_ois = OptionalInputSection(
             self.zeroz_cb,
-            [
-                toolchangez_lbl,
-                self.toolchangez_entry,
-                toolchangexy_lbl,
-                self.toolchange_xy_entry
-            ]
+            [toolchangez_lbl, self.toolchangez_entry, toolchangexy_lbl, self.toolchange_xy_entry],
         )
 
         separator_line1 = QtWidgets.QFrame()
@@ -845,15 +871,18 @@ class CalibUI:
         grid_lay.addWidget(separator_line1, 6, 0, 1, 3)
 
         # Second point choice
-        second_point_lbl = QtWidgets.QLabel('%s:' % _("Second point"))
+        second_point_lbl = QtWidgets.QLabel("%s:" % _("Second point"))
         second_point_lbl.setToolTip(
-            _("Second point in the Gcode verification can be:\n"
-              "- top-left -> the user will align the PCB vertically\n"
-              "- bottom-right -> the user will align the PCB horizontally")
+            _(
+                "Second point in the Gcode verification can be:\n"
+                "- top-left -> the user will align the PCB vertically\n"
+                "- bottom-right -> the user will align the PCB horizontally"
+            )
         )
-        self.second_point_radio = RadioSet([{'label': _('Top Left'), 'value': 'tl'},
-                                            {'label': _('Bottom Right'), 'value': 'br'}],
-                                           orientation='vertical')
+        self.second_point_radio = RadioSet(
+            [{"label": _("Top Left"), "value": "tl"}, {"label": _("Bottom Right"), "value": "br"}],
+            orientation="vertical",
+        )
 
         grid_lay.addWidget(second_point_lbl, 7, 0)
         grid_lay.addWidget(self.second_point_radio, 7, 1, 1, 2)
@@ -863,24 +892,31 @@ class CalibUI:
         separator_line1.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay.addWidget(separator_line1, 8, 0, 1, 3)
 
-        grid_lay.addWidget(QtWidgets.QLabel(''), 9, 0, 1, 3)
+        grid_lay.addWidget(QtWidgets.QLabel(""), 9, 0, 1, 3)
 
-        step_1 = QtWidgets.QLabel('<b>%s</b>' % _("STEP 1: Acquire Calibration Points"))
+        step_1 = QtWidgets.QLabel("<b>%s</b>" % _("STEP 1: Acquire Calibration Points"))
         step_1.setToolTip(
-            _("Pick four points by clicking on canvas.\n"
-              "Those four points should be in the four\n"
-              "(as much as possible) corners of the object.")
+            _(
+                "Pick four points by clicking on canvas.\n"
+                "Those four points should be in the four\n"
+                "(as much as possible) corners of the object."
+            )
         )
         grid_lay.addWidget(step_1, 10, 0, 1, 3)
 
         self.cal_source_lbl = QtWidgets.QLabel("<b>%s:</b>" % _("Source Type"))
-        self.cal_source_lbl.setToolTip(_("The source of calibration points.\n"
-                                         "It can be:\n"
-                                         "- Object -> click a hole geo for Excellon or a pad for Gerber\n"
-                                         "- Free -> click freely on canvas to acquire the calibration points"))
-        self.cal_source_radio = RadioSet([{'label': _('Object'), 'value': 'object'},
-                                          {'label': _('Free'), 'value': 'free'}],
-                                         stretch=False)
+        self.cal_source_lbl.setToolTip(
+            _(
+                "The source of calibration points.\n"
+                "It can be:\n"
+                "- Object -> click a hole geo for Excellon or a pad for Gerber\n"
+                "- Free -> click freely on canvas to acquire the calibration points"
+            )
+        )
+        self.cal_source_radio = RadioSet(
+            [{"label": _("Object"), "value": "object"}, {"label": _("Free"), "value": "free"}],
+            stretch=False,
+        )
 
         grid_lay.addWidget(self.cal_source_lbl, 11, 0)
         grid_lay.addWidget(self.cal_source_radio, 11, 1, 1, 2)
@@ -891,7 +927,9 @@ class CalibUI:
         self.obj_type_combo.addItem(_("Gerber"))
         self.obj_type_combo.addItem(_("Excellon"))
 
-        self.obj_type_combo.setItemIcon(0, QtGui.QIcon(self.app.resource_location + "/flatcam_icon16.png"))
+        self.obj_type_combo.setItemIcon(
+            0, QtGui.QIcon(self.app.resource_location + "/flatcam_icon16.png")
+        )
         self.obj_type_combo.setItemIcon(1, QtGui.QIcon(self.app.resource_location + "/drill16.png"))
 
         grid_lay.addWidget(self.obj_type_label, 12, 0)
@@ -910,10 +948,9 @@ class CalibUI:
         grid_lay.addWidget(self.object_label, 13, 0, 1, 3)
         grid_lay.addWidget(self.object_combo, 14, 0, 1, 3)
 
-        self.points_table_label = QtWidgets.QLabel('<b>%s</b>' % _('Calibration Points'))
+        self.points_table_label = QtWidgets.QLabel("<b>%s</b>" % _("Calibration Points"))
         self.points_table_label.setToolTip(
-            _("Contain the expected calibration points and the\n"
-              "ones measured.")
+            _("Contain the expected calibration points and the\n" "ones measured.")
         )
         grid_lay.addWidget(self.points_table_label, 15, 0, 1, 3)
 
@@ -923,24 +960,17 @@ class CalibUI:
         grid_lay.addWidget(self.points_table, 16, 0, 1, 3)
 
         self.points_table.setColumnCount(4)
-        self.points_table.setHorizontalHeaderLabels(
-            [
-                '#',
-                _("Name"),
-                _("Target"),
-                _("Found Delta")
-            ]
-        )
+        self.points_table.setHorizontalHeaderLabels(["#", _("Name"), _("Target"), _("Found Delta")])
         self.points_table.setRowCount(8)
         row = 0
 
         # BOTTOM LEFT
-        id_item_1 = QtWidgets.QTableWidgetItem('%d' % 1)
+        id_item_1 = QtWidgets.QTableWidgetItem("%d" % 1)
         flags = QtCore.Qt.ItemIsEnabled
         id_item_1.setFlags(flags)
         self.points_table.setItem(row, 0, id_item_1)  # Tool name/id
 
-        self.bottom_left_coordx_lbl = QtWidgets.QLabel('%s' % _('Bot Left X'))
+        self.bottom_left_coordx_lbl = QtWidgets.QLabel("%s" % _("Bot Left X"))
         self.points_table.setCellWidget(row, 1, self.bottom_left_coordx_lbl)
         self.bottom_left_coordx_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.bottom_left_coordx_tgt)
@@ -949,7 +979,7 @@ class CalibUI:
         self.points_table.setCellWidget(row, 3, self.bottom_left_coordx_found)
         row += 1
 
-        self.bottom_left_coordy_lbl = QtWidgets.QLabel('%s' % _('Bot Left Y'))
+        self.bottom_left_coordy_lbl = QtWidgets.QLabel("%s" % _("Bot Left Y"))
         self.points_table.setCellWidget(row, 1, self.bottom_left_coordy_lbl)
         self.bottom_left_coordy_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.bottom_left_coordy_tgt)
@@ -962,12 +992,12 @@ class CalibUI:
         row += 1
 
         # BOTTOM RIGHT
-        id_item_2 = QtWidgets.QTableWidgetItem('%d' % 2)
+        id_item_2 = QtWidgets.QTableWidgetItem("%d" % 2)
         flags = QtCore.Qt.ItemIsEnabled
         id_item_2.setFlags(flags)
         self.points_table.setItem(row, 0, id_item_2)  # Tool name/id
 
-        self.bottom_right_coordx_lbl = QtWidgets.QLabel('%s' % _('Bot Right X'))
+        self.bottom_right_coordx_lbl = QtWidgets.QLabel("%s" % _("Bot Right X"))
         self.points_table.setCellWidget(row, 1, self.bottom_right_coordx_lbl)
         self.bottom_right_coordx_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.bottom_right_coordx_tgt)
@@ -977,7 +1007,7 @@ class CalibUI:
 
         row += 1
 
-        self.bottom_right_coordy_lbl = QtWidgets.QLabel('%s' % _('Bot Right Y'))
+        self.bottom_right_coordy_lbl = QtWidgets.QLabel("%s" % _("Bot Right Y"))
         self.points_table.setCellWidget(row, 1, self.bottom_right_coordy_lbl)
         self.bottom_right_coordy_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.bottom_right_coordy_tgt)
@@ -987,12 +1017,12 @@ class CalibUI:
         row += 1
 
         # TOP LEFT
-        id_item_3 = QtWidgets.QTableWidgetItem('%d' % 3)
+        id_item_3 = QtWidgets.QTableWidgetItem("%d" % 3)
         flags = QtCore.Qt.ItemIsEnabled
         id_item_3.setFlags(flags)
         self.points_table.setItem(row, 0, id_item_3)  # Tool name/id
 
-        self.top_left_coordx_lbl = QtWidgets.QLabel('%s' % _('Top Left X'))
+        self.top_left_coordx_lbl = QtWidgets.QLabel("%s" % _("Top Left X"))
         self.points_table.setCellWidget(row, 1, self.top_left_coordx_lbl)
         self.top_left_coordx_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.top_left_coordx_tgt)
@@ -1001,7 +1031,7 @@ class CalibUI:
         self.points_table.setCellWidget(row, 3, self.top_left_coordx_found)
         row += 1
 
-        self.top_left_coordy_lbl = QtWidgets.QLabel('%s' % _('Top Left Y'))
+        self.top_left_coordy_lbl = QtWidgets.QLabel("%s" % _("Top Left Y"))
         self.points_table.setCellWidget(row, 1, self.top_left_coordy_lbl)
         self.top_left_coordy_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.top_left_coordy_tgt)
@@ -1011,12 +1041,12 @@ class CalibUI:
         row += 1
 
         # TOP RIGHT
-        id_item_4 = QtWidgets.QTableWidgetItem('%d' % 4)
+        id_item_4 = QtWidgets.QTableWidgetItem("%d" % 4)
         flags = QtCore.Qt.ItemIsEnabled
         id_item_4.setFlags(flags)
         self.points_table.setItem(row, 0, id_item_4)  # Tool name/id
 
-        self.top_right_coordx_lbl = QtWidgets.QLabel('%s' % _('Top Right X'))
+        self.top_right_coordx_lbl = QtWidgets.QLabel("%s" % _("Top Right X"))
         self.points_table.setCellWidget(row, 1, self.top_right_coordx_lbl)
         self.top_right_coordx_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.top_right_coordx_tgt)
@@ -1026,7 +1056,7 @@ class CalibUI:
         self.points_table.setCellWidget(row, 3, self.top_right_coordx_found)
         row += 1
 
-        self.top_right_coordy_lbl = QtWidgets.QLabel('%s' % _('Top Right Y'))
+        self.top_right_coordy_lbl = QtWidgets.QLabel("%s" % _("Top Right Y"))
         self.points_table.setCellWidget(row, 1, self.top_right_coordy_lbl)
         self.top_right_coordy_tgt = EvalEntry()
         self.points_table.setCellWidget(row, 2, self.top_right_coordy_tgt)
@@ -1061,17 +1091,21 @@ class CalibUI:
         # ## Get Points Button
         self.start_button = QtWidgets.QPushButton(_("Get Points"))
         self.start_button.setToolTip(
-            _("Pick four points by clicking on canvas if the source choice\n"
-              "is 'free' or inside the object geometry if the source is 'object'.\n"
-              "Those four points should be in the four squares of\n"
-              "the object.")
+            _(
+                "Pick four points by clicking on canvas if the source choice\n"
+                "is 'free' or inside the object geometry if the source is 'object'.\n"
+                "Those four points should be in the four squares of\n"
+                "the object."
+            )
         )
-        self.start_button.setStyleSheet("""
+        self.start_button.setStyleSheet(
+            """
                                QPushButton
                                {
                                    font-weight: bold;
                                }
-                               """)
+                               """
+        )
         grid_lay.addWidget(self.start_button, 17, 0, 1, 3)
 
         separator_line = QtWidgets.QFrame()
@@ -1079,38 +1113,44 @@ class CalibUI:
         separator_line.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay.addWidget(separator_line, 18, 0, 1, 3)
 
-        grid_lay.addWidget(QtWidgets.QLabel(''), 19, 0)
+        grid_lay.addWidget(QtWidgets.QLabel(""), 19, 0)
 
         # STEP 2 #
-        step_2 = QtWidgets.QLabel('<b>%s</b>' % _("STEP 2: Verification GCode"))
+        step_2 = QtWidgets.QLabel("<b>%s</b>" % _("STEP 2: Verification GCode"))
         step_2.setToolTip(
-            _("Generate GCode file to locate and align the PCB by using\n"
-              "the four points acquired above.\n"
-              "The points sequence is:\n"
-              "- first point -> set the origin\n"
-              "- second point -> alignment point. Can be: top-left or bottom-right.\n"
-              "- third point -> check point. Can be: top-left or bottom-right.\n"
-              "- forth point -> final verification point. Just for evaluation.")
+            _(
+                "Generate GCode file to locate and align the PCB by using\n"
+                "the four points acquired above.\n"
+                "The points sequence is:\n"
+                "- first point -> set the origin\n"
+                "- second point -> alignment point. Can be: top-left or bottom-right.\n"
+                "- third point -> check point. Can be: top-left or bottom-right.\n"
+                "- forth point -> final verification point. Just for evaluation."
+            )
         )
         grid_lay.addWidget(step_2, 20, 0, 1, 3)
 
         # ## GCode Button
         self.gcode_button = QtWidgets.QPushButton(_("Generate GCode"))
         self.gcode_button.setToolTip(
-            _("Generate GCode file to locate and align the PCB by using\n"
-              "the four points acquired above.\n"
-              "The points sequence is:\n"
-              "- first point -> set the origin\n"
-              "- second point -> alignment point. Can be: top-left or bottom-right.\n"
-              "- third point -> check point. Can be: top-left or bottom-right.\n"
-              "- forth point -> final verification point. Just for evaluation.")
+            _(
+                "Generate GCode file to locate and align the PCB by using\n"
+                "the four points acquired above.\n"
+                "The points sequence is:\n"
+                "- first point -> set the origin\n"
+                "- second point -> alignment point. Can be: top-left or bottom-right.\n"
+                "- third point -> check point. Can be: top-left or bottom-right.\n"
+                "- forth point -> final verification point. Just for evaluation."
+            )
         )
-        self.gcode_button.setStyleSheet("""
+        self.gcode_button.setStyleSheet(
+            """
                                QPushButton
                                {
                                    font-weight: bold;
                                }
-                               """)
+                               """
+        )
         grid_lay.addWidget(self.gcode_button, 21, 0, 1, 3)
 
         separator_line1 = QtWidgets.QFrame()
@@ -1118,30 +1158,36 @@ class CalibUI:
         separator_line1.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay.addWidget(separator_line1, 22, 0, 1, 3)
 
-        grid_lay.addWidget(QtWidgets.QLabel(''), 23, 0, 1, 3)
+        grid_lay.addWidget(QtWidgets.QLabel(""), 23, 0, 1, 3)
 
         # STEP 3 #
-        step_3 = QtWidgets.QLabel('<b>%s</b>' % _("STEP 3: Adjustments"))
+        step_3 = QtWidgets.QLabel("<b>%s</b>" % _("STEP 3: Adjustments"))
         step_3.setToolTip(
-            _("Calculate Scale and Skew factors based on the differences (delta)\n"
-              "found when checking the PCB pattern. The differences must be filled\n"
-              "in the fields Found (Delta).")
+            _(
+                "Calculate Scale and Skew factors based on the differences (delta)\n"
+                "found when checking the PCB pattern. The differences must be filled\n"
+                "in the fields Found (Delta)."
+            )
         )
         grid_lay.addWidget(step_3, 24, 0, 1, 3)
 
         # ## Factors Button
         self.generate_factors_button = QtWidgets.QPushButton(_("Calculate Factors"))
         self.generate_factors_button.setToolTip(
-            _("Calculate Scale and Skew factors based on the differences (delta)\n"
-              "found when checking the PCB pattern. The differences must be filled\n"
-              "in the fields Found (Delta).")
+            _(
+                "Calculate Scale and Skew factors based on the differences (delta)\n"
+                "found when checking the PCB pattern. The differences must be filled\n"
+                "in the fields Found (Delta)."
+            )
         )
-        self.generate_factors_button.setStyleSheet("""
+        self.generate_factors_button.setStyleSheet(
+            """
                                QPushButton
                                {
                                    font-weight: bold;
                                }
-                               """)
+                               """
+        )
         grid_lay.addWidget(self.generate_factors_button, 25, 0, 1, 3)
 
         separator_line1 = QtWidgets.QFrame()
@@ -1149,20 +1195,17 @@ class CalibUI:
         separator_line1.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay.addWidget(separator_line1, 26, 0, 1, 3)
 
-        grid_lay.addWidget(QtWidgets.QLabel(''), 27, 0, 1, 3)
+        grid_lay.addWidget(QtWidgets.QLabel(""), 27, 0, 1, 3)
 
         # STEP 4 #
-        step_4 = QtWidgets.QLabel('<b>%s</b>' % _("STEP 4: Adjusted GCode"))
+        step_4 = QtWidgets.QLabel("<b>%s</b>" % _("STEP 4: Adjusted GCode"))
         step_4.setToolTip(
-            _("Generate verification GCode file adjusted with\n"
-              "the factors above.")
+            _("Generate verification GCode file adjusted with\n" "the factors above.")
         )
         grid_lay.addWidget(step_4, 28, 0, 1, 3)
 
         self.scalex_label = QtWidgets.QLabel(_("Scale Factor X:"))
-        self.scalex_label.setToolTip(
-            _("Factor for Scale action over X axis.")
-        )
+        self.scalex_label.setToolTip(_("Factor for Scale action over X axis."))
         self.scalex_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.scalex_entry.set_range(0, 10000.0000)
         self.scalex_entry.set_precision(self.decimals)
@@ -1172,9 +1215,7 @@ class CalibUI:
         grid_lay.addWidget(self.scalex_entry, 29, 1, 1, 2)
 
         self.scaley_label = QtWidgets.QLabel(_("Scale Factor Y:"))
-        self.scaley_label.setToolTip(
-            _("Factor for Scale action over Y axis.")
-        )
+        self.scaley_label.setToolTip(_("Factor for Scale action over Y axis."))
         self.scaley_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.scaley_entry.set_range(0, 10000.0000)
         self.scaley_entry.set_precision(self.decimals)
@@ -1184,22 +1225,19 @@ class CalibUI:
         grid_lay.addWidget(self.scaley_entry, 30, 1, 1, 2)
 
         self.scale_button = QtWidgets.QPushButton(_("Apply Scale Factors"))
-        self.scale_button.setToolTip(
-            _("Apply Scale factors on the calibration points.")
-        )
-        self.scale_button.setStyleSheet("""
+        self.scale_button.setToolTip(_("Apply Scale factors on the calibration points."))
+        self.scale_button.setStyleSheet(
+            """
                                       QPushButton
                                       {
                                           font-weight: bold;
                                       }
-                                      """)
+                                      """
+        )
         grid_lay.addWidget(self.scale_button, 31, 0, 1, 3)
 
         self.skewx_label = QtWidgets.QLabel(_("Skew Angle X:"))
-        self.skewx_label.setToolTip(
-            _("Angle, in degrees.\n"
-              "Float number between -360 and 359.")
-        )
+        self.skewx_label.setToolTip(_("Angle, in degrees.\n" "Float number between -360 and 359."))
         self.skewx_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.skewx_entry.set_range(-360, 360)
         self.skewx_entry.set_precision(self.decimals)
@@ -1209,10 +1247,7 @@ class CalibUI:
         grid_lay.addWidget(self.skewx_entry, 32, 1, 1, 2)
 
         self.skewy_label = QtWidgets.QLabel(_("Skew Angle Y:"))
-        self.skewy_label.setToolTip(
-            _("Angle, in degrees.\n"
-              "Float number between -360 and 359.")
-        )
+        self.skewy_label.setToolTip(_("Angle, in degrees.\n" "Float number between -360 and 359."))
         self.skewy_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.skewy_entry.set_range(-360, 360)
         self.skewy_entry.set_precision(self.decimals)
@@ -1222,15 +1257,15 @@ class CalibUI:
         grid_lay.addWidget(self.skewy_entry, 33, 1, 1, 2)
 
         self.skew_button = QtWidgets.QPushButton(_("Apply Skew Factors"))
-        self.skew_button.setToolTip(
-            _("Apply Skew factors on the calibration points.")
-        )
-        self.skew_button.setStyleSheet("""
+        self.skew_button.setToolTip(_("Apply Skew factors on the calibration points."))
+        self.skew_button.setStyleSheet(
+            """
                                       QPushButton
                                       {
                                           font-weight: bold;
                                       }
-                                      """)
+                                      """
+        )
         grid_lay.addWidget(self.skew_button, 34, 0, 1, 3)
 
         # final_factors_lbl = QtWidgets.QLabel('<b>%s</b>' % _("Final Factors"))
@@ -1294,17 +1329,21 @@ class CalibUI:
 
         self.adj_gcode_button = QtWidgets.QPushButton(_("Generate Adjusted GCode"))
         self.adj_gcode_button.setToolTip(
-            _("Generate verification GCode file adjusted with\n"
-              "the factors set above.\n"
-              "The GCode parameters can be readjusted\n"
-              "before clicking this button.")
+            _(
+                "Generate verification GCode file adjusted with\n"
+                "the factors set above.\n"
+                "The GCode parameters can be readjusted\n"
+                "before clicking this button."
+            )
         )
-        self.adj_gcode_button.setStyleSheet("""
+        self.adj_gcode_button.setStyleSheet(
+            """
                                QPushButton
                                {
                                    font-weight: bold;
                                }
-                               """)
+                               """
+        )
         grid_lay.addWidget(self.adj_gcode_button, 42, 0, 1, 3)
 
         separator_line1 = QtWidgets.QFrame()
@@ -1312,22 +1351,27 @@ class CalibUI:
         separator_line1.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay.addWidget(separator_line1, 43, 0, 1, 3)
 
-        grid_lay.addWidget(QtWidgets.QLabel(''), 44, 0, 1, 3)
+        grid_lay.addWidget(QtWidgets.QLabel(""), 44, 0, 1, 3)
 
         # STEP 5 #
-        step_5 = QtWidgets.QLabel('<b>%s</b>' % _("STEP 5: Calibrate FlatCAM Objects"))
+        step_5 = QtWidgets.QLabel("<b>%s</b>" % _("STEP 5: Calibrate FlatCAM Objects"))
         step_5.setToolTip(
-            _("Adjust the FlatCAM objects\n"
-              "with the factors determined and verified above.")
+            _("Adjust the FlatCAM objects\n" "with the factors determined and verified above.")
         )
         grid_lay.addWidget(step_5, 45, 0, 1, 3)
 
         self.adj_object_type_combo = FCComboBox()
         self.adj_object_type_combo.addItems([_("Gerber"), _("Excellon"), _("Geometry")])
 
-        self.adj_object_type_combo.setItemIcon(0, QtGui.QIcon(self.app.resource_location + "/flatcam_icon16.png"))
-        self.adj_object_type_combo.setItemIcon(1, QtGui.QIcon(self.app.resource_location + "/drill16.png"))
-        self.adj_object_type_combo.setItemIcon(2, QtGui.QIcon(self.app.resource_location + "/geometry16.png"))
+        self.adj_object_type_combo.setItemIcon(
+            0, QtGui.QIcon(self.app.resource_location + "/flatcam_icon16.png")
+        )
+        self.adj_object_type_combo.setItemIcon(
+            1, QtGui.QIcon(self.app.resource_location + "/drill16.png")
+        )
+        self.adj_object_type_combo.setItemIcon(
+            2, QtGui.QIcon(self.app.resource_location + "/geometry16.png")
+        )
 
         self.adj_object_type_label = QtWidgets.QLabel("%s:" % _("Adjusted object type"))
         self.adj_object_type_label.setToolTip(_("Type of the FlatCAM Object to be adjusted."))
@@ -1337,16 +1381,18 @@ class CalibUI:
 
         self.adj_object_combo = FCComboBox()
         self.adj_object_combo.setModel(self.app.collection)
-        self.adj_object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.adj_object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         self.adj_object_combo.is_last = True
         self.adj_object_combo.obj_type = {
-            _("Gerber"): "Gerber", _("Excellon"): "Excellon", _("Geometry"): "Geometry"
+            _("Gerber"): "Gerber",
+            _("Excellon"): "Excellon",
+            _("Geometry"): "Geometry",
         }[self.adj_object_type_combo.get_value()]
 
         self.adj_object_label = QtWidgets.QLabel("%s:" % _("Adjusted object selection"))
-        self.adj_object_label.setToolTip(
-            _("The FlatCAM Object to be adjusted.")
-        )
+        self.adj_object_label.setToolTip(_("The FlatCAM Object to be adjusted."))
 
         grid_lay.addWidget(self.adj_object_label, 48, 0, 1, 3)
         grid_lay.addWidget(self.adj_object_combo, 49, 0, 1, 3)
@@ -1354,15 +1400,16 @@ class CalibUI:
         # ## Adjust Objects Button
         self.cal_button = QtWidgets.QPushButton(_("Calibrate"))
         self.cal_button.setToolTip(
-            _("Adjust (scale and/or skew) the objects\n"
-              "with the factors determined above.")
+            _("Adjust (scale and/or skew) the objects\n" "with the factors determined above.")
         )
-        self.cal_button.setStyleSheet("""
+        self.cal_button.setStyleSheet(
+            """
                                QPushButton
                                {
                                    font-weight: bold;
                                }
-                               """)
+                               """
+        )
         grid_lay.addWidget(self.cal_button, 50, 0, 1, 3)
 
         separator_line2 = QtWidgets.QFrame()
@@ -1370,39 +1417,46 @@ class CalibUI:
         separator_line2.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay.addWidget(separator_line2, 51, 0, 1, 3)
 
-        grid_lay.addWidget(QtWidgets.QLabel(''), 52, 0, 1, 3)
+        grid_lay.addWidget(QtWidgets.QLabel(""), 52, 0, 1, 3)
 
         self.layout.addStretch()
 
         # ## Reset Tool
         self.reset_button = QtWidgets.QPushButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                QPushButton
                                {
                                    font-weight: bold;
                                }
-                               """)
+                               """
+        )
         self.layout.addWidget(self.reset_button)
         # #################################### FINSIHED GUI ###########################
         # #############################################################################
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

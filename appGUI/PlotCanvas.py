@@ -19,11 +19,11 @@ import builtins
 import numpy as np
 from vispy.geometry import Rect
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class PlotCanvas(QtCore.QObject, VisPyCanvas):
@@ -56,18 +56,18 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
 
         settings = QtCore.QSettings("Open Source", "FlatCAM")
         if settings.contains("theme"):
-            theme = settings.value('theme', type=str)
+            theme = settings.value("theme", type=str)
         else:
-            theme = 'white'
+            theme = "white"
 
-        if theme == 'white':
+        if theme == "white":
             self.line_color = (0.3, 0.0, 0.0, 1.0)
-            self.rect_hud_color = Color('#0000FF10')
-            self.text_hud_color = 'black'
+            self.rect_hud_color = Color("#0000FF10")
+            self.text_hud_color = "black"
         else:
             self.line_color = (0.4, 0.4, 0.4, 1.0)
-            self.rect_hud_color = Color('#80808040')
-            self.text_hud_color = 'white'
+            self.rect_hud_color = Color("#80808040")
+            self.text_hud_color = "white"
 
         # workspace lines; I didn't use the rectangle because I didn't want to add another VisPy Node,
         # which might decrease performance
@@ -77,53 +77,49 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         self.pagesize_dict = {}
         self.pagesize_dict.update(
             {
-                'A0': (841, 1189),
-                'A1': (594, 841),
-                'A2': (420, 594),
-                'A3': (297, 420),
-                'A4': (210, 297),
-                'A5': (148, 210),
-                'A6': (105, 148),
-                'A7': (74, 105),
-                'A8': (52, 74),
-                'A9': (37, 52),
-                'A10': (26, 37),
-
-                'B0': (1000, 1414),
-                'B1': (707, 1000),
-                'B2': (500, 707),
-                'B3': (353, 500),
-                'B4': (250, 353),
-                'B5': (176, 250),
-                'B6': (125, 176),
-                'B7': (88, 125),
-                'B8': (62, 88),
-                'B9': (44, 62),
-                'B10': (31, 44),
-
-                'C0': (917, 1297),
-                'C1': (648, 917),
-                'C2': (458, 648),
-                'C3': (324, 458),
-                'C4': (229, 324),
-                'C5': (162, 229),
-                'C6': (114, 162),
-                'C7': (81, 114),
-                'C8': (57, 81),
-                'C9': (40, 57),
-                'C10': (28, 40),
-
+                "A0": (841, 1189),
+                "A1": (594, 841),
+                "A2": (420, 594),
+                "A3": (297, 420),
+                "A4": (210, 297),
+                "A5": (148, 210),
+                "A6": (105, 148),
+                "A7": (74, 105),
+                "A8": (52, 74),
+                "A9": (37, 52),
+                "A10": (26, 37),
+                "B0": (1000, 1414),
+                "B1": (707, 1000),
+                "B2": (500, 707),
+                "B3": (353, 500),
+                "B4": (250, 353),
+                "B5": (176, 250),
+                "B6": (125, 176),
+                "B7": (88, 125),
+                "B8": (62, 88),
+                "B9": (44, 62),
+                "B10": (31, 44),
+                "C0": (917, 1297),
+                "C1": (648, 917),
+                "C2": (458, 648),
+                "C3": (324, 458),
+                "C4": (229, 324),
+                "C5": (162, 229),
+                "C6": (114, 162),
+                "C7": (81, 114),
+                "C8": (57, 81),
+                "C9": (40, 57),
+                "C10": (28, 40),
                 # American paper sizes
-                'LETTER': (8.5*25.4, 11*25.4),
-                'LEGAL': (8.5*25.4, 14*25.4),
-                'ELEVENSEVENTEEN': (11*25.4, 17*25.4),
-
+                "LETTER": (8.5 * 25.4, 11 * 25.4),
+                "LEGAL": (8.5 * 25.4, 14 * 25.4),
+                "ELEVENSEVENTEEN": (11 * 25.4, 17 * 25.4),
                 # From https://en.wikipedia.org/wiki/Paper_size
-                'JUNIOR_LEGAL': (5*25.4, 8*25.4),
-                'HALF_LETTER': (5.5*25.4, 8*25.4),
-                'GOV_LETTER': (8*25.4, 10.5*25.4),
-                'GOV_LEGAL': (8.5*25.4, 13*25.4),
-                'LEDGER': (17*25.4, 11*25.4),
+                "JUNIOR_LEGAL": (5 * 25.4, 8 * 25.4),
+                "HALF_LETTER": (5.5 * 25.4, 8 * 25.4),
+                "GOV_LETTER": (8 * 25.4, 10.5 * 25.4),
+                "GOV_LEGAL": (8.5 * 25.4, 13 * 25.4),
+                "LEDGER": (17 * 25.4, 11 * 25.4),
             }
         )
 
@@ -135,11 +131,13 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         self.container.addWidget(self.native)
 
         # ## AXIS # ##
-        self.v_line = InfiniteLine(pos=0, color=(0.70, 0.3, 0.3, 0.8), vertical=True,
-                                   parent=self.view.scene)
+        self.v_line = InfiniteLine(
+            pos=0, color=(0.70, 0.3, 0.3, 0.8), vertical=True, parent=self.view.scene
+        )
 
-        self.h_line = InfiniteLine(pos=0, color=(0.70, 0.3, 0.3, 0.8), vertical=False,
-                                   parent=self.view.scene)
+        self.h_line = InfiniteLine(
+            pos=0, color=(0.70, 0.3, 0.3, 0.8), vertical=False, parent=self.view.scene
+        )
 
         self.line_parent = None
         if self.fcapp.defaults["global_cursor_color_enabled"]:
@@ -147,16 +145,18 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         else:
             c_color = self.line_color
 
-        self.cursor_v_line = InfiniteLine(pos=None, color=c_color, vertical=True,
-                                          parent=self.line_parent)
+        self.cursor_v_line = InfiniteLine(
+            pos=None, color=c_color, vertical=True, parent=self.line_parent
+        )
 
-        self.cursor_h_line = InfiniteLine(pos=None, color=c_color, vertical=False,
-                                          parent=self.line_parent)
+        self.cursor_h_line = InfiniteLine(
+            pos=None, color=c_color, vertical=False, parent=self.line_parent
+        )
 
         # font size
         qsettings = QtCore.QSettings("Open Source", "FlatCAM")
         if qsettings.contains("hud_font_size"):
-            fsize = qsettings.value('hud_font_size', type=int)
+            fsize = qsettings.value("hud_font_size", type=int)
         else:
             fsize = 8
 
@@ -164,33 +164,54 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         units = self.fcapp.defaults["units"].lower()
 
         # coordinates and anchors
-        height = fsize * 11     # 90. Constant 11 is something that works
-        width = height * 2      # width is double the height = it is something that works
+        height = fsize * 11  # 90. Constant 11 is something that works
+        width = height * 2  # width is double the height = it is something that works
         center_x = (width / 2) + 5
         center_y = (height / 2) + 5
 
         # text
-        self.text_hud = Text('', color=self.text_hud_color, pos=(10, center_y), method='gpu', anchor_x='left',
-                             parent=None)
+        self.text_hud = Text(
+            "",
+            color=self.text_hud_color,
+            pos=(10, center_y),
+            method="gpu",
+            anchor_x="left",
+            parent=None,
+        )
         self.text_hud.font_size = fsize
-        self.text_hud.text = 'Dx:\t%s [%s]\nDy:\t%s [%s]\n\nX:  \t%s [%s]\nY:  \t%s [%s]' % \
-                             ('0.0000', units, '0.0000', units, '0.0000', units, '0.0000', units)
+        self.text_hud.text = "Dx:\t%s [%s]\nDy:\t%s [%s]\n\nX:  \t%s [%s]\nY:  \t%s [%s]" % (
+            "0.0000",
+            units,
+            "0.0000",
+            units,
+            "0.0000",
+            units,
+            "0.0000",
+            units,
+        )
 
         # rectangle
-        self.rect_hud = Rectangle(center=(center_x, center_y), width=width, height=height, radius=[5, 5, 5, 5],
-                                  border_color=self.rect_hud_color, color=self.rect_hud_color, parent=None)
+        self.rect_hud = Rectangle(
+            center=(center_x, center_y),
+            width=width,
+            height=height,
+            radius=[5, 5, 5, 5],
+            border_color=self.rect_hud_color,
+            color=self.rect_hud_color,
+            parent=None,
+        )
         self.rect_hud.set_gl_state(depth_test=False)
 
         # draw a rectangle made out of 4 lines on the canvas to serve as a hint for the work area
         # all CNC have a limited workspace
-        if self.fcapp.defaults['global_workspace'] is True:
+        if self.fcapp.defaults["global_workspace"] is True:
             self.draw_workspace(workspace_size=self.fcapp.defaults["global_workspaceT"])
 
         # HUD Display
         self.hud_enabled = False
 
         # enable the HUD if it is activated in FlatCAM Preferences
-        if self.fcapp.defaults['global_hud'] is True:
+        if self.fcapp.defaults["global_hud"] is True:
             self.on_toggle_hud(state=True, silent=True)
 
         # Axis Display
@@ -216,7 +237,7 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         self.freeze()
         self.fit_view()
 
-        self.graph_event_connect('mouse_wheel', self.on_mouse_scroll)
+        self.graph_event_connect("mouse_wheel", self.on_mouse_scroll)
 
     def on_toggle_axis(self, signal=None, state=None, silent=None):
         if not state:
@@ -224,21 +245,23 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
 
         if state:
             self.axis_enabled = True
-            self.fcapp.defaults['global_axis'] = True
+            self.fcapp.defaults["global_axis"] = True
             self.v_line.parent = self.view.scene
             self.h_line.parent = self.view.scene
-            self.fcapp.ui.axis_status_label.setStyleSheet("""
+            self.fcapp.ui.axis_status_label.setStyleSheet(
+                """
                                                           QLabel
                                                           {
                                                               color: black;
                                                               background-color: orange;
                                                           }
-                                                          """)
+                                                          """
+            )
             if silent is None:
                 self.fcapp.inform[str, bool].emit(_("Axis enabled."), False)
         else:
             self.axis_enabled = False
-            self.fcapp.defaults['global_axis'] = False
+            self.fcapp.defaults["global_axis"] = False
             self.v_line.parent = None
             self.h_line.parent = None
             self.fcapp.ui.axis_status_label.setStyleSheet("")
@@ -253,14 +276,16 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
             self.hud_enabled = True
             self.rect_hud.parent = self.view
             self.text_hud.parent = self.view
-            self.fcapp.defaults['global_hud'] = True
-            self.fcapp.ui.hud_label.setStyleSheet("""
+            self.fcapp.defaults["global_hud"] = True
+            self.fcapp.ui.hud_label.setStyleSheet(
+                """
                                                   QLabel
                                                   {
                                                       color: black;
                                                       background-color: mediumpurple;
                                                   }
-                                                  """)
+                                                  """
+            )
             if silent is None:
                 self.fcapp.inform[str, bool].emit(_("HUD enabled."), False)
 
@@ -268,7 +293,7 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
             self.hud_enabled = False
             self.rect_hud.parent = None
             self.text_hud.parent = None
-            self.fcapp.defaults['global_hud'] = False
+            self.fcapp.defaults["global_hud"] = False
             self.fcapp.ui.hud_label.setStyleSheet("")
             if silent is None:
                 self.fcapp.inform[str, bool].emit(_("HUD disabled."), False)
@@ -277,13 +302,13 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         state = not self.grid_lines_enabled
 
         if state:
-            self.fcapp.defaults['global_grid_lines'] = True
+            self.fcapp.defaults["global_grid_lines"] = True
             self.grid_lines_enabled = True
             self.grid.parent = self.view.scene
             if silent is None:
                 self.fcapp.inform[str, bool].emit(_("Grid enabled."), False)
         else:
-            self.fcapp.defaults['global_grid_lines'] = False
+            self.fcapp.defaults["global_grid_lines"] = False
             self.grid_lines_enabled = False
             self.grid.parent = None
             if silent is None:
@@ -305,15 +330,18 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         :return:
         """
         try:
-            if self.fcapp.defaults['units'].upper() == 'MM':
+            if self.fcapp.defaults["units"].upper() == "MM":
                 dims = self.pagesize_dict[workspace_size]
             else:
-                dims = (self.pagesize_dict[workspace_size][0]/25.4, self.pagesize_dict[workspace_size][1]/25.4)
+                dims = (
+                    self.pagesize_dict[workspace_size][0] / 25.4,
+                    self.pagesize_dict[workspace_size][1] / 25.4,
+                )
         except Exception as e:
             log.debug("PlotCanvas.draw_workspace() --> %s" % str(e))
             return
 
-        if self.fcapp.defaults['global_workspace_orientation'] == 'l':
+        if self.fcapp.defaults["global_workspace_orientation"] == "l":
             dims = (dims[1], dims[0])
 
         a = np.array([(0, 0), (dims[0], 0), (dims[0], dims[1]), (0, dims[1])])
@@ -323,18 +351,25 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         #                                antialias=True, method='agg', parent=self.view.scene)
         # else:
         #     self.workspace_line.parent = self.view.scene
-        self.workspace_line = Line(pos=np.array((a[0], a[1], a[2], a[3], a[0])), color=(0.70, 0.3, 0.3, 0.7),
-                                   antialias=True, method='agg', parent=self.view.scene)
+        self.workspace_line = Line(
+            pos=np.array((a[0], a[1], a[2], a[3], a[0])),
+            color=(0.70, 0.3, 0.3, 0.7),
+            antialias=True,
+            method="agg",
+            parent=self.view.scene,
+        )
 
         self.fcapp.ui.wplace_label.set_value(workspace_size[:3])
         self.fcapp.ui.wplace_label.setToolTip(workspace_size)
-        self.fcapp.ui.wplace_label.setStyleSheet("""
+        self.fcapp.ui.wplace_label.setStyleSheet(
+            """
                         QLabel
                         {
                             color: black;
                             background-color: olivedrab;
                         }
-                        """)
+                        """
+        )
 
     def delete_workspace(self):
         try:
@@ -423,8 +458,8 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
 
     def on_mouse_position(self, pos):
 
-        if self.fcapp.defaults['global_cursor_color_enabled']:
-            color = Color(self.fcapp.defaults['global_cursor_color']).rgba
+        if self.fcapp.defaults["global_cursor_color_enabled"]:
+            color = Color(self.fcapp.defaults["global_cursor_color"]).rgba
         else:
             color = self.line_color
 
@@ -441,7 +476,7 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
         curr_pos = event.pos
 
         # Controlled pan by mouse wheel
-        if 'Shift' in modifiers:
+        if "Shift" in modifiers:
             p1 = np.array(curr_pos)[:2]
 
             if event.delta[1] > 0:
@@ -450,7 +485,7 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
                 curr_pos[0] += pan_delta_x
             p2 = np.array(curr_pos)[:2]
             self.view.camera.pan(p2 - p1)
-        elif 'Control' in modifiers:
+        elif "Control" in modifiers:
             p1 = np.array(curr_pos)[:2]
 
             if event.delta[1] > 0:
@@ -465,10 +500,13 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
             pos = self.fcapp.geo_editor.snap(pos_canvas[0], pos_canvas[1])
 
             # Update cursor
-            self.fcapp.app_cursor.set_data(np.asarray([(pos[0], pos[1])]),
-                                           symbol='++', edge_color=self.fcapp.cursor_color_3D,
-                                           edge_width=self.fcapp.defaults["global_cursor_width"],
-                                           size=self.fcapp.defaults["global_cursor_size"])
+            self.fcapp.app_cursor.set_data(
+                np.asarray([(pos[0], pos[1])]),
+                symbol="++",
+                edge_color=self.fcapp.cursor_color_3D,
+                edge_width=self.fcapp.defaults["global_cursor_width"],
+                size=self.fcapp.defaults["global_cursor_size"],
+            )
 
     def new_text_group(self, collection=None):
         if collection:
@@ -530,7 +568,7 @@ class PlotCanvas(QtCore.QObject, VisPyCanvas):
 
         if not rect:
             try:
-                rect = Rect(loc[0]-20, loc[1]-20, 40, 40)
+                rect = Rect(loc[0] - 20, loc[1] - 20, 40, 40)
             except TypeError:
                 pass
 

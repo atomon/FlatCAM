@@ -2,11 +2,12 @@
 # Run kernprof -l -v gerber_parsing_line_profile_1.py
 
 import sys
-sys.path.append('../../')
+
+sys.path.append("../../")
 
 from flatcamParsers.ParseGerber import *
 
-log = logging.getLogger('base2')
+log = logging.getLogger("base2")
 log.setLevel(logging.WARNING)
 
 g = Gerber()

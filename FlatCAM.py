@@ -7,6 +7,7 @@ from app_Main import App
 from appGUI import VisPyPatches
 
 from multiprocessing import freeze_support
+
 # import copyreg
 # import types
 
@@ -24,12 +25,13 @@ def debug_trace():
     :return: None
     """
     from PyQt5.QtCore import pyqtRemoveInputHook
+
     # from pdb import set_trace
     pyqtRemoveInputHook()
     # set_trace()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # All X11 calling should be thread safe otherwise we have strange issues
     # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
     # NOTE: Never talk to the GUI from threads! This is why I commented the above.
@@ -42,16 +44,22 @@ if __name__ == '__main__':
         if minor_v >= MIN_VERSION_MINOR:
             pass
         else:
-            print("FlatCAM BETA uses PYTHON 3 or later. The version minimum is %s.%s\n"
-                  "Your Python version is: %s.%s" % (MIN_VERSION_MAJOR, MIN_VERSION_MINOR, str(major_v), str(minor_v)))
+            print(
+                "FlatCAM BETA uses PYTHON 3 or later. The version minimum is %s.%s\n"
+                "Your Python version is: %s.%s"
+                % (MIN_VERSION_MAJOR, MIN_VERSION_MINOR, str(major_v), str(minor_v))
+            )
 
             if minor_v >= 8:
                 os._exit(0)
             else:
                 sys.exit(0)
     else:
-        print("FlatCAM BETA uses PYTHON 3 or later. The version minimum is %s.%s\n"
-              "Your Python version is: %s.%s" % (MIN_VERSION_MAJOR, MIN_VERSION_MINOR, str(major_v), str(minor_v)))
+        print(
+            "FlatCAM BETA uses PYTHON 3 or later. The version minimum is %s.%s\n"
+            "Your Python version is: %s.%s"
+            % (MIN_VERSION_MAJOR, MIN_VERSION_MINOR, str(major_v), str(minor_v))
+        )
         sys.exit(0)
 
     debug_trace()
@@ -60,7 +68,7 @@ if __name__ == '__main__':
     # apply High DPI support
     settings = QSettings("Open Source", "FlatCAM")
     if settings.contains("hdpi"):
-        hdpi_support = settings.value('hdpi', type=int)
+        hdpi_support = settings.value("hdpi", type=int)
     else:
         hdpi_support = 0
 
@@ -87,7 +95,7 @@ if __name__ == '__main__':
     # apply style
     settings = QSettings("Open Source", "FlatCAM")
     if settings.contains("style"):
-        style = settings.value('style', type=str)
+        style = settings.value("style", type=str)
         app.setStyle(style)
 
     fc = App(qapp=app)

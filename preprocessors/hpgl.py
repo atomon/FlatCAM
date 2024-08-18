@@ -16,33 +16,33 @@ class hpgl(PreProc):
     coordinate_format = "%.*f"
 
     def start_code(self, p):
-        gcode = 'IN;\n'
-        gcode += 'PU;'
+        gcode = "IN;\n"
+        gcode += "PU;"
         return gcode
 
     def startz_code(self, p):
-        return ''
+        return ""
 
     def lift_code(self, p):
-        gcode = 'PU;' + '\n'
+        gcode = "PU;" + "\n"
         return gcode
 
     def down_code(self, p):
-        gcode = 'PD;' + '\n'
+        gcode = "PD;" + "\n"
         return gcode
 
     def toolchange_code(self, p):
-        return 'SP%d;' % int(p.tool)
+        return "SP%d;" % int(p.tool)
 
     def up_to_zero_code(self, p):
-        return ''
+        return ""
 
     def position_code(self, p):
-        units = str(p['units']).lower()
+        units = str(p["units"]).lower()
 
         # we work only with METRIC units because HPGL mention only metric units so if FlatCAM units are INCH we
         # transform them in METRIC
-        if units == 'in':
+        if units == "in":
             x = p.x * 25.4
             y = p.y * 25.4
         else:
@@ -64,8 +64,12 @@ class hpgl(PreProc):
         if y >= 32768:
             y = 32768
 
-        return ('PA' + self.coordinate_format + ',' + self.coordinate_format + ';') % \
-               (p.coords_decimals, x, p.coords_decimals, y)
+        return ("PA" + self.coordinate_format + "," + self.coordinate_format + ";") % (
+            p.coords_decimals,
+            x,
+            p.coords_decimals,
+            y,
+        )
 
     def rapid_code(self, p):
         return self.position_code(p).format(**p)
@@ -78,19 +82,19 @@ class hpgl(PreProc):
         return gcode
 
     def feedrate_code(self, p):
-        return ''
+        return ""
 
     def z_feedrate_code(self, p):
-        return ''
+        return ""
 
     def feedrate_rapid_code(self, p):
-        return ''
+        return ""
 
     def spindle_code(self, p):
-        return ''
+        return ""
 
     def dwell_code(self, p):
-        return ''
+        return ""
 
     def spindle_stop_code(self, p):
-        return ''
+        return ""

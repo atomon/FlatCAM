@@ -8,8 +8,16 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from appTool import AppTool
-from appGUI.GUIElements import OptionalHideInputSection, FCTextArea, FCEntry, FCSpinner, FCCheckBox, FCComboBox, \
-    FCLabel, FCButton
+from appGUI.GUIElements import (
+    OptionalHideInputSection,
+    FCTextArea,
+    FCEntry,
+    FCSpinner,
+    FCCheckBox,
+    FCComboBox,
+    FCLabel,
+    FCButton,
+)
 from camlib import grace
 
 from shapely.geometry import MultiPolygon
@@ -22,11 +30,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolOptimal(AppTool):
@@ -37,7 +45,7 @@ class ToolOptimal(AppTool):
     def __init__(self, app):
         AppTool.__init__(self, app)
 
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
         self.decimals = self.app.decimals
 
         # #############################################################################
@@ -47,10 +55,10 @@ class ToolOptimal(AppTool):
         self.toolName = self.ui.toolName
 
         # this is the line selected in the textbox with the locations of the minimum
-        self.selected_text = ''
+        self.selected_text = ""
 
         # this is the line selected in the textbox with the locations of the other distances found in the Gerber object
-        self.selected_locations_text = ''
+        self.selected_locations_text = ""
 
         # dict to hold the distances between every two elements in Gerber as keys and the actual locations where that
         # distances happen as values
@@ -73,7 +81,7 @@ class ToolOptimal(AppTool):
         self.ui.reset_button.clicked.connect(self.set_tool_ui)
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+O', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+O", **kwargs)
 
     def run(self, toggle=True):
         self.app.defaults.report_usage("ToolOptimal()")
@@ -104,7 +112,7 @@ class ToolOptimal(AppTool):
 
     def set_tool_ui(self):
         self.ui.result_entry.set_value(0.0)
-        self.ui.freq_entry.set_value('0')
+        self.ui.freq_entry.set_value("0")
 
         self.ui.precision_spinner.set_value(int(self.app.defaults["tools_opt_precision"]))
         self.ui.locations_textb.clear()
@@ -121,52 +129,62 @@ class ToolOptimal(AppTool):
         self.ui.locate_button.setVisible(False)
 
         self.ui.result_entry.set_value(0.0)
-        self.ui.freq_entry.set_value('0')
+        self.ui.freq_entry.set_value("0")
         self.reset_fields()
 
     def find_minimum_distance(self):
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
         self.decimals = int(self.ui.precision_spinner.get_value())
 
         selection_index = self.ui.gerber_object_combo.currentIndex()
 
-        model_index = self.app.collection.index(selection_index, 0, self.ui.gerber_object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.gerber_object_combo.rootModelIndex()
+        )
         try:
             fcobj = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolOptimal.find_minimum_distance() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no Gerber object loaded ..."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("There is no Gerber object loaded ..."))
             return
 
-        if fcobj.kind != 'gerber':
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Only Gerber objects can be evaluated."))
+        if fcobj.kind != "gerber":
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Only Gerber objects can be evaluated."))
             return
 
         proc = self.app.proc_container.new(_("Working ..."))
 
         def job_thread(app_obj):
-            app_obj.inform.emit(_("Optimal Tool. Started to search for the minimum distance between copper features."))
+            app_obj.inform.emit(
+                _(
+                    "Optimal Tool. Started to search for the minimum distance between copper features."
+                )
+            )
             try:
                 old_disp_number = 0
                 pol_nr = 0
-                app_obj.proc_container.update_view_text(' %d%%' % 0)
+                app_obj.proc_container.update_view_text(" %d%%" % 0)
                 total_geo = []
 
                 for ap in list(fcobj.apertures.keys()):
-                    if 'geometry' in fcobj.apertures[ap]:
+                    if "geometry" in fcobj.apertures[ap]:
                         app_obj.inform.emit(
-                            '%s: %s' % (_("Optimal Tool. Parsing geometry for aperture"), str(ap)))
+                            "%s: %s" % (_("Optimal Tool. Parsing geometry for aperture"), str(ap))
+                        )
 
-                        for geo_el in fcobj.apertures[ap]['geometry']:
+                        for geo_el in fcobj.apertures[ap]["geometry"]:
                             if self.app.abort_flag:
                                 # graceful abort requested by the user
                                 raise grace
 
-                            if 'solid' in geo_el and geo_el['solid'] is not None and geo_el['solid'].is_valid:
-                                total_geo.append(geo_el['solid'])
+                            if (
+                                "solid" in geo_el
+                                and geo_el["solid"] is not None
+                                and geo_el["solid"].is_valid
+                            ):
+                                total_geo.append(geo_el["solid"])
 
-                app_obj.inform.emit(
-                    _("Optimal Tool. Creating a buffer for the object geometry."))
+                app_obj.inform.emit(_("Optimal Tool. Creating a buffer for the object geometry."))
                 total_geo = MultiPolygon(total_geo)
                 total_geo = total_geo.buffer(0)
 
@@ -175,14 +193,24 @@ class ToolOptimal(AppTool):
                     geo_len = len(total_geo)
                     geo_len = (geo_len * (geo_len - 1)) / 2
                 except TypeError:
-                    app_obj.inform.emit('[ERROR_NOTCL] %s' %
-                                        _("The Gerber object has one Polygon as geometry.\n"
-                                          "There are no distances between geometry elements to be found."))
-                    return 'fail'
+                    app_obj.inform.emit(
+                        "[ERROR_NOTCL] %s"
+                        % _(
+                            "The Gerber object has one Polygon as geometry.\n"
+                            "There are no distances between geometry elements to be found."
+                        )
+                    )
+                    return "fail"
 
                 app_obj.inform.emit(
-                    '%s: %s' % (_("Optimal Tool. Finding the distances between each two elements. Iterations"),
-                                str(geo_len)))
+                    "%s: %s"
+                    % (
+                        _(
+                            "Optimal Tool. Finding the distances between each two elements. Iterations"
+                        ),
+                        str(geo_len),
+                    )
+                )
 
                 self.min_dict = {}
                 idx = 1
@@ -194,12 +222,18 @@ class ToolOptimal(AppTool):
 
                         # minimize the number of distances by not taking into considerations those that are too small
                         dist = geo.distance(s_geo)
-                        dist = float('%.*f' % (self.decimals, dist))
+                        dist = float("%.*f" % (self.decimals, dist))
                         loc_1, loc_2 = nearest_points(geo, s_geo)
 
                         proc_loc = (
-                            (float('%.*f' % (self.decimals, loc_1.x)), float('%.*f' % (self.decimals, loc_1.y))),
-                            (float('%.*f' % (self.decimals, loc_2.x)), float('%.*f' % (self.decimals, loc_2.y)))
+                            (
+                                float("%.*f" % (self.decimals, loc_1.x)),
+                                float("%.*f" % (self.decimals, loc_1.y)),
+                            ),
+                            (
+                                float("%.*f" % (self.decimals, loc_2.x)),
+                                float("%.*f" % (self.decimals, loc_2.y)),
+                            ),
                         )
 
                         if dist in self.min_dict:
@@ -211,7 +245,7 @@ class ToolOptimal(AppTool):
                         disp_number = int(np.interp(pol_nr, [0, geo_len], [0, 100]))
 
                         if old_disp_number < disp_number <= 100:
-                            app_obj.proc_container.update_view_text(' %d%%' % disp_number)
+                            app_obj.proc_container.update_view_text(" %d%%" % disp_number)
                             old_disp_number = disp_number
                     idx += 1
 
@@ -219,11 +253,11 @@ class ToolOptimal(AppTool):
 
                 min_list = list(self.min_dict.keys())
                 min_dist = min(min_list)
-                min_dist_string = '%.*f' % (self.decimals, float(min_dist))
+                min_dist_string = "%.*f" % (self.decimals, float(min_dist))
                 self.ui.result_entry.set_value(min_dist_string)
 
                 freq = len(self.min_dict[min_dist])
-                freq = '%d' % int(freq)
+                freq = "%d" % int(freq)
                 self.ui.freq_entry.set_value(freq)
 
                 min_locations = self.min_dict.pop(min_dist)
@@ -231,28 +265,30 @@ class ToolOptimal(AppTool):
                 self.update_text.emit(min_locations)
                 self.update_sec_distances.emit(self.min_dict)
 
-                app_obj.inform.emit('[success] %s' % _("Optimal Tool. Finished successfully."))
+                app_obj.inform.emit("[success] %s" % _("Optimal Tool. Finished successfully."))
             except Exception as ee:
                 proc.done()
                 log.debug(str(ee))
                 return
             proc.done()
 
-        self.app.worker_task.emit({'fcn': job_thread, 'params': [self.app]})
+        self.app.worker_task.emit({"fcn": job_thread, "params": [self.app]})
 
     def on_locate_position(self):
         # cursor = self.locations_textb.textCursor()
         # self.selected_text = cursor.selectedText()
 
         try:
-            if self.selected_text != '':
+            if self.selected_text != "":
                 loc = eval(self.selected_text)
             else:
-                return 'fail'
+                return "fail"
         except Exception as e:
             log.debug("ToolOptimal.on_locate_position() --> first try %s" % str(e))
-            self.app.inform.emit("[ERROR_NOTCL] The selected text is no valid location in the format "
-                                 "((x0, y0), (x1, y1)).")
+            self.app.inform.emit(
+                "[ERROR_NOTCL] The selected text is no valid location in the format "
+                "((x0, y0), (x1, y1))."
+            )
             return
 
         try:
@@ -260,18 +296,20 @@ class ToolOptimal(AppTool):
             loc_2 = loc[1]
             dx = loc_1[0] - loc_2[0]
             dy = loc_1[1] - loc_2[1]
-            loc = (float('%.*f' % (self.decimals, (min(loc_1[0], loc_2[0]) + (abs(dx) / 2)))),
-                   float('%.*f' % (self.decimals, (min(loc_1[1], loc_2[1]) + (abs(dy) / 2)))))
+            loc = (
+                float("%.*f" % (self.decimals, (min(loc_1[0], loc_2[0]) + (abs(dx) / 2)))),
+                float("%.*f" % (self.decimals, (min(loc_1[1], loc_2[1]) + (abs(dy) / 2)))),
+            )
             self.app.on_jump_to(custom_location=loc)
         except Exception as e:
             log.debug("ToolOptimal.on_locate_position() --> sec try %s" % str(e))
             return
 
     def on_update_text(self, data):
-        txt = ''
+        txt = ""
         for loc in data:
             if loc:
-                txt += '%s, %s\n' % (str(loc[0]), str(loc[1]))
+                txt += "%s, %s\n" % (str(loc[0]), str(loc[1]))
         self.ui.locations_textb.setPlainText(txt)
         self.ui.locate_button.setDisabled(False)
 
@@ -298,9 +336,9 @@ class ToolOptimal(AppTool):
 
     def on_update_sec_distances_txt(self, data):
         distance_list = sorted(list(data.keys()))
-        txt = ''
+        txt = ""
         for loc in distance_list:
-            txt += '%s\n' % str(loc)
+            txt += "%s\n" % str(loc)
         self.ui.distances_textb.setPlainText(txt)
         self.ui.locate_sec_button.setDisabled(False)
 
@@ -329,10 +367,10 @@ class ToolOptimal(AppTool):
 
     def on_update_locations_text(self, dist):
         distance_list = self.min_dict[dist]
-        txt = ''
+        txt = ""
         for loc in distance_list:
             if loc:
-                txt += '%s, %s\n' % (str(loc[0]), str(loc[1]))
+                txt += "%s, %s\n" % (str(loc[0]), str(loc[1]))
         self.ui.locations_sec_textb.setPlainText(txt)
 
     def on_locations_sec_clicked(self):
@@ -358,14 +396,16 @@ class ToolOptimal(AppTool):
 
     def on_locate_sec_position(self):
         try:
-            if self.selected_locations_text != '':
+            if self.selected_locations_text != "":
                 loc = eval(self.selected_locations_text)
             else:
                 return
         except Exception as e:
             log.debug("ToolOptimal.on_locate_sec_position() --> first try %s" % str(e))
-            self.app.inform.emit("[ERROR_NOTCL] The selected text is no valid location in the format "
-                                 "((x0, y0), (x1, y1)).")
+            self.app.inform.emit(
+                "[ERROR_NOTCL] The selected text is no valid location in the format "
+                "((x0, y0), (x1, y1))."
+            )
             return
 
         try:
@@ -373,15 +413,19 @@ class ToolOptimal(AppTool):
             loc_2 = loc[1]
             dx = loc_1[0] - loc_2[0]
             dy = loc_1[1] - loc_2[1]
-            loc = (float('%.*f' % (self.decimals, (min(loc_1[0], loc_2[0]) + (abs(dx) / 2)))),
-                   float('%.*f' % (self.decimals, (min(loc_1[1], loc_2[1]) + (abs(dy) / 2)))))
+            loc = (
+                float("%.*f" % (self.decimals, (min(loc_1[0], loc_2[0]) + (abs(dx) / 2)))),
+                float("%.*f" % (self.decimals, (min(loc_1[1], loc_2[1]) + (abs(dy) / 2)))),
+            )
             self.app.on_jump_to(custom_location=loc)
         except Exception as e:
             log.debug("ToolOptimal.on_locate_sec_position() --> sec try %s" % str(e))
             return
 
     def reset_fields(self):
-        self.ui.gerber_object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.ui.gerber_object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         self.ui.gerber_object_combo.setCurrentIndex(0)
 
 
@@ -393,17 +437,19 @@ class OptimalUI:
         self.app = app
         self.decimals = self.app.decimals
         self.layout = layout
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         # ## Title
         title_label = FCLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
         self.layout.addWidget(FCLabel(""))
 
@@ -414,7 +460,9 @@ class OptimalUI:
         # ## Gerber Object to mirror
         self.gerber_object_combo = FCComboBox()
         self.gerber_object_combo.setModel(self.app.collection)
-        self.gerber_object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.gerber_object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         self.gerber_object_combo.is_last = True
         self.gerber_object_combo.obj_type = "Gerber"
 
@@ -431,7 +479,7 @@ class OptimalUI:
         form_lay.addRow(separator_line)
 
         # Precision = nr of decimals
-        self.precision_label = FCLabel('%s:' % _("Precision"))
+        self.precision_label = FCLabel("%s:" % _("Precision"))
         self.precision_label.setToolTip(_("Number of decimals kept for found distances."))
 
         self.precision_spinner = FCSpinner(callback=self.confirmation_message_int)
@@ -440,12 +488,12 @@ class OptimalUI:
         form_lay.addRow(self.precision_label, self.precision_spinner)
 
         # Results Title
-        self.title_res_label = FCLabel('<b>%s:</b>' % _("Minimum distance"))
+        self.title_res_label = FCLabel("<b>%s:</b>" % _("Minimum distance"))
         self.title_res_label.setToolTip(_("Display minimum distance between copper features."))
         form_lay.addRow(self.title_res_label)
 
         # Result value
-        self.result_label = FCLabel('%s:' % _("Determined"))
+        self.result_label = FCLabel("%s:" % _("Determined"))
         self.result_entry = FCEntry()
         self.result_entry.setReadOnly(True)
 
@@ -459,7 +507,7 @@ class OptimalUI:
         form_lay.addRow(self.result_label, hlay)
 
         # Frequency of minimum encounter
-        self.freq_label = FCLabel('%s:' % _("Occurring"))
+        self.freq_label = FCLabel("%s:" % _("Occurring"))
         self.freq_label.setToolTip(_("How many times this minimum is found."))
         self.freq_entry = FCEntry()
         self.freq_entry.setReadOnly(True)
@@ -488,23 +536,27 @@ class OptimalUI:
         # Jump button
         self.locate_button = FCButton(_("Jump to selected position"))
         self.locate_button.setToolTip(
-            _("Select a position in the Locations text box and then\n"
-              "click this button.")
+            _("Select a position in the Locations text box and then\n" "click this button.")
         )
         self.locate_button.setMinimumWidth(60)
         self.locate_button.setDisabled(True)
         form_lay.addRow(self.locate_button)
 
         # Other distances in Gerber
-        self.title_second_res_label = FCLabel('<b>%s:</b>' % _("Other distances"))
-        self.title_second_res_label.setToolTip(_("Will display other distances in the Gerber file ordered from\n"
-                                                 "the minimum to the maximum, not including the absolute minimum."))
+        self.title_second_res_label = FCLabel("<b>%s:</b>" % _("Other distances"))
+        self.title_second_res_label.setToolTip(
+            _(
+                "Will display other distances in the Gerber file ordered from\n"
+                "the minimum to the maximum, not including the absolute minimum."
+            )
+        )
         form_lay.addRow(self.title_second_res_label)
 
         # Control if to display the locations of where the minimum was found
         self.sec_locations_cb = FCCheckBox(_("Other distances points coordinates"))
-        self.sec_locations_cb.setToolTip(_("Other distances and the coordinates for points\n"
-                                           "where the distance was found."))
+        self.sec_locations_cb.setToolTip(
+            _("Other distances and the coordinates for points\n" "where the distance was found.")
+        )
         form_lay.addRow(self.sec_locations_cb)
 
         # this way I can hide/show the frame
@@ -516,16 +568,16 @@ class OptimalUI:
         self.sec_locations_frame.setLayout(self.distances_box)
 
         # Other Distances label
-        self.distances_label = FCLabel('%s' % _("Gerber distances"))
-        self.distances_label.setToolTip(_("Other distances and the coordinates for points\n"
-                                          "where the distance was found."))
+        self.distances_label = FCLabel("%s" % _("Gerber distances"))
+        self.distances_label.setToolTip(
+            _("Other distances and the coordinates for points\n" "where the distance was found.")
+        )
         self.distances_box.addWidget(self.distances_label)
 
         # Other distances
         self.distances_textb = FCTextArea()
         self.distances_textb.setPlaceholderText(
-            _("Other distances and the coordinates for points\n"
-              "where the distance was found.")
+            _("Other distances and the coordinates for points\n" "where the distance was found.")
         )
         self.distances_textb.setReadOnly(True)
         stylesheet = """
@@ -537,19 +589,19 @@ class OptimalUI:
         self.distances_textb.setStyleSheet(stylesheet)
         self.distances_box.addWidget(self.distances_textb)
 
-        self.distances_box.addWidget(FCLabel(''))
+        self.distances_box.addWidget(FCLabel(""))
 
         # Other Locations label
-        self.locations_label = FCLabel('%s' % _("Points coordinates"))
-        self.locations_label.setToolTip(_("Other distances and the coordinates for points\n"
-                                          "where the distance was found."))
+        self.locations_label = FCLabel("%s" % _("Points coordinates"))
+        self.locations_label.setToolTip(
+            _("Other distances and the coordinates for points\n" "where the distance was found.")
+        )
         self.distances_box.addWidget(self.locations_label)
 
         # Locations where minimum was found
         self.locations_sec_textb = FCTextArea()
         self.locations_sec_textb.setPlaceholderText(
-            _("Other distances and the coordinates for points\n"
-              "where the distance was found.")
+            _("Other distances and the coordinates for points\n" "where the distance was found.")
         )
         self.locations_sec_textb.setReadOnly(True)
         stylesheet = """
@@ -564,8 +616,7 @@ class OptimalUI:
         # Jump button
         self.locate_sec_button = FCButton(_("Jump to selected position"))
         self.locate_sec_button.setToolTip(
-            _("Select a position in the Locations text box and then\n"
-              "click this button.")
+            _("Select a position in the Locations text box and then\n" "click this button.")
         )
         self.locate_sec_button.setMinimumWidth(60)
         self.locate_sec_button.setDisabled(True)
@@ -573,18 +624,24 @@ class OptimalUI:
 
         # GO button
         self.calculate_button = FCButton(_("Find Minimum"))
-        self.calculate_button.setIcon(QtGui.QIcon(self.app.resource_location + '/open_excellon32.png'))
-        self.calculate_button.setToolTip(
-            _("Calculate the minimum distance between copper features,\n"
-              "this will allow the determination of the right tool to\n"
-              "use for isolation or copper clearing.")
+        self.calculate_button.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/open_excellon32.png")
         )
-        self.calculate_button.setStyleSheet("""
+        self.calculate_button.setToolTip(
+            _(
+                "Calculate the minimum distance between copper features,\n"
+                "this will allow the determination of the right tool to\n"
+                "use for isolation or copper clearing."
+            )
+        )
+        self.calculate_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.calculate_button.setMinimumWidth(60)
         self.layout.addWidget(self.calculate_button)
 
@@ -592,37 +649,48 @@ class OptimalUI:
 
         # ## Reset Tool
         self.reset_button = FCButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(self.reset_button)
 
-        self.loc_ois = OptionalHideInputSection(self.locations_cb, [self.locations_textb, self.locate_button])
-        self.sec_loc_ois = OptionalHideInputSection(self.sec_locations_cb, [self.sec_locations_frame])
+        self.loc_ois = OptionalHideInputSection(
+            self.locations_cb, [self.locations_textb, self.locate_button]
+        )
+        self.sec_loc_ois = OptionalHideInputSection(
+            self.sec_locations_cb, [self.sec_locations_frame]
+        )
 
         # #################################### FINSIHED GUI ###########################
         # #############################################################################
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

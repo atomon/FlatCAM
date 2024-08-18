@@ -5,7 +5,7 @@ from matplotlib.axes import *
 from camlib import *
 
 
-def plotg2(geo, solid_poly=False, color="black", linestyle='solid'):
+def plotg2(geo, solid_poly=False, color="black", linestyle="solid"):
 
     try:
         for sub_geo in geo:
@@ -13,12 +13,14 @@ def plotg2(geo, solid_poly=False, color="black", linestyle='solid'):
     except TypeError:
         if type(geo) == Polygon:
             if solid_poly:
-                patch = PolygonPatch(geo,
-                                     #facecolor="#BBF268",
-                                     facecolor=color,
-                                     edgecolor="#006E20",
-                                     alpha=0.5,
-                                     zorder=2)
+                patch = PolygonPatch(
+                    geo,
+                    # facecolor="#BBF268",
+                    facecolor=color,
+                    edgecolor="#006E20",
+                    alpha=0.5,
+                    zorder=2,
+                )
                 ax = subplot(111)
                 ax.add_patch(patch)
             else:
@@ -34,15 +36,12 @@ def plotg2(geo, solid_poly=False, color="black", linestyle='solid'):
 
         if type(geo) == Point:
             x, y = geo.coords.xy
-            plot(x, y, 'o')
+            plot(x, y, "o")
 
 
 if __name__ == "__main__":
     p = Polygon([[0, 0], [0, 5], [5, 5], [5, 0]])
-    paths = [
-        LineString([[0.5, 2], [2, 4.5]]),
-        LineString([[2, 0.5], [4.5, 2]])
-    ]
+    paths = [LineString([[0.5, 2], [2, 4.5]]), LineString([[2, 0.5], [4.5, 2]])]
     plotg2(p, solid_poly=True)
     plotg2(paths, linestyle="dashed")
     show()

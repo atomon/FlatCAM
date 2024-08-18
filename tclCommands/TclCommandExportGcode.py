@@ -29,32 +29,36 @@ class TclCommandExportGcode(TclCommandSignaled):
     """
 
     # array of all command aliases, to be able use  old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['export_gcode']
+    aliases = ["export_gcode"]
 
-    description = '%s %s' % ("--", "Return Gcode into console output.")
+    description = "%s %s" % ("--", "Return Gcode into console output.")
 
     # dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('name', str),
-        ('preamble', str),
-        ('postamble', str),
-    ])
+    arg_names = collections.OrderedDict(
+        [
+            ("name", str),
+            ("preamble", str),
+            ("postamble", str),
+        ]
+    )
 
     # dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
     option_types = collections.OrderedDict()
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name']
+    required = ["name"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Export gcode into console output.",
-        'args': collections.OrderedDict([
-            ('name', 'Name of the source Geometry object. Required.'),
-            ('preamble', 'Prepend GCode to the original GCode.'),
-            ('postamble', 'Append GCode o the original GCode.'),
-        ]),
-        'examples': ['export_gcode geo_name -preamble "G01 X10 Y10" -postamble "G00 X20 Y20\nM04"']
+        "main": "Export gcode into console output.",
+        "args": collections.OrderedDict(
+            [
+                ("name", "Name of the source Geometry object. Required."),
+                ("preamble", "Prepend GCode to the original GCode."),
+                ("postamble", "Append GCode o the original GCode."),
+            ]
+        ),
+        "examples": ['export_gcode geo_name -preamble "G01 X10 Y10" -postamble "G00 X20 Y20\nM04"'],
     }
 
     def execute(self, args, unnamed_args):
@@ -67,18 +71,18 @@ class TclCommandExportGcode(TclCommandSignaled):
         :return: None or exception
         """
 
-        name = args['name']
+        name = args["name"]
 
         obj = self.app.collection.get_by_name(name)
         if obj is None:
             self.raise_tcl_error("Object not found: %s" % name)
 
         if not isinstance(obj, CNCjob):
-            self.raise_tcl_error('Expected CNCjob, got %s %s.' % (name, type(obj)))
+            self.raise_tcl_error("Expected CNCjob, got %s %s." % (name, type(obj)))
 
         if self.app.collection.has_promises():
-            self.raise_tcl_error('!!!Promises exists, but should not here!!!')
+            self.raise_tcl_error("!!!Promises exists, but should not here!!!")
 
-        del args['name']
+        del args["name"]
         obj.get_gcode(**args)
         return

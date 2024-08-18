@@ -8,13 +8,13 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 settings = QSettings("Open Source", "FlatCAM")
 if settings.contains("machinist"):
-    machinist_setting = settings.value('machinist', type=int)
+    machinist_setting = settings.value("machinist", type=int)
 else:
     machinist_setting = 0
 
@@ -28,7 +28,9 @@ class AutoCompletePrefGroupUI(OptionsGroupUI):
         self.decimals = decimals
 
         self.restore_btn = FCButton(_("Restore"))
-        self.restore_btn.setToolTip(_("Restore the autocompleter keywords list to the default state."))
+        self.restore_btn.setToolTip(
+            _("Restore the autocompleter keywords list to the default state.")
+        )
         self.del_all_btn = FCButton(_("Delete All"))
         self.del_all_btn.setToolTip(_("Delete all autocompleter keywords from the list."))
 
@@ -40,16 +42,18 @@ class AutoCompletePrefGroupUI(OptionsGroupUI):
         # ## Gerber associations
         self.grb_list_label = QtWidgets.QLabel("<b>%s:</b>" % _("Keywords list"))
         self.grb_list_label.setToolTip(
-            _("List of keywords used by\n"
-              "the autocompleter in FlatCAM.\n"
-              "The autocompleter is installed\n"
-              "in the Code Editor and for the Tcl Shell.")
+            _(
+                "List of keywords used by\n"
+                "the autocompleter in FlatCAM.\n"
+                "The autocompleter is installed\n"
+                "in the Code Editor and for the Tcl Shell."
+            )
         )
         self.layout.addWidget(self.grb_list_label)
 
         qsettings = QSettings("Open Source", "FlatCAM")
         if qsettings.contains("textbox_font_size"):
-            tb_fsize = qsettings.value('textbox_font_size', type=int)
+            tb_fsize = qsettings.value("textbox_font_size", type=int)
         else:
             tb_fsize = 10
 
@@ -61,7 +65,7 @@ class AutoCompletePrefGroupUI(OptionsGroupUI):
         font.setPointSize(tb_fsize)
         self.kw_list_text.setFont(font)
 
-        self.kw_label = QtWidgets.QLabel('%s:' % _("Extension"))
+        self.kw_label = QtWidgets.QLabel("%s:" % _("Extension"))
         self.kw_label.setToolTip(_("A keyword to be added or deleted to the list."))
         self.kw_entry = FCEntry()
 

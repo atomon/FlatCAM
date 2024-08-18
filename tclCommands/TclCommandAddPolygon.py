@@ -7,31 +7,29 @@ class TclCommandAddPolygon(TclCommandSignaled):
     """
 
     # array of all command aliases, to be able use  old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['add_polygon', 'add_poly']
+    aliases = ["add_polygon", "add_poly"]
 
-    description = '%s %s' % ("--", "Creates a polygon in the given Geometry object.")
+    description = "%s %s" % ("--", "Creates a polygon in the given Geometry object.")
 
     # dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('name', str)
-    ])
+    arg_names = collections.OrderedDict([("name", str)])
 
     # dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
     option_types = collections.OrderedDict()
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name']
+    required = ["name"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Creates a polygon in the given Geometry object.",
-        'args': collections.OrderedDict([
-            ('name', 'Name of the Geometry object to which to append the polygon.'),
-            ('xi, yi', 'Coordinates of points in the polygon.')
-        ]),
-        'examples': [
-            'add_polygon <name> <x0> <y0> <x1> <y1> <x2> <y2> [x3 y3 [...]]'
-        ]
+        "main": "Creates a polygon in the given Geometry object.",
+        "args": collections.OrderedDict(
+            [
+                ("name", "Name of the Geometry object to which to append the polygon."),
+                ("xi, yi", "Coordinates of points in the polygon."),
+            ]
+        ),
+        "examples": ["add_polygon <name> <x0> <y0> <x1> <y1> <x2> <y2> [x3 y3 [...]]"],
     }
 
     def execute(self, args, unnamed_args):
@@ -44,19 +42,21 @@ class TclCommandAddPolygon(TclCommandSignaled):
         :return: None or exception
         """
 
-        name = args['name']
+        name = args["name"]
 
         obj = self.app.collection.get_by_name(name)
         if obj is None:
             self.raise_tcl_error("Object not found: %s" % name)
 
-        if obj.kind != 'geometry':
-            self.raise_tcl_error('Expected Geometry, got %s %s.' % (name, type(obj)))
+        if obj.kind != "geometry":
+            self.raise_tcl_error("Expected Geometry, got %s %s." % (name, type(obj)))
 
         if len(unnamed_args) % 2 != 0:
             self.raise_tcl_error("Incomplete coordinates.")
 
         nr_points = int(len(unnamed_args) / 2)
-        points = [[float(unnamed_args[2*i]), float(unnamed_args[2*i+1])] for i in range(nr_points)]
+        points = [
+            [float(unnamed_args[2 * i]), float(unnamed_args[2 * i + 1])] for i in range(nr_points)
+        ]
 
         obj.add_polygon(points)

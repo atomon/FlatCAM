@@ -20,6 +20,7 @@ import shapely.affinity as affinity
 import logging
 from copy import deepcopy
 import numpy as np
+
 try:
     from collections import Iterable
 except ImportError:
@@ -29,11 +30,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolCopperThieving(AppTool):
@@ -46,7 +47,7 @@ class ToolCopperThieving(AppTool):
         self.canvas = self.app.plotcanvas
 
         self.decimals = self.app.decimals
-        self.units = self.app.defaults['units']
+        self.units = self.app.defaults["units"]
 
         # #############################################################################
         # ######################### Tool GUI ##########################################
@@ -129,13 +130,15 @@ class ToolCopperThieving(AppTool):
         self.app.ui.notebook.setTabText(2, _("Copper Thieving Tool"))
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+J', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+J", **kwargs)
 
     def set_tool_ui(self):
-        self.units = self.app.defaults['units']
+        self.units = self.app.defaults["units"]
         self.geo_steps_per_circle = int(self.app.defaults["tools_copper_thieving_circle_steps"])
 
-        self.ui.clearance_entry.set_value(float(self.app.defaults["tools_copper_thieving_clearance"]))
+        self.ui.clearance_entry.set_value(
+            float(self.app.defaults["tools_copper_thieving_clearance"])
+        )
         self.ui.margin_entry.set_value(float(self.app.defaults["tools_copper_thieving_margin"]))
         self.ui.reference_radio.set_value(self.app.defaults["tools_copper_thieving_reference"])
         self.ui.bbox_type_radio.set_value(self.app.defaults["tools_copper_thieving_box_type"])
@@ -145,13 +148,21 @@ class ToolCopperThieving(AppTool):
         self.ui.dot_dia_entry.set_value(self.app.defaults["tools_copper_thieving_dots_dia"])
         self.ui.dot_spacing_entry.set_value(self.app.defaults["tools_copper_thieving_dots_spacing"])
         self.ui.square_size_entry.set_value(self.app.defaults["tools_copper_thieving_squares_size"])
-        self.ui.squares_spacing_entry.set_value(self.app.defaults["tools_copper_thieving_squares_spacing"])
+        self.ui.squares_spacing_entry.set_value(
+            self.app.defaults["tools_copper_thieving_squares_spacing"]
+        )
         self.ui.line_size_entry.set_value(self.app.defaults["tools_copper_thieving_lines_size"])
-        self.ui.lines_spacing_entry.set_value(self.app.defaults["tools_copper_thieving_lines_spacing"])
+        self.ui.lines_spacing_entry.set_value(
+            self.app.defaults["tools_copper_thieving_lines_spacing"]
+        )
 
         self.ui.rb_margin_entry.set_value(self.app.defaults["tools_copper_thieving_rb_margin"])
-        self.ui.rb_thickness_entry.set_value(self.app.defaults["tools_copper_thieving_rb_thickness"])
-        self.ui.clearance_ppm_entry.set_value(self.app.defaults["tools_copper_thieving_mask_clearance"])
+        self.ui.rb_thickness_entry.set_value(
+            self.app.defaults["tools_copper_thieving_rb_thickness"]
+        )
+        self.ui.clearance_ppm_entry.set_value(
+            self.app.defaults["tools_copper_thieving_mask_clearance"]
+        )
         self.ui.ppm_choice_radio.set_value(self.app.defaults["tools_copper_thieving_geo_choice"])
 
         # INIT SECTION
@@ -162,14 +173,21 @@ class ToolCopperThieving(AppTool):
 
     def on_ref_combo_type_change(self):
         obj_type = self.ui.ref_combo_type.currentIndex()
-        self.ui.ref_combo.setRootModelIndex(self.app.collection.index(obj_type, 0, QtCore.QModelIndex()))
+        self.ui.ref_combo.setRootModelIndex(
+            self.app.collection.index(obj_type, 0, QtCore.QModelIndex())
+        )
         self.ui.ref_combo.setCurrentIndex(0)
         self.ui.ref_combo.obj_type = {
-            _("Gerber"): "Gerber", _("Excellon"): "Excellon", _("Geometry"): "Geometry"
+            _("Gerber"): "Gerber",
+            _("Excellon"): "Excellon",
+            _("Geometry"): "Geometry",
         }[self.ui.ref_combo_type.get_value()]
 
     def on_toggle_reference(self):
-        if self.ui.reference_radio.get_value() == "itself" or self.ui.reference_radio.get_value() == "area":
+        if (
+            self.ui.reference_radio.get_value() == "itself"
+            or self.ui.reference_radio.get_value() == "area"
+        ):
             self.ui.ref_combo.hide()
             self.ui.ref_combo_label.hide()
             self.ui.ref_combo_type.hide()
@@ -184,34 +202,38 @@ class ToolCopperThieving(AppTool):
             self.ui.bbox_type_label.show()
             self.ui.bbox_type_radio.show()
         else:
-            if self.ui.fill_type_radio.get_value() == 'line':
-                self.ui.reference_radio.set_value('itself')
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _("Lines Grid works only for 'itself' reference ..."))
+            if self.ui.fill_type_radio.get_value() == "line":
+                self.ui.reference_radio.set_value("itself")
+                self.app.inform.emit(
+                    "[WARNING_NOTCL] %s" % _("Lines Grid works only for 'itself' reference ...")
+                )
                 return
 
             self.ui.bbox_type_label.hide()
             self.ui.bbox_type_radio.hide()
 
     def on_thieving_type(self, choice):
-        if choice == 'solid':
+        if choice == "solid":
             self.ui.dots_frame.hide()
             self.ui.squares_frame.hide()
             self.ui.lines_frame.hide()
             self.app.inform.emit(_("Solid fill selected."))
-        elif choice == 'dot':
+        elif choice == "dot":
             self.ui.dots_frame.show()
             self.ui.squares_frame.hide()
             self.ui.lines_frame.hide()
             self.app.inform.emit(_("Dots grid fill selected."))
-        elif choice == 'square':
+        elif choice == "square":
             self.ui.dots_frame.hide()
             self.ui.squares_frame.show()
             self.ui.lines_frame.hide()
             self.app.inform.emit(_("Squares grid fill selected."))
         else:
-            if self.ui.reference_radio.get_value() != 'itself':
-                self.ui.reference_radio.set_value('itself')
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _("Lines Grid works only for 'itself' reference ..."))
+            if self.ui.reference_radio.get_value() != "itself":
+                self.ui.reference_radio.set_value("itself")
+                self.app.inform.emit(
+                    "[WARNING_NOTCL] %s" % _("Lines Grid works only for 'itself' reference ...")
+                )
 
             self.ui.dots_frame.hide()
             self.ui.squares_frame.hide()
@@ -223,13 +245,15 @@ class ToolCopperThieving(AppTool):
 
         # get the Gerber object on which the Robber bar will be inserted
         selection_index = self.ui.grb_object_combo.currentIndex()
-        model_index = self.app.collection.index(selection_index, 0, self.ui.grb_object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.grb_object_combo.rootModelIndex()
+        )
 
         try:
             self.grb_object = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolCopperThieving.on_add_robber_bar_click() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no Gerber object loaded ..."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("There is no Gerber object loaded ..."))
             return
 
         try:
@@ -242,33 +266,33 @@ class ToolCopperThieving(AppTool):
 
         self.robber_geo = self.robber_line.buffer(self.rb_thickness / 2.0)
 
-        self.app.proc_container.update_view_text(' %s' % _("Append geometry"))
+        self.app.proc_container.update_view_text(" %s" % _("Append geometry"))
 
         new_apertures = deepcopy(self.grb_object.apertures)
         aperture_found = None
         for ap_id, ap_val in self.grb_object.apertures.items():
-            if ap_val['type'] == 'C' and ap_val['size'] == self.rb_thickness:
+            if ap_val["type"] == "C" and ap_val["size"] == self.rb_thickness:
                 aperture_found = ap_id
                 break
 
         if aperture_found:
-            geo_elem = {'solid': self.robber_geo, 'follow': self.robber_line}
-            new_apertures[aperture_found]['geometry'].append(deepcopy(geo_elem))
+            geo_elem = {"solid": self.robber_geo, "follow": self.robber_line}
+            new_apertures[aperture_found]["geometry"].append(deepcopy(geo_elem))
         else:
             ap_keys = list(new_apertures.keys())
             if ap_keys:
                 new_apid = str(int(max(ap_keys)) + 1)
             else:
-                new_apid = '10'
+                new_apid = "10"
 
             new_apertures[new_apid] = {
-                'type': 'C',
-                'size': deepcopy(self.rb_thickness),
-                'geometry': []
+                "type": "C",
+                "size": deepcopy(self.rb_thickness),
+                "geometry": [],
             }
 
-            geo_elem = {'solid': self.robber_geo, 'follow': self.robber_line}
-            new_apertures[new_apid]['geometry'].append(deepcopy(geo_elem))
+            geo_elem = {"solid": self.robber_geo, "follow": self.robber_line}
+            new_apertures[new_apid]["geometry"].append(deepcopy(geo_elem))
 
         geo_obj = deepcopy(self.grb_object.solid_geometry)
         if isinstance(geo_obj, MultiPolygon):
@@ -282,35 +306,38 @@ class ToolCopperThieving(AppTool):
         elif isinstance(geo_obj, Polygon):
             geo_obj = MultiPolygon([geo_obj, deepcopy(self.robber_geo)])
 
-        outname = '%s_%s' % (str(self.grb_object.options['name']), 'robber')
+        outname = "%s_%s" % (str(self.grb_object.options["name"]), "robber")
 
         def initialize(grb_obj, app_obj):
             grb_obj.options = {}
             for opt in self.grb_object.options:
-                if opt != 'name':
+                if opt != "name":
                     grb_obj.options[opt] = deepcopy(self.grb_object.options[opt])
-            grb_obj.options['name'] = outname
+            grb_obj.options["name"] = outname
             grb_obj.multitool = False
             grb_obj.multigeo = False
             grb_obj.follow = deepcopy(self.grb_object.follow)
             grb_obj.apertures = new_apertures
             grb_obj.solid_geometry = unary_union(geo_obj)
-            grb_obj.follow_geometry = deepcopy(self.grb_object.follow_geometry) + [deepcopy(self.robber_line)]
+            grb_obj.follow_geometry = deepcopy(self.grb_object.follow_geometry) + [
+                deepcopy(self.robber_line)
+            ]
 
-            app_obj.proc_container.update_view_text(' %s' % _("Append source file"))
+            app_obj.proc_container.update_view_text(" %s" % _("Append source file"))
             # update the source file with the new geometry:
-            grb_obj.source_file = app_obj.f_handlers.export_gerber(obj_name=outname, filename=None, local_use=grb_obj,
-                                                                   use_thread=False)
+            grb_obj.source_file = app_obj.f_handlers.export_gerber(
+                obj_name=outname, filename=None, local_use=grb_obj, use_thread=False
+            )
 
-        ret_val = self.app.app_obj.new_object('gerber', outname, initialize, plot=True)
-        self.app.proc_container.update_view_text(' %s' % '')
-        if ret_val == 'fail':
+        ret_val = self.app.app_obj.new_object("gerber", outname, initialize, plot=True)
+        self.app.proc_container.update_view_text(" %s" % "")
+        if ret_val == "fail":
             self.app.call_source = "app"
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed."))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed."))
             return
 
         self.on_exit()
-        self.app.inform.emit('[success] %s' % _("Copper Thieving Tool done."))
+        self.app.inform.emit("[success] %s" % _("Copper Thieving Tool done."))
 
     def on_add_copper_thieving_click(self):
         self.app.call_source = "copper_thieving_tool"
@@ -321,50 +348,54 @@ class ToolCopperThieving(AppTool):
 
         # get the Gerber object on which the Copper thieving will be inserted
         selection_index = self.ui.grb_object_combo.currentIndex()
-        model_index = self.app.collection.index(selection_index, 0, self.ui.grb_object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.grb_object_combo.rootModelIndex()
+        )
 
         try:
             self.grb_object = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolCopperThieving.on_add_copper_thieving_click() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no Gerber object loaded ..."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("There is no Gerber object loaded ..."))
             return
 
-        if reference_method == 'itself':
+        if reference_method == "itself":
             bound_obj_name = self.ui.grb_object_combo.currentText()
 
             # Get reference object.
             try:
                 self.ref_obj = self.app.collection.get_by_name(bound_obj_name)
             except Exception as e:
-                self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), str(e)))
+                self.app.inform.emit(
+                    "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), str(e))
+                )
                 return "Could not retrieve object: %s" % self.obj_name
 
             self.copper_thieving(
-                thieving_obj=self.grb_object,
-                c_val=self.clearance_val,
-                margin=self.margin_val
+                thieving_obj=self.grb_object, c_val=self.clearance_val, margin=self.margin_val
             )
 
-        elif reference_method == 'area':
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("Click the start point of the area."))
+        elif reference_method == "area":
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("Click the start point of the area."))
             self.connect_event_handlers()
 
-        elif reference_method == 'box':
+        elif reference_method == "box":
             bound_obj_name = self.ui.ref_combo.currentText()
 
             # Get reference object.
             try:
                 self.ref_obj = self.app.collection.get_by_name(bound_obj_name)
             except Exception:
-                self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), bound_obj_name))
+                self.app.inform.emit(
+                    "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), bound_obj_name)
+                )
                 return
 
             self.copper_thieving(
                 thieving_obj=self.grb_object,
                 ref_obj=self.ref_obj,
                 c_val=self.clearance_val,
-                margin=self.margin_val
+                margin=self.margin_val,
             )
 
         # To be called after clicking on the plot.
@@ -385,13 +416,17 @@ class ToolCopperThieving(AppTool):
         if event.button == 1:
             if self.first_click is False:
                 self.first_click = True
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _("Click the end point of the filling area."))
+                self.app.inform.emit(
+                    "[WARNING_NOTCL] %s" % _("Click the end point of the filling area.")
+                )
 
                 self.cursor_pos = self.app.plotcanvas.translate_coords(event_pos)
                 if self.app.grid_status() is True:
                     self.cursor_pos = self.app.geo_editor.snap(event_pos[0], event_pos[1])
             else:
-                self.app.inform.emit(_("Zone added. Click to start adding next zone or right click to finish."))
+                self.app.inform.emit(
+                    _("Zone added. Click to start adding next zone or right click to finish.")
+                )
                 self.app.delete_selection_shape()
 
                 if self.app.grid_status() is True:
@@ -432,7 +467,7 @@ class ToolCopperThieving(AppTool):
                 thieving_obj=self.grb_object,
                 ref_obj=self.sel_rect,
                 c_val=self.clearance_val,
-                margin=self.margin_val
+                margin=self.margin_val,
             )
 
     # called on mouse move
@@ -459,10 +494,13 @@ class ToolCopperThieving(AppTool):
             # Update cursor
             curr_pos = self.app.geo_editor.snap(curr_pos[0], curr_pos[1])
 
-            self.app.app_cursor.set_data(np.asarray([(curr_pos[0], curr_pos[1])]),
-                                         symbol='++', edge_color=self.app.cursor_color_3D,
-                                         edge_width=self.app.defaults["global_cursor_width"],
-                                         size=self.app.defaults["global_cursor_size"])
+            self.app.app_cursor.set_data(
+                np.asarray([(curr_pos[0], curr_pos[1])]),
+                symbol="++",
+                edge_color=self.app.cursor_color_3D,
+                edge_width=self.app.defaults["global_cursor_width"],
+                size=self.app.defaults["global_cursor_size"],
+            )
 
         if self.cursor_pos is None:
             self.cursor_pos = (0, 0)
@@ -471,23 +509,31 @@ class ToolCopperThieving(AppTool):
         self.app.dy = curr_pos[1] - float(self.cursor_pos[1])
 
         # # update the positions on status bar
-        self.app.ui.position_label.setText("&nbsp;<b>X</b>: %.4f&nbsp;&nbsp;   "
-                                           "<b>Y</b>: %.4f&nbsp;" % (curr_pos[0], curr_pos[1]))
-        self.app.ui.rel_position_label.setText("<b>Dx</b>: %.4f&nbsp;&nbsp;  <b>Dy</b>: "
-                                               "%.4f&nbsp;&nbsp;&nbsp;&nbsp;" % (self.app.dx, self.app.dy))
+        self.app.ui.position_label.setText(
+            "&nbsp;<b>X</b>: %.4f&nbsp;&nbsp;   "
+            "<b>Y</b>: %.4f&nbsp;" % (curr_pos[0], curr_pos[1])
+        )
+        self.app.ui.rel_position_label.setText(
+            "<b>Dx</b>: %.4f&nbsp;&nbsp;  <b>Dy</b>: "
+            "%.4f&nbsp;&nbsp;&nbsp;&nbsp;" % (self.app.dx, self.app.dy)
+        )
 
         units = self.app.defaults["units"].lower()
-        self.app.plotcanvas.text_hud.text = \
-            'Dx:\t{:<.4f} [{:s}]\nDy:\t{:<.4f} [{:s}]\n\nX:  \t{:<.4f} [{:s}]\nY:  \t{:<.4f} [{:s}]'.format(
-                self.app.dx, units, self.app.dy, units, curr_pos[0], units, curr_pos[1], units)
+        self.app.plotcanvas.text_hud.text = "Dx:\t{:<.4f} [{:s}]\nDy:\t{:<.4f} [{:s}]\n\nX:  \t{:<.4f} [{:s}]\nY:  \t{:<.4f} [{:s}]".format(
+            self.app.dx, units, self.app.dy, units, curr_pos[0], units, curr_pos[1], units
+        )
 
         # draw the utility geometry
         if self.first_click:
             self.app.delete_selection_shape()
-            self.app.draw_moving_selection_shape(old_coords=(self.cursor_pos[0], self.cursor_pos[1]),
-                                                 coords=(curr_pos[0], curr_pos[1]))
+            self.app.draw_moving_selection_shape(
+                old_coords=(self.cursor_pos[0], self.cursor_pos[1]),
+                coords=(curr_pos[0], curr_pos[1]),
+            )
 
-    def copper_thieving(self, thieving_obj, ref_obj=None, c_val=None, margin=None, run_threaded=True):
+    def copper_thieving(
+        self, thieving_obj, ref_obj=None, c_val=None, margin=None, run_threaded=True
+    ):
         """
 
         :param thieving_obj:
@@ -499,11 +545,11 @@ class ToolCopperThieving(AppTool):
         """
 
         if run_threaded:
-            self.app.proc_container.new('%s ...' % _("Thieving"))
+            self.app.proc_container.new("%s ..." % _("Thieving"))
         else:
             QtWidgets.QApplication.processEvents()
 
-        self.app.proc_container.view.set_busy('%s ...' % _("Thieving"))
+        self.app.proc_container.view.set_busy("%s ..." % _("Thieving"))
 
         # #####################################################################
         # ####### Read the parameters #########################################
@@ -565,91 +611,111 @@ class ToolCopperThieving(AppTool):
                     disp_number = int(np.interp(pol_nr, [0, geo_len], [0, 100]))
 
                     if old_disp_number < disp_number <= 100:
-                        msg = ' %s ... %d%%' % (_("Thieving"), int(disp_number))
+                        msg = " %s ... %d%%" % (_("Thieving"), int(disp_number))
                         tool_obj.app.proc_container.update_view_text(msg)
                         old_disp_number = disp_number
             except TypeError:
                 # taking care of the case when the self.solid_geometry is just a single Polygon, not a list or a
                 # MultiPolygon (not an iterable)
                 clearance_geometry.append(
-                    tool_obj.grb_object.solid_geometry.buffer(c_val, int(int(tool_obj.geo_steps_per_circle) / 4))
+                    tool_obj.grb_object.solid_geometry.buffer(
+                        c_val, int(int(tool_obj.geo_steps_per_circle) / 4)
+                    )
                 )
 
-            tool_obj.app.proc_container.update_view_text(' %s ...' % _("Buffering"))
+            tool_obj.app.proc_container.update_view_text(" %s ..." % _("Buffering"))
             clearance_geometry = unary_union(clearance_geometry)
 
             # #########################################################################################################
             # Prepare the area to fill with copper.
             # #########################################################################################################
             log.debug("Copper Thieving Tool. Preparing areas to fill with copper.")
-            tool_obj.app.inform.emit(_("Copper Thieving Tool. Preparing areas to fill with copper."))
+            tool_obj.app.inform.emit(
+                _("Copper Thieving Tool. Preparing areas to fill with copper.")
+            )
 
             try:
-                if ref_obj is None or ref_obj == 'itself':
+                if ref_obj is None or ref_obj == "itself":
                     working_obj = thieving_obj
                 else:
                     working_obj = ref_obj
             except Exception as e:
                 log.debug("ToolCopperThieving.copper_thieving() --> %s" % str(e))
-                return 'fail'
+                return "fail"
 
-            tool_obj.app.proc_container.update_view_text(' %s' % _("Working..."))
+            tool_obj.app.proc_container.update_view_text(" %s" % _("Working..."))
 
             # #########################################################################################################
             # generate the bounding box geometry
             # #########################################################################################################
-            if ref_selected == 'itself':
+            if ref_selected == "itself":
                 geo_n = deepcopy(working_obj.solid_geometry)
 
                 try:
-                    if tool_obj.ui.bbox_type_radio.get_value() == 'min':
+                    if tool_obj.ui.bbox_type_radio.get_value() == "min":
                         if isinstance(geo_n, MultiPolygon):
                             env_obj = geo_n.convex_hull
-                        elif (isinstance(geo_n, MultiPolygon) and len(geo_n) == 1) or \
-                                (isinstance(geo_n, list) and len(geo_n) == 1) and isinstance(geo_n[0], Polygon):
+                        elif (
+                            (isinstance(geo_n, MultiPolygon) and len(geo_n) == 1)
+                            or (isinstance(geo_n, list) and len(geo_n) == 1)
+                            and isinstance(geo_n[0], Polygon)
+                        ):
                             env_obj = unary_union(geo_n)
                         else:
                             env_obj = unary_union(geo_n)
                             env_obj = env_obj.convex_hull
-                        bounding_box = env_obj.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                        bounding_box = env_obj.buffer(
+                            distance=margin, join_style=base.JOIN_STYLE.mitre
+                        )
                     else:
                         if isinstance(geo_n, Polygon):
-                            bounding_box = geo_n.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                            bounding_box = geo_n.buffer(
+                                distance=margin, join_style=base.JOIN_STYLE.mitre
+                            )
                         elif isinstance(geo_n, list):
                             geo_n = MultiPolygon(geo_n)
                             x0, y0, x1, y1 = geo_n.bounds
                             geo = box(x0, y0, x1, y1)
-                            bounding_box = geo.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                            bounding_box = geo.buffer(
+                                distance=margin, join_style=base.JOIN_STYLE.mitre
+                            )
                         elif isinstance(geo_n, MultiPolygon):
                             x0, y0, x1, y1 = geo_n.bounds
                             geo = box(x0, y0, x1, y1)
-                            bounding_box = geo.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                            bounding_box = geo.buffer(
+                                distance=margin, join_style=base.JOIN_STYLE.mitre
+                            )
                         else:
                             tool_obj.app.inform.emit(
-                                '[ERROR_NOTCL] %s: %s' % (_("Geometry not supported for"), type(geo_n))
+                                "[ERROR_NOTCL] %s: %s"
+                                % (_("Geometry not supported for"), type(geo_n))
                             )
-                            return 'fail'
+                            return "fail"
 
                 except Exception as e:
                     log.debug("ToolCopperFIll.copper_thieving()  'itself'  --> %s" % str(e))
-                    tool_obj.app.inform.emit('[ERROR_NOTCL] %s' % _("No object available."))
-                    return 'fail'
-            elif ref_selected == 'area':
+                    tool_obj.app.inform.emit("[ERROR_NOTCL] %s" % _("No object available."))
+                    return "fail"
+            elif ref_selected == "area":
                 geo_buff_list = []
                 try:
                     for poly in working_obj:
                         if tool_obj.app.abort_flag:
                             # graceful abort requested by the user
                             raise grace
-                        geo_buff_list.append(poly.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre))
+                        geo_buff_list.append(
+                            poly.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                        )
                 except TypeError:
-                    geo_buff_list.append(working_obj.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre))
+                    geo_buff_list.append(
+                        working_obj.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                    )
 
                 bounding_box = MultiPolygon(geo_buff_list)
-            else:   # ref_selected == 'box'
+            else:  # ref_selected == 'box'
                 geo_n = working_obj.solid_geometry
 
-                if working_obj.kind == 'geometry':
+                if working_obj.kind == "geometry":
                     try:
                         __ = iter(geo_n)
                     except Exception as e:
@@ -661,20 +727,30 @@ class ToolCopperThieving(AppTool):
                         if tool_obj.app.abort_flag:
                             # graceful abort requested by the user
                             raise grace
-                        geo_buff_list.append(poly.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre))
+                        geo_buff_list.append(
+                            poly.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                        )
 
                     bounding_box = unary_union(geo_buff_list)
-                elif working_obj.kind == 'gerber':
+                elif working_obj.kind == "gerber":
                     geo_n = unary_union(geo_n).convex_hull
-                    bounding_box = unary_union(thieving_obj.solid_geometry).convex_hull.intersection(geo_n)
-                    bounding_box = bounding_box.buffer(distance=margin, join_style=base.JOIN_STYLE.mitre)
+                    bounding_box = unary_union(
+                        thieving_obj.solid_geometry
+                    ).convex_hull.intersection(geo_n)
+                    bounding_box = bounding_box.buffer(
+                        distance=margin, join_style=base.JOIN_STYLE.mitre
+                    )
                 else:
-                    tool_obj.app.inform.emit('[ERROR_NOTCL] %s' % _("The reference object type is not supported."))
-                    return 'fail'
+                    tool_obj.app.inform.emit(
+                        "[ERROR_NOTCL] %s" % _("The reference object type is not supported.")
+                    )
+                    return "fail"
 
             log.debug("Copper Thieving Tool. Finished creating areas to fill with copper.")
 
-            tool_obj.app.inform.emit(_("Copper Thieving Tool. Appending new geometry and buffering."))
+            tool_obj.app.inform.emit(
+                _("Copper Thieving Tool. Appending new geometry and buffering.")
+            )
 
             # #########################################################################################################
             # Generate solid filling geometry. Effectively it's a NEGATIVE of the source object
@@ -697,26 +773,24 @@ class ToolCopperThieving(AppTool):
             # #########################################################################################################
             try:
                 bounding_box = thieving_obj.solid_geometry.envelope.buffer(
-                    distance=margin,
-                    join_style=base.JOIN_STYLE.mitre
+                    distance=margin, join_style=base.JOIN_STYLE.mitre
                 )
             except AttributeError:
                 bounding_box = MultiPolygon(thieving_obj.solid_geometry).envelope.buffer(
-                    distance=margin,
-                    join_style=base.JOIN_STYLE.mitre
+                    distance=margin, join_style=base.JOIN_STYLE.mitre
                 )
             x0, y0, x1, y1 = bounding_box.bounds
 
             # #########################################################################################################
             # add Thieving geometry
             # #########################################################################################################
-            tool_obj.app.proc_container.update_view_text(' %s' % _("Create geometry"))
+            tool_obj.app.proc_container.update_view_text(" %s" % _("Create geometry"))
 
-            if fill_type == 'dot' or fill_type == 'square':
+            if fill_type == "dot" or fill_type == "square":
                 # build the MultiPolygon of dots/squares that will fill the entire bounding box
                 thieving_list = []
 
-                if fill_type == 'dot':
+                if fill_type == "dot":
                     radius = dot_dia / 2.0
                     new_x = x0 + radius
                     new_y = y0 + radius
@@ -759,7 +833,7 @@ class ToolCopperThieving(AppTool):
 
                 tool_obj.thief_solid_geometry = thieving_geo
 
-            if fill_type == 'line':
+            if fill_type == "line":
                 half_thick_line = line_size / 2.0
 
                 # create a thick polygon-line that surrounds the copper features
@@ -771,14 +845,16 @@ class ToolCopperThieving(AppTool):
                             raise grace
 
                         outline_geometry.append(
-                            pol.buffer(c_val+half_thick_line, int(int(tool_obj.geo_steps_per_circle) / 4))
+                            pol.buffer(
+                                c_val + half_thick_line, int(int(tool_obj.geo_steps_per_circle) / 4)
+                            )
                         )
 
                         pol_nr += 1
                         disp_number = int(np.interp(pol_nr, [0, geo_len], [0, 100]))
 
                         if old_disp_number < disp_number <= 100:
-                            msg = ' %s ... %d%%' % (_("Buffering"), int(disp_number))
+                            msg = " %s ... %d%%" % (_("Buffering"), int(disp_number))
                             tool_obj.app.proc_container.update_view_text(msg)
                             old_disp_number = disp_number
                 except TypeError:
@@ -786,12 +862,11 @@ class ToolCopperThieving(AppTool):
                     # MultiPolygon (not an iterable)
                     outline_geometry.append(
                         tool_obj.grb_object.solid_geometry.buffer(
-                            c_val+half_thick_line,
-                            int(int(tool_obj.geo_steps_per_circle) / 4)
+                            c_val + half_thick_line, int(int(tool_obj.geo_steps_per_circle) / 4)
                         )
                     )
 
-                tool_obj.app.proc_container.update_view_text(' %s' % _("Buffering"))
+                tool_obj.app.proc_container.update_view_text(" %s" % _("Buffering"))
                 outline_geometry = unary_union(outline_geometry)
 
                 outline_line = []
@@ -799,7 +874,8 @@ class ToolCopperThieving(AppTool):
                     for geo_o in outline_geometry:
                         outline_line.append(
                             geo_o.exterior.buffer(
-                                half_thick_line, resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
+                                half_thick_line,
+                                resolution=int(int(tool_obj.geo_steps_per_circle) / 4),
                             )
                         )
                 except TypeError:
@@ -815,8 +891,7 @@ class ToolCopperThieving(AppTool):
                 box_outline_geo = box(x0, y0, x1, y1).buffer(-half_thick_line)
                 box_outline_geo_exterior = box_outline_geo.exterior
                 box_outline_geometry = box_outline_geo_exterior.buffer(
-                    half_thick_line,
-                    resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
+                    half_thick_line, resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
                 )
 
                 bx0, by0, bx1, by1 = box_outline_geo.bounds
@@ -825,16 +900,14 @@ class ToolCopperThieving(AppTool):
                 new_y = by0
                 while new_x <= x1 - half_thick_line:
                     line_geo = LineString([(new_x, by0), (new_x, by1)]).buffer(
-                        half_thick_line,
-                        resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
+                        half_thick_line, resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
                     )
                     thieving_lines_geo.append(line_geo)
                     new_x += line_size + line_spacing
 
                 while new_y <= y1 - half_thick_line:
                     line_geo = LineString([(bx0, new_y), (bx1, new_y)]).buffer(
-                        half_thick_line,
-                        resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
+                        half_thick_line, resolution=int(int(tool_obj.geo_steps_per_circle) / 4)
                     )
                     thieving_lines_geo.append(line_geo)
                     new_y += line_size + line_spacing
@@ -847,7 +920,7 @@ class ToolCopperThieving(AppTool):
                 tool_obj.flatten([outline_geometry, box_outline_geometry, diff_lines_geo])
                 tool_obj.thief_solid_geometry = tool_obj.flat_geometry
 
-            tool_obj.app.proc_container.update_view_text(' %s' % _("Append geometry"))
+            tool_obj.app.proc_container.update_view_text(" %s" % _("Append geometry"))
             # create a list of the source geometry
             geo_list = deepcopy(tool_obj.grb_object.solid_geometry)
             if isinstance(tool_obj.grb_object.solid_geometry, MultiPolygon):
@@ -856,12 +929,8 @@ class ToolCopperThieving(AppTool):
             # create a new dictionary to hold the source object apertures allowing us to tamper with without altering
             # the original source object's apertures
             new_apertures = deepcopy(tool_obj.grb_object.apertures)
-            if '0' not in new_apertures:
-                new_apertures['0'] = {
-                    'type': 'REG',
-                    'size': 0.0,
-                    'geometry': []
-                }
+            if "0" not in new_apertures:
+                new_apertures["0"] = {"type": "REG", "size": 0.0, "geometry": []}
 
             # add the thieving geometry in the '0' aperture of the new_apertures dict
             try:
@@ -870,27 +939,30 @@ class ToolCopperThieving(AppTool):
                     geo_list.append(poly)
 
                     # append into the '0' aperture
-                    geo_elem = {'solid': poly, 'follow': poly.exterior}
-                    new_apertures['0']['geometry'].append(deepcopy(geo_elem))
+                    geo_elem = {"solid": poly, "follow": poly.exterior}
+                    new_apertures["0"]["geometry"].append(deepcopy(geo_elem))
             except TypeError:
                 # append to the new solid geometry
                 geo_list.append(tool_obj.thief_solid_geometry)
 
                 # append into the '0' aperture
-                geo_elem = {'solid': tool_obj.new_solid_geometry, 'follow': tool_obj.new_solid_geometry.exterior}
-                new_apertures['0']['geometry'].append(deepcopy(geo_elem))
+                geo_elem = {
+                    "solid": tool_obj.new_solid_geometry,
+                    "follow": tool_obj.new_solid_geometry.exterior,
+                }
+                new_apertures["0"]["geometry"].append(deepcopy(geo_elem))
 
             # prepare also the solid_geometry for the new object having the thieving geometry
             new_solid_geo = MultiPolygon(geo_list).buffer(0.0000001).buffer(-0.0000001)
 
-            outname = '%s_%s' % (str(self.grb_object.options['name']), 'thief')
+            outname = "%s_%s" % (str(self.grb_object.options["name"]), "thief")
 
             def initialize(grb_obj, app_obj):
                 grb_obj.options = {}
                 for opt in self.grb_object.options:
-                    if opt != 'name':
+                    if opt != "name":
                         grb_obj.options[opt] = deepcopy(self.grb_object.options[opt])
-                grb_obj.options['name'] = outname
+                grb_obj.options["name"] = outname
                 grb_obj.multitool = False
                 grb_obj.multigeo = False
                 grb_obj.follow = deepcopy(self.grb_object.follow)
@@ -898,23 +970,23 @@ class ToolCopperThieving(AppTool):
                 grb_obj.solid_geometry = deepcopy(new_solid_geo)
                 grb_obj.follow_geometry = deepcopy(self.grb_object.follow_geometry)
 
-                app_obj.proc_container.update_view_text(' %s' % _("Append source file"))
-                grb_obj.source_file = app_obj.f_handlers.export_gerber(obj_name=outname, filename=None,
-                                                                       local_use=grb_obj,
-                                                                       use_thread=False)
+                app_obj.proc_container.update_view_text(" %s" % _("Append source file"))
+                grb_obj.source_file = app_obj.f_handlers.export_gerber(
+                    obj_name=outname, filename=None, local_use=grb_obj, use_thread=False
+                )
 
-            ret_val = self.app.app_obj.new_object('gerber', outname, initialize, plot=True)
-            tool_obj.app.proc_container.update_view_text(' %s' % '')
-            if ret_val == 'fail':
+            ret_val = self.app.app_obj.new_object("gerber", outname, initialize, plot=True)
+            tool_obj.app.proc_container.update_view_text(" %s" % "")
+            if ret_val == "fail":
                 self.app.call_source = "app"
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed."))
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed."))
                 return
 
             tool_obj.on_exit()
-            tool_obj.app.inform.emit('[success] %s' % _("Copper Thieving Tool done."))
+            tool_obj.app.inform.emit("[success] %s" % _("Copper Thieving Tool done."))
 
         if run_threaded:
-            self.app.worker_task.emit({'fcn': job_thread_thieving, 'params': [self]})
+            self.app.worker_task.emit({"fcn": job_thread_thieving, "params": [self]})
         else:
             job_thread_thieving(self)
 
@@ -922,14 +994,14 @@ class ToolCopperThieving(AppTool):
         run_threaded = True
 
         if run_threaded:
-            self.app.proc_container.new('%s ...' % _("P-Plating Mask"))
+            self.app.proc_container.new("%s ..." % _("P-Plating Mask"))
         else:
             QtWidgets.QApplication.processEvents()
 
-        self.app.proc_container.view.set_busy('%s ...' % _("P-Plating Mask"))
+        self.app.proc_container.view.set_busy("%s ..." % _("P-Plating Mask"))
 
         if run_threaded:
-            self.app.worker_task.emit({'fcn': self.on_new_pattern_plating_object, 'params': []})
+            self.app.worker_task.emit({"fcn": self.on_new_pattern_plating_object, "params": []})
         else:
             self.on_new_pattern_plating_object()
 
@@ -940,16 +1012,18 @@ class ToolCopperThieving(AppTool):
 
         # get the Gerber object on which the Copper thieving will be inserted
         selection_index = self.ui.sm_object_combo.currentIndex()
-        model_index = self.app.collection.index(selection_index, 0, self.ui.sm_object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.sm_object_combo.rootModelIndex()
+        )
 
         try:
             self.sm_object = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolCopperThieving.on_add_ppm_click() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no Gerber object loaded ..."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("There is no Gerber object loaded ..."))
             return
 
-        self.app.proc_container.update_view_text(' %s' % _("Append PP-M geometry"))
+        self.app.proc_container.update_view_text(" %s" % _("Append PP-M geometry"))
         geo_list = deepcopy(self.sm_object.solid_geometry)
         if isinstance(geo_list, MultiPolygon):
             geo_list = list(geo_list.geoms)
@@ -967,21 +1041,23 @@ class ToolCopperThieving(AppTool):
             # squash former geometry in apertures
             for ap_id in new_apertures:
                 for k in new_apertures[ap_id]:
-                    if k == 'geometry':
-                        new_apertures[ap_id]['geometry'] = []
+                    if k == "geometry":
+                        new_apertures[ap_id]["geometry"] = []
 
             # then add a buffered geometry
             for ap_id in new_apertures:
-                if 'geometry' in self.sm_object.apertures[ap_id]:
+                if "geometry" in self.sm_object.apertures[ap_id]:
                     new_geo_list = []
-                    for geo_el in self.sm_object.apertures[ap_id]['geometry']:
+                    for geo_el in self.sm_object.apertures[ap_id]["geometry"]:
                         new_el = {
-                            'solid': geo_el['solid'].buffer(ppm_clearance) if 'solid' in geo_el else [],
-                            'follow': geo_el['follow'] if 'follow' in geo_el else [],
-                            'clear': geo_el['clear'] if 'clear' in geo_el else []
+                            "solid": (
+                                geo_el["solid"].buffer(ppm_clearance) if "solid" in geo_el else []
+                            ),
+                            "follow": geo_el["follow"] if "follow" in geo_el else [],
+                            "clear": geo_el["clear"] if "clear" in geo_el else [],
                         }
                         new_geo_list.append(deepcopy(new_el))
-                    new_apertures[ap_id]['geometry'] = deepcopy(new_geo_list)
+                    new_apertures[ap_id]["geometry"] = deepcopy(new_geo_list)
 
         # calculate its own plated area (from the solder mask object)
         plated_area = 0.0
@@ -996,17 +1072,13 @@ class ToolCopperThieving(AppTool):
         new_follow_geo = deepcopy(self.sm_object.follow_geometry)
 
         # if we have copper thieving geometry, add it
-        if thieving_solid_geo and geo_choice in ['b', 't']:
+        if thieving_solid_geo and geo_choice in ["b", "t"]:
             # add to the total the thieving geometry area, if chosen
             for geo in thieving_solid_geo:
                 plated_area += geo.area
 
-            if '0' not in new_apertures:
-                new_apertures['0'] = {
-                    'type': 'REG',
-                    'size': 0.0,
-                    'geometry': []
-                }
+            if "0" not in new_apertures:
+                new_apertures["0"] = {"type": "REG", "size": 0.0, "geometry": []}
 
             try:
                 for poly in thieving_solid_geo:
@@ -1016,11 +1088,8 @@ class ToolCopperThieving(AppTool):
                     geo_list.append(poly_b)
 
                     # append into the '0' aperture
-                    geo_elem = {
-                        'solid': poly_b,
-                        'follow': poly_b.exterior
-                    }
-                    new_apertures['0']['geometry'].append(deepcopy(geo_elem))
+                    geo_elem = {"solid": poly_b, "follow": poly_b.exterior}
+                    new_apertures["0"]["geometry"].append(deepcopy(geo_elem))
             except TypeError:
                 # append to the new solid geometry
                 assert isinstance(thieving_solid_geo, Polygon)
@@ -1028,13 +1097,13 @@ class ToolCopperThieving(AppTool):
 
                 # append into the '0' aperture
                 geo_elem = {
-                    'solid': thieving_solid_geo.buffer(ppm_clearance),
-                    'follow': thieving_solid_geo.buffer(ppm_clearance).exterior
+                    "solid": thieving_solid_geo.buffer(ppm_clearance),
+                    "follow": thieving_solid_geo.buffer(ppm_clearance).exterior,
                 }
-                new_apertures['0']['geometry'].append(deepcopy(geo_elem))
+                new_apertures["0"]["geometry"].append(deepcopy(geo_elem))
 
         # if we have robber bar geometry, add it
-        if robber_solid_geo and geo_choice in ['b', 'r']:
+        if robber_solid_geo and geo_choice in ["b", "r"]:
             # add to the total the robber bar geometry are, if chose
             plated_area += robber_solid_geo.area
 
@@ -1043,32 +1112,32 @@ class ToolCopperThieving(AppTool):
 
             aperture_found = None
             for ap_id, ap_val in new_apertures.items():
-                if ap_val['type'] == 'C' and ap_val['size'] == self.rb_thickness + ppm_clearance:
+                if ap_val["type"] == "C" and ap_val["size"] == self.rb_thickness + ppm_clearance:
                     aperture_found = ap_id
                     break
 
             if aperture_found:
-                geo_elem = {'solid': robber_solid_geo, 'follow': robber_line}
-                new_apertures[aperture_found]['geometry'].append(deepcopy(geo_elem))
+                geo_elem = {"solid": robber_solid_geo, "follow": robber_line}
+                new_apertures[aperture_found]["geometry"].append(deepcopy(geo_elem))
             else:
                 ap_keys = list(new_apertures.keys())
                 max_apid = int(max(ap_keys))
                 if ap_keys and max_apid != 0:
                     new_apid = str(max_apid + 1)
                 else:
-                    new_apid = '10'
+                    new_apid = "10"
 
                 new_apertures[new_apid] = {
-                    'type': 'C',
-                    'size': rb_thickness + ppm_clearance,
-                    'geometry': []
+                    "type": "C",
+                    "size": rb_thickness + ppm_clearance,
+                    "geometry": [],
                 }
 
                 geo_elem = {
-                    'solid': robber_solid_geo.buffer(ppm_clearance),
-                    'follow': deepcopy(robber_line)
+                    "solid": robber_solid_geo.buffer(ppm_clearance),
+                    "follow": deepcopy(robber_line),
                 }
-                new_apertures[new_apid]['geometry'].append(deepcopy(geo_elem))
+                new_apertures[new_apid]["geometry"].append(deepcopy(geo_elem))
 
             geo_list.append(robber_solid_geo.buffer(ppm_clearance))
 
@@ -1080,9 +1149,9 @@ class ToolCopperThieving(AppTool):
         def obj_init(grb_obj, app_obj):
             grb_obj.options = {}
             for opt in self.sm_object.options:
-                if opt != 'name':
+                if opt != "name":
                     grb_obj.options[opt] = deepcopy(self.sm_object.options[opt])
-            grb_obj.options['name'] = outname
+            grb_obj.options["name"] = outname
             grb_obj.multitool = False
             grb_obj.source_file = []
             grb_obj.multigeo = False
@@ -1091,36 +1160,37 @@ class ToolCopperThieving(AppTool):
             grb_obj.apertures = deepcopy(new_apertures)
             grb_obj.solid_geometry = deepcopy(new_solid_geometry)
 
-            app_obj.proc_container.update_view_text(' %s' % _("Append source file"))
+            app_obj.proc_container.update_view_text(" %s" % _("Append source file"))
             # update the source file with the new geometry:
-            grb_obj.source_file = app_obj.f_handlers.export_gerber(obj_name=outname, filename=None, local_use=grb_obj,
-                                                                   use_thread=False)
-            app_obj.proc_container.update_view_text(' %s' % '')
+            grb_obj.source_file = app_obj.f_handlers.export_gerber(
+                obj_name=outname, filename=None, local_use=grb_obj, use_thread=False
+            )
+            app_obj.proc_container.update_view_text(" %s" % "")
 
         # Object name
-        obj_name, separatpr, obj_extension = self.sm_object.options['name'].rpartition('.')
-        outname = '%s_%s.%s' % (obj_name, 'plating_mask', obj_extension)
+        obj_name, separatpr, obj_extension = self.sm_object.options["name"].rpartition(".")
+        outname = "%s_%s.%s" % (obj_name, "plating_mask", obj_extension)
 
-        ret_val = self.app.app_obj.new_object('gerber', outname, obj_init, autoselected=False)
-        if ret_val == 'fail':
+        ret_val = self.app.app_obj.new_object("gerber", outname, obj_init, autoselected=False)
+        if ret_val == "fail":
             self.app.call_source = "app"
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed."))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed."))
             return
 
         # Register recent file
         self.app.file_opened.emit("gerber", outname)
 
         self.on_exit()
-        self.app.inform.emit('[success] %s' % _("Generating Pattern Plating Mask done."))
+        self.app.inform.emit("[success] %s" % _("Generating Pattern Plating Mask done."))
 
     def replot(self, obj, run_thread=True):
         def worker_task():
-            with self.app.proc_container.new('%s...' % _("Plotting")):
+            with self.app.proc_container.new("%s..." % _("Plotting")):
                 obj.plot()
                 self.app.app_obj.object_plotted.emit(obj)
 
         if run_thread:
-            self.app.worker_task.emit({'fcn': worker_task, 'params': []})
+            self.app.worker_task.emit({"fcn": worker_task, "params": []})
         else:
             worker_task()
 
@@ -1154,38 +1224,49 @@ class ToolCopperThieving(AppTool):
         self.disconnect_event_handlers()
 
         self.app.call_source = "app"
-        self.app.inform.emit('[success] %s' % _("Copper Thieving Tool exit."))
+        self.app.inform.emit("[success] %s" % _("Copper Thieving Tool exit."))
 
     def connect_event_handlers(self):
         if self.handlers_connected is False:
             if self.app.is_legacy is False:
-                self.app.plotcanvas.graph_event_disconnect('mouse_press', self.app.on_mouse_click_over_plot)
-                self.app.plotcanvas.graph_event_disconnect('mouse_move', self.app.on_mouse_move_over_plot)
-                self.app.plotcanvas.graph_event_disconnect('mouse_release', self.app.on_mouse_click_release_over_plot)
+                self.app.plotcanvas.graph_event_disconnect(
+                    "mouse_press", self.app.on_mouse_click_over_plot
+                )
+                self.app.plotcanvas.graph_event_disconnect(
+                    "mouse_move", self.app.on_mouse_move_over_plot
+                )
+                self.app.plotcanvas.graph_event_disconnect(
+                    "mouse_release", self.app.on_mouse_click_release_over_plot
+                )
             else:
                 self.app.plotcanvas.graph_event_disconnect(self.app.mp)
                 self.app.plotcanvas.graph_event_disconnect(self.app.mm)
                 self.app.plotcanvas.graph_event_disconnect(self.app.mr)
 
-            self.mr = self.app.plotcanvas.graph_event_connect('mouse_release', self.on_mouse_release)
-            self.mm = self.app.plotcanvas.graph_event_connect('mouse_move', self.on_mouse_move)
+            self.mr = self.app.plotcanvas.graph_event_connect(
+                "mouse_release", self.on_mouse_release
+            )
+            self.mm = self.app.plotcanvas.graph_event_connect("mouse_move", self.on_mouse_move)
             self.handlers_connected = True
 
     def disconnect_event_handlers(self):
         if self.handlers_connected is True:
             if self.app.is_legacy is False:
-                self.app.plotcanvas.graph_event_disconnect('mouse_release', self.on_mouse_release)
-                self.app.plotcanvas.graph_event_disconnect('mouse_move', self.on_mouse_move)
+                self.app.plotcanvas.graph_event_disconnect("mouse_release", self.on_mouse_release)
+                self.app.plotcanvas.graph_event_disconnect("mouse_move", self.on_mouse_move)
             else:
                 self.app.plotcanvas.graph_event_disconnect(self.mr)
                 self.app.plotcanvas.graph_event_disconnect(self.mm)
 
-            self.app.mp = self.app.plotcanvas.graph_event_connect('mouse_press',
-                                                                  self.app.on_mouse_click_over_plot)
-            self.app.mm = self.app.plotcanvas.graph_event_connect('mouse_move',
-                                                                  self.app.on_mouse_move_over_plot)
-            self.app.mr = self.app.plotcanvas.graph_event_connect('mouse_release',
-                                                                  self.app.on_mouse_click_release_over_plot)
+            self.app.mp = self.app.plotcanvas.graph_event_connect(
+                "mouse_press", self.app.on_mouse_click_over_plot
+            )
+            self.app.mm = self.app.plotcanvas.graph_event_connect(
+                "mouse_move", self.app.on_mouse_move_over_plot
+            )
+            self.app.mr = self.app.plotcanvas.graph_event_connect(
+                "mouse_release", self.app.on_mouse_click_release_over_plot
+            )
             self.handlers_connected = False
 
     def flatten(self, geometry):
@@ -1216,18 +1297,20 @@ class ThievingUI:
     def __init__(self, layout, app):
         self.app = app
         self.decimals = self.app.decimals
-        self.units = self.app.defaults['units']
+        self.units = self.app.defaults["units"]
         self.layout = layout
 
         # ## Title
         title_label = FCLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
         self.layout.addWidget(FCLabel(""))
 
@@ -1239,14 +1322,14 @@ class ThievingUI:
 
         self.grb_object_combo = FCComboBox()
         self.grb_object_combo.setModel(self.app.collection)
-        self.grb_object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.grb_object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         self.grb_object_combo.is_last = True
-        self.grb_object_combo.obj_type = 'Gerber'
+        self.grb_object_combo.obj_type = "Gerber"
 
         self.grbobj_label = FCLabel("<b>%s:</b>" % _("GERBER"))
-        self.grbobj_label.setToolTip(
-            _("Gerber Object to which will be added a copper thieving.")
-        )
+        self.grbobj_label.setToolTip(_("Gerber Object to which will be added a copper thieving."))
 
         i_grid_lay.addWidget(self.grbobj_label, 0, 0)
         i_grid_lay.addWidget(self.grb_object_combo, 1, 0, 1, 2)
@@ -1262,18 +1345,18 @@ class ThievingUI:
         grid_lay.setColumnStretch(0, 0)
         grid_lay.setColumnStretch(1, 1)
 
-        self.copper_fill_label = FCLabel('<b>%s</b>' % _('Parameters'))
-        self.copper_fill_label.setToolTip(
-            _("Parameters used for this tool.")
-        )
+        self.copper_fill_label = FCLabel("<b>%s</b>" % _("Parameters"))
+        self.copper_fill_label.setToolTip(_("Parameters used for this tool."))
         grid_lay.addWidget(self.copper_fill_label, 0, 0, 1, 2)
 
         # CLEARANCE #
-        self.clearance_label = FCLabel('%s:' % _("Clearance"))
+        self.clearance_label = FCLabel("%s:" % _("Clearance"))
         self.clearance_label.setToolTip(
-            _("This set the distance between the copper thieving components\n"
-              "(the polygon fill may be split in multiple polygons)\n"
-              "and the copper traces in the Gerber file.")
+            _(
+                "This set the distance between the copper thieving components\n"
+                "(the polygon fill may be split in multiple polygons)\n"
+                "and the copper traces in the Gerber file."
+            )
         )
         self.clearance_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.clearance_entry.set_range(0.00001, 10000.0000)
@@ -1284,10 +1367,8 @@ class ThievingUI:
         grid_lay.addWidget(self.clearance_entry, 2, 1)
 
         # MARGIN #
-        self.margin_label = FCLabel('%s:' % _("Margin"))
-        self.margin_label.setToolTip(
-            _("Bounding box margin.")
-        )
+        self.margin_label = FCLabel("%s:" % _("Margin"))
+        self.margin_label.setToolTip(_("Bounding box margin."))
         self.margin_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.margin_entry.set_range(0.0, 10000.0000)
         self.margin_entry.set_precision(self.decimals)
@@ -1298,7 +1379,7 @@ class ThievingUI:
 
         # Area #
         area_hlay = QtWidgets.QHBoxLayout()
-        self.area_label = FCLabel('%s:' % _("Area"))
+        self.area_label = FCLabel("%s:" % _("Area"))
         self.area_label.setToolTip(
             _("Thieving areas with area less then this value will not be added.")
         )
@@ -1306,12 +1387,14 @@ class ThievingUI:
         self.area_entry.set_range(0.0, 10000.0000)
         self.area_entry.set_precision(self.decimals)
         self.area_entry.setSingleStep(0.1)
-        self.area_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.area_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
 
-        if self.units.upper() == 'MM':
-            units_area_label = FCLabel('%s<sup>2</sup>' % _("mm"))
+        if self.units.upper() == "MM":
+            units_area_label = FCLabel("%s<sup>2</sup>" % _("mm"))
         else:
-            units_area_label = FCLabel('%s<sup>2</sup>' % _("in"))
+            units_area_label = FCLabel("%s<sup>2</sup>" % _("in"))
 
         area_hlay.addWidget(self.area_entry)
         area_hlay.addWidget(units_area_label)
@@ -1320,24 +1403,32 @@ class ThievingUI:
         grid_lay.addLayout(area_hlay, 6, 1)
 
         # Reference #
-        self.reference_radio = RadioSet([
-            {'label': _('Itself'), 'value': 'itself'},
-            {"label": _("Area Selection"), "value": "area"},
-            {'label': _("Reference Object"), 'value': 'box'}
-        ], orientation='vertical', stretch=False)
+        self.reference_radio = RadioSet(
+            [
+                {"label": _("Itself"), "value": "itself"},
+                {"label": _("Area Selection"), "value": "area"},
+                {"label": _("Reference Object"), "value": "box"},
+            ],
+            orientation="vertical",
+            stretch=False,
+        )
         self.reference_label = FCLabel(_("Reference:"))
         self.reference_label.setToolTip(
-            _("- 'Itself' - the copper thieving extent is based on the object extent.\n"
-              "- 'Area Selection' - left mouse click to start selection of the area to be filled.\n"
-              "- 'Reference Object' - will do copper thieving within the area specified by another object.")
+            _(
+                "- 'Itself' - the copper thieving extent is based on the object extent.\n"
+                "- 'Area Selection' - left mouse click to start selection of the area to be filled.\n"
+                "- 'Reference Object' - will do copper thieving within the area specified by another object."
+            )
         )
         grid_lay.addWidget(self.reference_label, 8, 0)
         grid_lay.addWidget(self.reference_radio, 8, 1)
 
-        self.ref_combo_type_label = FCLabel('%s:' % _("Ref. Type"))
+        self.ref_combo_type_label = FCLabel("%s:" % _("Ref. Type"))
         self.ref_combo_type_label.setToolTip(
-            _("The type of FlatCAM object to be used as copper thieving reference.\n"
-              "It can be Gerber, Excellon or Geometry.")
+            _(
+                "The type of FlatCAM object to be used as copper thieving reference.\n"
+                "It can be Gerber, Excellon or Geometry."
+            )
         )
         self.ref_combo_type = FCComboBox()
         self.ref_combo_type.addItems([_("Gerber"), _("Excellon"), _("Geometry")])
@@ -1345,7 +1436,7 @@ class ThievingUI:
         grid_lay.addWidget(self.ref_combo_type_label, 10, 0)
         grid_lay.addWidget(self.ref_combo_type, 10, 1)
 
-        self.ref_combo_label = FCLabel('%s:' % _("Ref. Object"))
+        self.ref_combo_label = FCLabel("%s:" % _("Ref. Object"))
         self.ref_combo_label.setToolTip(
             _("The FlatCAM object to be used as non copper clearing reference.")
         )
@@ -1354,7 +1445,9 @@ class ThievingUI:
         self.ref_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
         self.ref_combo.is_last = True
         self.ref_combo.obj_type = {
-            _("Gerber"): "Gerber", _("Excellon"): "Excellon", _("Geometry"): "Geometry"
+            _("Gerber"): "Gerber",
+            _("Excellon"): "Excellon",
+            _("Geometry"): "Geometry",
         }[self.ref_combo_type.get_value()]
 
         grid_lay.addWidget(self.ref_combo_label, 12, 0)
@@ -1366,15 +1459,17 @@ class ThievingUI:
         self.ref_combo_type_label.hide()
 
         # Bounding Box Type #
-        self.bbox_type_label = FCLabel('%s:' % _("Box Type"))
+        self.bbox_type_label = FCLabel("%s:" % _("Box Type"))
         self.bbox_type_label.setToolTip(
-            _("- 'Rectangular' - the bounding box will be of rectangular shape.\n"
-              "- 'Minimal' - the bounding box will be the convex hull shape.")
+            _(
+                "- 'Rectangular' - the bounding box will be of rectangular shape.\n"
+                "- 'Minimal' - the bounding box will be the convex hull shape."
+            )
         )
-        self.bbox_type_radio = RadioSet([
-            {'label': _('Rectangular'), 'value': 'rect'},
-            {"label": _("Minimal"), "value": "min"}
-        ], stretch=False)
+        self.bbox_type_radio = RadioSet(
+            [{"label": _("Rectangular"), "value": "rect"}, {"label": _("Minimal"), "value": "min"}],
+            stretch=False,
+        )
 
         grid_lay.addWidget(self.bbox_type_label, 14, 0)
         grid_lay.addWidget(self.bbox_type_radio, 14, 1)
@@ -1387,18 +1482,24 @@ class ThievingUI:
         grid_lay.addWidget(separator_line, 16, 0, 1, 2)
 
         # Fill Type
-        self.fill_type_radio = RadioSet([
-            {'label': _('Solid'), 'value': 'solid'},
-            {"label": _("Dots Grid"), "value": "dot"},
-            {"label": _("Squares Grid"), "value": "square"},
-            {"label": _("Lines Grid"), "value": "line"}
-        ], orientation='vertical', stretch=False)
+        self.fill_type_radio = RadioSet(
+            [
+                {"label": _("Solid"), "value": "solid"},
+                {"label": _("Dots Grid"), "value": "dot"},
+                {"label": _("Squares Grid"), "value": "square"},
+                {"label": _("Lines Grid"), "value": "line"},
+            ],
+            orientation="vertical",
+            stretch=False,
+        )
         self.fill_type_label = FCLabel(_("Fill Type:"))
         self.fill_type_label.setToolTip(
-            _("- 'Solid' - copper thieving will be a solid polygon.\n"
-              "- 'Dots Grid' - the empty area will be filled with a pattern of dots.\n"
-              "- 'Squares Grid' - the empty area will be filled with a pattern of squares.\n"
-              "- 'Lines Grid' - the empty area will be filled with a pattern of lines.")
+            _(
+                "- 'Solid' - copper thieving will be a solid polygon.\n"
+                "- 'Dots Grid' - the empty area will be filled with a pattern of dots.\n"
+                "- 'Squares Grid' - the empty area will be filled with a pattern of squares.\n"
+                "- 'Lines Grid' - the empty area will be filled with a pattern of lines."
+            )
         )
         grid_lay.addWidget(self.fill_type_label, 18, 0)
         grid_lay.addWidget(self.fill_type_radio, 18, 1)
@@ -1414,14 +1515,12 @@ class ThievingUI:
         self.dots_frame.setLayout(dots_grid)
         self.dots_frame.hide()
 
-        self.dots_label = FCLabel('<b>%s</b>:' % _("Dots Grid Parameters"))
+        self.dots_label = FCLabel("<b>%s</b>:" % _("Dots Grid Parameters"))
         dots_grid.addWidget(self.dots_label, 0, 0, 1, 2)
 
         # Dot diameter #
-        self.dotdia_label = FCLabel('%s:' % _("Dia"))
-        self.dotdia_label.setToolTip(
-            _("Dot diameter in Dots Grid.")
-        )
+        self.dotdia_label = FCLabel("%s:" % _("Dia"))
+        self.dotdia_label.setToolTip(_("Dot diameter in Dots Grid."))
         self.dot_dia_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.dot_dia_entry.set_range(0.0, 10000.0000)
         self.dot_dia_entry.set_precision(self.decimals)
@@ -1431,10 +1530,8 @@ class ThievingUI:
         dots_grid.addWidget(self.dot_dia_entry, 1, 1)
 
         # Dot spacing #
-        self.dotspacing_label = FCLabel('%s:' % _("Spacing"))
-        self.dotspacing_label.setToolTip(
-            _("Distance between each two dots in Dots Grid.")
-        )
+        self.dotspacing_label = FCLabel("%s:" % _("Spacing"))
+        self.dotspacing_label.setToolTip(_("Distance between each two dots in Dots Grid."))
         self.dot_spacing_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.dot_spacing_entry.set_range(0.0, 10000.0000)
         self.dot_spacing_entry.set_precision(self.decimals)
@@ -1454,14 +1551,12 @@ class ThievingUI:
         self.squares_frame.setLayout(squares_grid)
         self.squares_frame.hide()
 
-        self.squares_label = FCLabel('<b>%s</b>:' % _("Squares Grid Parameters"))
+        self.squares_label = FCLabel("<b>%s</b>:" % _("Squares Grid Parameters"))
         squares_grid.addWidget(self.squares_label, 0, 0, 1, 2)
 
         # Square Size #
-        self.square_size_label = FCLabel('%s:' % _("Size"))
-        self.square_size_label.setToolTip(
-            _("Square side size in Squares Grid.")
-        )
+        self.square_size_label = FCLabel("%s:" % _("Size"))
+        self.square_size_label.setToolTip(_("Square side size in Squares Grid."))
         self.square_size_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.square_size_entry.set_range(0.0, 10000.0000)
         self.square_size_entry.set_precision(self.decimals)
@@ -1471,7 +1566,7 @@ class ThievingUI:
         squares_grid.addWidget(self.square_size_entry, 1, 1)
 
         # Squares spacing #
-        self.squares_spacing_label = FCLabel('%s:' % _("Spacing"))
+        self.squares_spacing_label = FCLabel("%s:" % _("Spacing"))
         self.squares_spacing_label.setToolTip(
             _("Distance between each two squares in Squares Grid.")
         )
@@ -1494,14 +1589,12 @@ class ThievingUI:
         self.lines_frame.setLayout(lines_grid)
         self.lines_frame.hide()
 
-        self.lines_label = FCLabel('<b>%s</b>:' % _("Lines Grid Parameters"))
+        self.lines_label = FCLabel("<b>%s</b>:" % _("Lines Grid Parameters"))
         lines_grid.addWidget(self.lines_label, 0, 0, 1, 2)
 
         # Square Size #
-        self.line_size_label = FCLabel('%s:' % _("Size"))
-        self.line_size_label.setToolTip(
-            _("Line thickness size in Lines Grid.")
-        )
+        self.line_size_label = FCLabel("%s:" % _("Size"))
+        self.line_size_label.setToolTip(_("Line thickness size in Lines Grid."))
         self.line_size_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.line_size_entry.set_range(0.0, 10000.0000)
         self.line_size_entry.set_precision(self.decimals)
@@ -1511,10 +1604,8 @@ class ThievingUI:
         lines_grid.addWidget(self.line_size_entry, 1, 1)
 
         # Lines spacing #
-        self.lines_spacing_label = FCLabel('%s:' % _("Spacing"))
-        self.lines_spacing_label.setToolTip(
-            _("Distance between each two lines in Lines Grid.")
-        )
+        self.lines_spacing_label = FCLabel("%s:" % _("Spacing"))
+        self.lines_spacing_label.setToolTip(_("Distance between each two lines in Lines Grid."))
         self.lines_spacing_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.lines_spacing_entry.set_range(0.0, 10000.0000)
         self.lines_spacing_entry.set_precision(self.decimals)
@@ -1525,17 +1616,21 @@ class ThievingUI:
 
         # ## Insert Copper Thieving
         self.fill_button = QtWidgets.QPushButton(_("Insert Copper thieving"))
-        self.fill_button.setIcon(QtGui.QIcon(self.app.resource_location + '/copperfill32.png'))
+        self.fill_button.setIcon(QtGui.QIcon(self.app.resource_location + "/copperfill32.png"))
         self.fill_button.setToolTip(
-            _("Will add a polygon (may be split in multiple parts)\n"
-              "that will surround the actual Gerber traces at a certain distance.")
+            _(
+                "Will add a polygon (may be split in multiple parts)\n"
+                "that will surround the actual Gerber traces at a certain distance."
+            )
         )
-        self.fill_button.setStyleSheet("""
+        self.fill_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(self.fill_button)
 
         # ## Grid Layout
@@ -1550,20 +1645,20 @@ class ThievingUI:
         separator_line_1.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay_1.addWidget(separator_line_1, 0, 0, 1, 3)
 
-        grid_lay_1.addWidget(FCLabel(''))
+        grid_lay_1.addWidget(FCLabel(""))
 
-        self.robber_bar_label = FCLabel('<b>%s</b>' % _('Robber Bar Parameters'))
+        self.robber_bar_label = FCLabel("<b>%s</b>" % _("Robber Bar Parameters"))
         self.robber_bar_label.setToolTip(
-            _("Parameters used for the robber bar.\n"
-              "Robber bar = copper border to help in pattern hole plating.")
+            _(
+                "Parameters used for the robber bar.\n"
+                "Robber bar = copper border to help in pattern hole plating."
+            )
         )
         grid_lay_1.addWidget(self.robber_bar_label, 2, 0, 1, 3)
 
         # ROBBER BAR MARGIN #
-        self.rb_margin_label = FCLabel('%s:' % _("Margin"))
-        self.rb_margin_label.setToolTip(
-            _("Bounding box margin for robber bar.")
-        )
+        self.rb_margin_label = FCLabel("%s:" % _("Margin"))
+        self.rb_margin_label.setToolTip(_("Bounding box margin for robber bar."))
         self.rb_margin_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.rb_margin_entry.set_range(-10000.0000, 10000.0000)
         self.rb_margin_entry.set_precision(self.decimals)
@@ -1573,10 +1668,8 @@ class ThievingUI:
         grid_lay_1.addWidget(self.rb_margin_entry, 4, 1, 1, 2)
 
         # THICKNESS #
-        self.rb_thickness_label = FCLabel('%s:' % _("Thickness"))
-        self.rb_thickness_label.setToolTip(
-            _("The robber bar thickness.")
-        )
+        self.rb_thickness_label = FCLabel("%s:" % _("Thickness"))
+        self.rb_thickness_label.setToolTip(_("The robber bar thickness."))
         self.rb_thickness_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.rb_thickness_entry.set_range(0.0000, 10000.0000)
         self.rb_thickness_entry.set_precision(self.decimals)
@@ -1587,19 +1680,23 @@ class ThievingUI:
 
         # ## Insert Robber Bar
         self.rb_button = QtWidgets.QPushButton(_("Insert Robber Bar"))
-        self.rb_button.setIcon(QtGui.QIcon(self.app.resource_location + '/robber32.png'))
+        self.rb_button.setIcon(QtGui.QIcon(self.app.resource_location + "/robber32.png"))
         self.rb_button.setToolTip(
-            _("Will add a polygon with a defined thickness\n"
-              "that will surround the actual Gerber object\n"
-              "at a certain distance.\n"
-              "Required when doing holes pattern plating.")
+            _(
+                "Will add a polygon with a defined thickness\n"
+                "that will surround the actual Gerber object\n"
+                "at a certain distance.\n"
+                "Required when doing holes pattern plating."
+            )
         )
-        self.rb_button.setStyleSheet("""
+        self.rb_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         grid_lay_1.addWidget(self.rb_button, 8, 0, 1, 3)
 
         separator_line_2 = QtWidgets.QFrame()
@@ -1607,33 +1704,37 @@ class ThievingUI:
         separator_line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid_lay_1.addWidget(separator_line_2, 10, 0, 1, 3)
 
-        self.patern_mask_label = FCLabel('<b>%s</b>' % _('Pattern Plating Mask'))
-        self.patern_mask_label.setToolTip(
-            _("Generate a mask for pattern plating.")
-        )
+        self.patern_mask_label = FCLabel("<b>%s</b>" % _("Pattern Plating Mask"))
+        self.patern_mask_label.setToolTip(_("Generate a mask for pattern plating."))
         grid_lay_1.addWidget(self.patern_mask_label, 12, 0, 1, 3)
 
         self.sm_obj_label = FCLabel("%s:" % _("Select Soldermask object"))
         self.sm_obj_label.setToolTip(
-            _("Gerber Object with the soldermask.\n"
-              "It will be used as a base for\n"
-              "the pattern plating mask.")
+            _(
+                "Gerber Object with the soldermask.\n"
+                "It will be used as a base for\n"
+                "the pattern plating mask."
+            )
         )
 
         self.sm_object_combo = FCComboBox()
         self.sm_object_combo.setModel(self.app.collection)
-        self.sm_object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.sm_object_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         self.sm_object_combo.is_last = True
-        self.sm_object_combo.obj_type = 'Gerber'
+        self.sm_object_combo.obj_type = "Gerber"
 
         grid_lay_1.addWidget(self.sm_obj_label, 14, 0, 1, 3)
         grid_lay_1.addWidget(self.sm_object_combo, 16, 0, 1, 3)
 
         # Openings CLEARANCE #
-        self.clearance_ppm_label = FCLabel('%s:' % _("Clearance"))
+        self.clearance_ppm_label = FCLabel("%s:" % _("Clearance"))
         self.clearance_ppm_label.setToolTip(
-            _("The distance between the possible copper thieving elements\n"
-              "and/or robber bar and the actual openings in the mask.")
+            _(
+                "The distance between the possible copper thieving elements\n"
+                "and/or robber bar and the actual openings in the mask."
+            )
         )
         self.clearance_ppm_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.clearance_ppm_entry.set_range(-10000.0000, 10000.0000)
@@ -1644,71 +1745,81 @@ class ThievingUI:
         grid_lay_1.addWidget(self.clearance_ppm_entry, 18, 1, 1, 2)
 
         # Plated area
-        self.plated_area_label = FCLabel('%s:' % _("Plated area"))
+        self.plated_area_label = FCLabel("%s:" % _("Plated area"))
         self.plated_area_label.setToolTip(
-            _("The area to be plated by pattern plating.\n"
-              "Basically is made from the openings in the plating mask.\n\n"
-              "<<WARNING>> - the calculated area is actually a bit larger\n"
-              "due of the fact that the soldermask openings are by design\n"
-              "a bit larger than the copper pads, and this area is\n"
-              "calculated from the soldermask openings.")
+            _(
+                "The area to be plated by pattern plating.\n"
+                "Basically is made from the openings in the plating mask.\n\n"
+                "<<WARNING>> - the calculated area is actually a bit larger\n"
+                "due of the fact that the soldermask openings are by design\n"
+                "a bit larger than the copper pads, and this area is\n"
+                "calculated from the soldermask openings."
+            )
         )
         self.plated_area_entry = FCEntry()
         self.plated_area_entry.setDisabled(True)
 
-        if self.units.upper() == 'MM':
-            self.units_area_label = FCLabel('%s<sup>2</sup>' % _("mm"))
+        if self.units.upper() == "MM":
+            self.units_area_label = FCLabel("%s<sup>2</sup>" % _("mm"))
         else:
-            self.units_area_label = FCLabel('%s<sup>2</sup>' % _("in"))
+            self.units_area_label = FCLabel("%s<sup>2</sup>" % _("in"))
 
         grid_lay_1.addWidget(self.plated_area_label, 20, 0)
         grid_lay_1.addWidget(self.plated_area_entry, 20, 1)
         grid_lay_1.addWidget(self.units_area_label, 20, 2)
 
         # Include geometry
-        self.ppm_choice_label = FCLabel('%s:' % _("Add"))
+        self.ppm_choice_label = FCLabel("%s:" % _("Add"))
         self.ppm_choice_label.setToolTip(
             _("Choose which additional geometry to include, if available.")
         )
-        self.ppm_choice_radio = RadioSet([
-            {"label": _("Both"), "value": "b"},
-            {'label': _('Thieving'), 'value': 't'},
-            {"label": _("Robber bar"), "value": "r"},
-            {"label": _("None"), "value": "n"}
-        ], orientation='vertical', stretch=False)
+        self.ppm_choice_radio = RadioSet(
+            [
+                {"label": _("Both"), "value": "b"},
+                {"label": _("Thieving"), "value": "t"},
+                {"label": _("Robber bar"), "value": "r"},
+                {"label": _("None"), "value": "n"},
+            ],
+            orientation="vertical",
+            stretch=False,
+        )
         grid_lay_1.addWidget(self.ppm_choice_label, 22, 0)
         grid_lay_1.addWidget(self.ppm_choice_radio, 22, 1, 1, 2)
 
         # ## Pattern Plating Mask
         self.ppm_button = QtWidgets.QPushButton(_("Generate pattern plating mask"))
-        self.ppm_button.setIcon(QtGui.QIcon(self.app.resource_location + '/pattern32.png'))
+        self.ppm_button.setIcon(QtGui.QIcon(self.app.resource_location + "/pattern32.png"))
         self.ppm_button.setToolTip(
-            _("Will add to the soldermask gerber geometry\n"
-              "the geometries of the copper thieving and/or\n"
-              "the robber bar if those were generated.")
+            _(
+                "Will add to the soldermask gerber geometry\n"
+                "the geometries of the copper thieving and/or\n"
+                "the robber bar if those were generated."
+            )
         )
-        self.ppm_button.setStyleSheet("""
+        self.ppm_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         grid_lay_1.addWidget(self.ppm_button, 24, 0, 1, 3)
 
         self.layout.addStretch()
 
         # ## Reset Tool
         self.reset_button = QtWidgets.QPushButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(self.reset_button)
 
         # #################################### FINSIHED GUI ###########################
@@ -1716,17 +1827,24 @@ class ThievingUI:
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

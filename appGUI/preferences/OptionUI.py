@@ -3,15 +3,26 @@ from typing import Union, Sequence, List
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import QSettings
 
-from appGUI.GUIElements import RadioSet, FCCheckBox, FCButton, FCComboBox, FCEntry, FCSpinner, FCColorEntry, \
-    FCSliderWithSpinner, FCDoubleSpinner, FloatEntry, FCTextArea
+from appGUI.GUIElements import (
+    RadioSet,
+    FCCheckBox,
+    FCButton,
+    FCComboBox,
+    FCEntry,
+    FCSpinner,
+    FCColorEntry,
+    FCSliderWithSpinner,
+    FCDoubleSpinner,
+    FloatEntry,
+    FCTextArea,
+)
 
 import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -33,8 +44,15 @@ class OptionUI:
 
 class BasicOptionUI(OptionUI):
     """Abstract OptionUI that has a label on the left then some other widget on the right"""
-    def __init__(self, option: str, label_text: str, label_tooltip: Union[str, None] = None,
-                 label_bold: bool = False, label_color: Union[str, None] = None):
+
+    def __init__(
+        self,
+        option: str,
+        label_text: str,
+        label_tooltip: Union[str, None] = None,
+        label_bold: bool = False,
+        label_color: Union[str, None] = None,
+    ):
         super().__init__(option=option)
         self.label_text = label_text
         self.label_tooltip = label_tooltip
@@ -48,7 +66,7 @@ class BasicOptionUI(OptionUI):
         if self.label_bold:
             fmt = "<b>%s</b>" % fmt
         if self.label_color:
-            fmt = "<span style=\"color:%s;\">%s</span>" % (self.label_color, fmt)
+            fmt = '<span style="color:%s;">%s</span>' % (self.label_color, fmt)
         label_widget = QtWidgets.QLabel(fmt % _(self.label_text))
         if self.label_tooltip is not None:
             label_widget.setToolTip(_(self.label_tooltip))
@@ -79,7 +97,9 @@ class FloatEntryOptionUI(BasicOptionUI):
 
 class RadioSetOptionUI(BasicOptionUI):
 
-    def __init__(self, option: str, label_text: str, choices: list, orientation='horizontal', **kwargs):
+    def __init__(
+        self, option: str, label_text: str, choices: list, orientation="horizontal", **kwargs
+    ):
         self.choices = choices
         self.orientation = orientation
         super().__init__(option=option, label_text=label_text, **kwargs)
@@ -108,7 +128,7 @@ class TextAreaOptionUI(OptionUI):
 
         qsettings = QSettings("Open Source", "FlatCAM")
         if qsettings.contains("textbox_font_size"):
-            tb_fsize = qsettings.value('textbox_font_size', type=int)
+            tb_fsize = qsettings.value("textbox_font_size", type=int)
         else:
             tb_fsize = 10
         font = QtGui.QFont()
@@ -122,7 +142,7 @@ class TextAreaOptionUI(OptionUI):
 
     def add_to_grid(self, grid: QtWidgets.QGridLayout, row: int) -> int:
         grid.addWidget(self.label_widget, row, 0, 1, 3)
-        grid.addWidget(self.textarea_widget, row+1, 0, 1, 3)
+        grid.addWidget(self.textarea_widget, row + 1, 0, 1, 3)
         return 2
 
 
@@ -135,7 +155,7 @@ class CheckboxOptionUI(OptionUI):
         self.checkbox_widget = self.build_checkbox_widget()
 
     def build_checkbox_widget(self):
-        checkbox = FCCheckBox('%s' % _(self.label_text))
+        checkbox = FCCheckBox("%s" % _(self.label_text))
         checkbox.setToolTip(_(self.label_tooltip))
         return checkbox
 
@@ -183,13 +203,21 @@ class ColorAlphaSliderOptionUI(SliderWithSpinnerOptionUI):
     def __init__(self, applies_to: List[str], group, label_text: str, **kwargs):
         self.applies_to = applies_to
         self.group = group
-        super().__init__(option="__color_alpha_slider", label_text=label_text, min_value=0, max_value=255, step=1,
-                         **kwargs)
+        super().__init__(
+            option="__color_alpha_slider",
+            label_text=label_text,
+            min_value=0,
+            max_value=255,
+            step=1,
+            **kwargs,
+        )
         self.get_field().valueChanged.connect(self._on_alpha_change)
 
     def add_to_grid(self, grid: QtWidgets.QGridLayout, row: int) -> int:
         for index, field in enumerate(self._get_target_fields()):
-            field.entry.textChanged.connect(lambda value, i=index: self._on_target_change(target_index=i))
+            field.entry.textChanged.connect(
+                lambda value, i=index: self._on_target_change(target_index=i)
+            )
         return super().add_to_grid(grid, row)
 
     def _get_target_fields(self):
@@ -228,7 +256,9 @@ class ColorAlphaSliderOptionUI(SliderWithSpinnerOptionUI):
 
 
 class SpinnerOptionUI(BasicOptionUI):
-    def __init__(self, option: str, label_text: str, min_value: int, max_value: int, step: int = 1, **kwargs):
+    def __init__(
+        self, option: str, label_text: str, min_value: int, max_value: int, step: int = 1, **kwargs
+    ):
         self.min_value = min_value
         self.max_value = max_value
         self.step = step
@@ -243,8 +273,17 @@ class SpinnerOptionUI(BasicOptionUI):
 
 
 class DoubleSpinnerOptionUI(BasicOptionUI):
-    def __init__(self, option: str, label_text: str, step: float, decimals: int, min_value=None, max_value=None,
-                 suffix=None, **kwargs):
+    def __init__(
+        self,
+        option: str,
+        label_text: str,
+        step: float,
+        decimals: int,
+        min_value=None,
+        max_value=None,
+        suffix=None,
+        **kwargs,
+    ):
         self.min_value = min_value
         self.max_value = max_value
         self.step = step
@@ -274,7 +313,7 @@ class HeadingOptionUI(OptionUI):
         self.label_tooltip = label_tooltip
 
     def build_heading_widget(self):
-        heading = QtWidgets.QLabel('<b>%s</b>' % _(self.label_text))
+        heading = QtWidgets.QLabel("<b>%s</b>" % _(self.label_text))
         heading.setToolTip(_(self.label_tooltip))
         return heading
 

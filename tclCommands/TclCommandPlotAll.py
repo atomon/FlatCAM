@@ -12,32 +12,29 @@ class TclCommandPlotAll(TclCommandSignaled):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['plot_all']
+    aliases = ["plot_all"]
 
-    description = '%s %s' % ("--", "Plots all objects on appGUI.")
+    description = "%s %s" % ("--", "Plots all objects on appGUI.")
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-
-    ])
+    arg_names = collections.OrderedDict([])
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-        ('plot_status', str),
-        ('use_thread', str)
-    ])
+    option_types = collections.OrderedDict([("plot_status", str), ("use_thread", str)])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
     required = []
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Plots all objects on appGUI.",
-        'args': collections.OrderedDict([
-            ('plot_status', 'If to display or not the objects: True (1) or False (0).'),
-            ('use_thread', 'If to use multithreading: True (1) or False (0).')
-        ]),
-        'examples': ['plot_all', 'plot_all -plot_status False']
+        "main": "Plots all objects on appGUI.",
+        "args": collections.OrderedDict(
+            [
+                ("plot_status", "If to display or not the objects: True (1) or False (0)."),
+                ("use_thread", "If to use multithreading: True (1) or False (0)."),
+            ]
+        ),
+        "examples": ["plot_all", "plot_all -plot_status False"],
     }
 
     def execute(self, args, unnamed_args):
@@ -48,25 +45,25 @@ class TclCommandPlotAll(TclCommandSignaled):
         :return:
         """
 
-        if 'use_thread' in args:
+        if "use_thread" in args:
             try:
-                par = args['use_thread'].capitalize()
+                par = args["use_thread"].capitalize()
             except AttributeError:
-                par = args['use_thread']
+                par = args["use_thread"]
             threaded = bool(eval(par))
         else:
             threaded = False
 
         plot_status = True
-        if 'plot_status' in args:
+        if "plot_status" in args:
             try:
-                if args['plot_status'] is None:
+                if args["plot_status"] is None:
                     plot_status = True
                 else:
                     try:
-                        par = args['plot_status'].capitalize()
+                        par = args["plot_status"].capitalize()
                     except AttributeError:
-                        par = args['plot_status']
+                        par = args["plot_status"]
                     plot_status = bool(eval(par))
             except KeyError:
                 plot_status = True

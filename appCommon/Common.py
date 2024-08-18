@@ -22,6 +22,7 @@ from copy import deepcopy
 import collections
 
 import numpy as np
+
 # from voronoi import Voronoi
 # from voronoi import Polygon as voronoi_polygon
 
@@ -29,8 +30,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -43,7 +44,7 @@ class GracefulException(Exception):
         super().__init__()
 
     def __str__(self):
-        return '\n\n%s' % _("The user requested a graceful exit of the current task.")
+        return "\n\n%s" % _("The user requested a graceful exit of the current task.")
 
 
 class LoudDict(dict):
@@ -84,12 +85,15 @@ class LoudDict(dict):
 
         self.callback = callback
 
+
 # Fix for Python3.10
 MutableSequence = None
 try:
     MutableSequence = collections.MutableSequence
 except AttributeError:
     MutableSequence = collections.abc.MutableSequence
+
+
 class LoudUniqueList(list, MutableSequence):
     """
     A List with a callback for item changes, callback which returns the index where the items are added/modified.
@@ -127,7 +131,9 @@ class LoudUniqueList(list, MutableSequence):
         self.callback(le)
         return super().extend(t)
 
-    def __add__(self, t):  # This is for something like `LoudUniqueList([1, 2, 3]) + list([4, 5, 6])`...
+    def __add__(
+        self, t
+    ):  # This is for something like `LoudUniqueList([1, 2, 3]) + list([4, 5, 6])`...
         for v in t:
             if v in self:
                 raise ValueError("One of the added items is already in the list.")
@@ -187,8 +193,7 @@ class FCSignal:
         try:
             self.__subscribers.remove(func)
         except ValueError:
-            print('Warning: function %s not removed '
-                  'from signal %s' % (func, self))
+            print("Warning: function %s not removed " "from signal %s" % (func, self))
 
 
 def color_variant(hex_color, bright_factor=1):
@@ -204,7 +209,9 @@ def color_variant(hex_color, bright_factor=1):
     """
 
     if len(hex_color) != 7:
-        print("Color is %s, but needs to be in #FF00FF format. Returning original color." % hex_color)
+        print(
+            "Color is %s, but needs to be in #FF00FF format. Returning original color." % hex_color
+        )
         return hex_color
 
     if bright_factor > 1.0:
@@ -212,7 +219,7 @@ def color_variant(hex_color, bright_factor=1):
     if bright_factor < 0.0:
         bright_factor = 0.0
 
-    rgb_hex = [hex_color[x:x + 2] for x in [1, 3, 5]]
+    rgb_hex = [hex_color[x : x + 2] for x in [1, 3, 5]]
     new_rgb = []
     for hex_value in rgb_hex:
         # adjust each color channel and turn it into a INT suitable as argument for hex()
@@ -228,6 +235,7 @@ class ExclusionAreas(QtCore.QObject):
     """
     Functionality for adding Exclusion Areas for the Excellon and Geometry FlatCAM Objects
     """
+
     e_shape_modified = QtCore.pyqtSignal()
 
     def __init__(self, app):
@@ -240,11 +248,14 @@ class ExclusionAreas(QtCore.QObject):
         # VisPy visuals
         if self.app.is_legacy is False:
             try:
-                self.exclusion_shapes = ShapeCollection(parent=self.app.plotcanvas.view.scene, layers=1)
+                self.exclusion_shapes = ShapeCollection(
+                    parent=self.app.plotcanvas.view.scene, layers=1
+                )
             except AttributeError:
                 self.exclusion_shapes = None
         else:
             from appGUI.PlotCanvasLegacy import ShapeCollectionLegacy
+
             self.exclusion_shapes = ShapeCollectionLegacy(obj=self, app=self.app, name="exclusion")
 
         # Event signals disconnect id holders
@@ -258,7 +269,7 @@ class ExclusionAreas(QtCore.QObject):
         self.points = []
         self.poly_drawn = False
 
-        '''
+        """
         Here we store the exclusion shapes and some other information's
         Each list element is a dictionary with the format:
         
@@ -268,7 +279,7 @@ class ExclusionAreas(QtCore.QObject):
             "strategy":   string ("over" or "around")         <- self.strategy_button
             "overz":      float                               <- self.over_z_button
         }
-        '''
+        """
         self.exclusion_areas_storage = []
 
         self.mouse_is_dragging = False
@@ -281,7 +292,9 @@ class ExclusionAreas(QtCore.QObject):
         self.strategy_button = None
         self.cnc_button = None
 
-    def on_add_area_click(self, shape_button, overz_button, strategy_radio, cnc_button, solid_geo, obj_type):
+    def on_add_area_click(
+        self, shape_button, overz_button, strategy_radio, cnc_button, solid_geo, obj_type
+    ):
         """
 
         :param shape_button:    a FCButton that has the value for the shape
@@ -295,8 +308,8 @@ class ExclusionAreas(QtCore.QObject):
         :type obj_type:         str
         :return:                None
         """
-        self.app.inform.emit('[WARNING_NOTCL] %s' % _("Click the start point of the area."))
-        self.app.call_source = 'geometry'
+        self.app.inform.emit("[WARNING_NOTCL] %s" % _("Click the start point of the area."))
+        self.app.call_source = "geometry"
 
         self.shape_type_button = shape_button
 
@@ -308,16 +321,22 @@ class ExclusionAreas(QtCore.QObject):
         self.obj_type = obj_type
 
         if self.app.is_legacy is False:
-            self.app.plotcanvas.graph_event_disconnect('mouse_press', self.app.on_mouse_click_over_plot)
-            self.app.plotcanvas.graph_event_disconnect('mouse_move', self.app.on_mouse_move_over_plot)
-            self.app.plotcanvas.graph_event_disconnect('mouse_release', self.app.on_mouse_click_release_over_plot)
+            self.app.plotcanvas.graph_event_disconnect(
+                "mouse_press", self.app.on_mouse_click_over_plot
+            )
+            self.app.plotcanvas.graph_event_disconnect(
+                "mouse_move", self.app.on_mouse_move_over_plot
+            )
+            self.app.plotcanvas.graph_event_disconnect(
+                "mouse_release", self.app.on_mouse_click_release_over_plot
+            )
         else:
             self.app.plotcanvas.graph_event_disconnect(self.app.mp)
             self.app.plotcanvas.graph_event_disconnect(self.app.mm)
             self.app.plotcanvas.graph_event_disconnect(self.app.mr)
 
-        self.mr = self.app.plotcanvas.graph_event_connect('mouse_release', self.on_mouse_release)
-        self.mm = self.app.plotcanvas.graph_event_connect('mouse_move', self.on_mouse_move)
+        self.mr = self.app.plotcanvas.graph_event_connect("mouse_release", self.on_mouse_release)
+        self.mm = self.app.plotcanvas.graph_event_connect("mouse_move", self.on_mouse_move)
         # self.kp = self.app.plotcanvas.graph_event_connect('key_press', self.on_key_press)
 
     # To be called after clicking on the plot.
@@ -354,13 +373,17 @@ class ExclusionAreas(QtCore.QObject):
             if self.shape_type_button.get_value() == "square":
                 if self.first_click is False:
                     self.first_click = True
-                    self.app.inform.emit('[WARNING_NOTCL] %s' % _("Click the end point of the area."))
+                    self.app.inform.emit(
+                        "[WARNING_NOTCL] %s" % _("Click the end point of the area.")
+                    )
 
                     self.cursor_pos = self.app.plotcanvas.translate_coords(event_pos)
                     if self.app.grid_status():
                         self.cursor_pos = self.app.geo_editor.snap(event_pos[0], event_pos[1])
                 else:
-                    self.app.inform.emit(_("Zone added. Click to start adding next zone or right click to finish."))
+                    self.app.inform.emit(
+                        _("Zone added. Click to start adding next zone or right click to finish.")
+                    )
                     self.app.delete_selection_shape()
 
                     x0, y0 = self.cursor_pos[0], self.cursor_pos[1]
@@ -382,11 +405,11 @@ class ExclusionAreas(QtCore.QObject):
                         "obj_type": self.obj_type,
                         "shape": new_rectangle,
                         "strategy": self.strategy_button.get_value(),
-                        "overz": self.over_z_button.get_value()
+                        "overz": self.over_z_button.get_value(),
                     }
                     self.exclusion_areas_storage.append(new_el)
 
-                    if self.obj_type == 'excellon':
+                    if self.obj_type == "excellon":
                         color = "#FF7400"
                         face_color = "#FF7400BF"
                     else:
@@ -395,10 +418,13 @@ class ExclusionAreas(QtCore.QObject):
 
                     # add a temporary shape on canvas
                     AppTool.draw_tool_selection_shape(
-                        self, old_coords=(x0, y0), coords=(x1, y1),
+                        self,
+                        old_coords=(x0, y0),
+                        coords=(x1, y1),
                         color=color,
                         face_color=face_color,
-                        shapes_storage=self.exclusion_shapes)
+                        shapes_storage=self.exclusion_shapes,
+                    )
 
                     self.first_click = False
                     return
@@ -407,7 +433,9 @@ class ExclusionAreas(QtCore.QObject):
 
                 if len(self.points) > 1:
                     self.poly_drawn = True
-                    self.app.inform.emit(_("Click on next Point or click right mouse button to complete ..."))
+                    self.app.inform.emit(
+                        _("Click on next Point or click right mouse button to complete ...")
+                    )
 
                 return ""
         elif event.button == right_button and self.mouse_is_dragging is False:
@@ -445,11 +473,11 @@ class ExclusionAreas(QtCore.QObject):
                                 "obj_type": self.obj_type,
                                 "shape": pol,
                                 "strategy": self.strategy_button.get_value(),
-                                "overz": self.over_z_button.get_value()
+                                "overz": self.over_z_button.get_value(),
                             }
                             self.exclusion_areas_storage.append(new_el)
 
-                            if self.obj_type == 'excellon':
+                            if self.obj_type == "excellon":
                                 color = "#FF7400"
                                 face_color = "#FF7400BF"
                             else:
@@ -457,12 +485,17 @@ class ExclusionAreas(QtCore.QObject):
                                 face_color = "#FF7400BF"
 
                             AppTool.draw_selection_shape_polygon(
-                                self, points=self.points,
+                                self,
+                                points=self.points,
                                 color=color,
                                 face_color=face_color,
-                                shapes_storage=self.exclusion_shapes)
+                                shapes_storage=self.exclusion_shapes,
+                            )
                             self.app.inform.emit(
-                                _("Zone added. Click to start adding next zone or right click to finish."))
+                                _(
+                                    "Zone added. Click to start adding next zone or right click to finish."
+                                )
+                            )
 
                     self.points = []
                     self.poly_drawn = False
@@ -471,47 +504,56 @@ class ExclusionAreas(QtCore.QObject):
             # AppTool.delete_tool_selection_shape(self, shapes_storage=self.exclusion_shapes)
 
             if self.app.is_legacy is False:
-                self.app.plotcanvas.graph_event_disconnect('mouse_release', self.on_mouse_release)
-                self.app.plotcanvas.graph_event_disconnect('mouse_move', self.on_mouse_move)
+                self.app.plotcanvas.graph_event_disconnect("mouse_release", self.on_mouse_release)
+                self.app.plotcanvas.graph_event_disconnect("mouse_move", self.on_mouse_move)
                 # self.app.plotcanvas.graph_event_disconnect('key_press', self.on_key_press)
             else:
                 self.app.plotcanvas.graph_event_disconnect(self.mr)
                 self.app.plotcanvas.graph_event_disconnect(self.mm)
                 # self.app.plotcanvas.graph_event_disconnect(self.kp)
 
-            self.app.mp = self.app.plotcanvas.graph_event_connect('mouse_press',
-                                                                  self.app.on_mouse_click_over_plot)
-            self.app.mm = self.app.plotcanvas.graph_event_connect('mouse_move',
-                                                                  self.app.on_mouse_move_over_plot)
-            self.app.mr = self.app.plotcanvas.graph_event_connect('mouse_release',
-                                                                  self.app.on_mouse_click_release_over_plot)
+            self.app.mp = self.app.plotcanvas.graph_event_connect(
+                "mouse_press", self.app.on_mouse_click_over_plot
+            )
+            self.app.mm = self.app.plotcanvas.graph_event_connect(
+                "mouse_move", self.app.on_mouse_move_over_plot
+            )
+            self.app.mr = self.app.plotcanvas.graph_event_connect(
+                "mouse_release", self.app.on_mouse_click_release_over_plot
+            )
 
-            self.app.call_source = 'app'
+            self.app.call_source = "app"
 
             if len(self.exclusion_areas_storage) == 0:
                 return
 
             # since the exclusion areas should apply to all objects in the app collection, this check is limited to
             # only the current object therefore it will not guarantee success
-            self.app.inform.emit("%s" % _("Exclusion areas added. Checking overlap with the object geometry ..."))
+            self.app.inform.emit(
+                "%s" % _("Exclusion areas added. Checking overlap with the object geometry ...")
+            )
 
             for el in self.exclusion_areas_storage:
                 if el["shape"].intersects(unary_union(self.solid_geometry)):
                     self.on_clear_area_click()
                     self.app.inform.emit(
-                        "[ERROR_NOTCL] %s" % _("Failed. Exclusion areas intersects the object geometry ..."))
+                        "[ERROR_NOTCL] %s"
+                        % _("Failed. Exclusion areas intersects the object geometry ...")
+                    )
                     return
 
             self.app.inform.emit("[success] %s" % _("Exclusion areas added."))
-            self.cnc_button.setStyleSheet("""
+            self.cnc_button.setStyleSheet(
+                """
                                     QPushButton
                                     {
                                         font-weight: bold;
                                         color: orange;
                                     }
-                                    """)
+                                    """
+            )
             self.cnc_button.setToolTip(
-                '%s %s' % (_("Generate the CNC Job object."), _("With Exclusion areas."))
+                "%s %s" % (_("Generate the CNC Job object."), _("With Exclusion areas."))
             )
 
             self.e_shape_modified.emit()
@@ -525,19 +567,22 @@ class ExclusionAreas(QtCore.QObject):
         :rtype:
         """
         if self.app.is_legacy is False:
-            self.app.plotcanvas.graph_event_disconnect('mouse_release', self.on_mouse_release)
-            self.app.plotcanvas.graph_event_disconnect('mouse_move', self.on_mouse_move)
+            self.app.plotcanvas.graph_event_disconnect("mouse_release", self.on_mouse_release)
+            self.app.plotcanvas.graph_event_disconnect("mouse_move", self.on_mouse_move)
         else:
             self.app.plotcanvas.graph_event_disconnect(self.mr)
             self.app.plotcanvas.graph_event_disconnect(self.mm)
             self.app.plotcanvas.graph_event_disconnect(self.kp)
 
-        self.app.mp = self.app.plotcanvas.graph_event_connect('mouse_press',
-                                                              self.app.on_mouse_click_over_plot)
-        self.app.mm = self.app.plotcanvas.graph_event_connect('mouse_move',
-                                                              self.app.on_mouse_move_over_plot)
-        self.app.mr = self.app.plotcanvas.graph_event_connect('mouse_release',
-                                                              self.app.on_mouse_click_release_over_plot)
+        self.app.mp = self.app.plotcanvas.graph_event_connect(
+            "mouse_press", self.app.on_mouse_click_over_plot
+        )
+        self.app.mm = self.app.plotcanvas.graph_event_connect(
+            "mouse_move", self.app.on_mouse_move_over_plot
+        )
+        self.app.mr = self.app.plotcanvas.graph_event_connect(
+            "mouse_release", self.app.on_mouse_click_release_over_plot
+        )
         self.points = []
         self.poly_drawn = False
         self.exclusion_areas_storage = []
@@ -546,7 +591,9 @@ class ExclusionAreas(QtCore.QObject):
         # AppTool.delete_tool_selection_shape(self, shapes_storage=self.exclusion_shapes)
 
         self.app.call_source = "app"
-        self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled. Area exclusion drawing was interrupted."))
+        self.app.inform.emit(
+            "[WARNING_NOTCL] %s" % _("Cancelled. Area exclusion drawing was interrupted.")
+        )
 
     def on_mouse_move(self, event):
         """
@@ -581,10 +628,13 @@ class ExclusionAreas(QtCore.QObject):
             # Update cursor
             curr_pos = self.app.geo_editor.snap(curr_pos[0], curr_pos[1])
 
-            self.app.app_cursor.set_data(np.asarray([(curr_pos[0], curr_pos[1])]),
-                                         symbol='++', edge_color=self.app.cursor_color_3D,
-                                         edge_width=self.app.defaults["global_cursor_width"],
-                                         size=self.app.defaults["global_cursor_size"])
+            self.app.app_cursor.set_data(
+                np.asarray([(curr_pos[0], curr_pos[1])]),
+                symbol="++",
+                edge_color=self.app.cursor_color_3D,
+                edge_width=self.app.defaults["global_cursor_width"],
+                size=self.app.defaults["global_cursor_size"],
+            )
 
         # update the positions on status bar
         if self.cursor_pos is None:
@@ -592,17 +642,21 @@ class ExclusionAreas(QtCore.QObject):
 
         self.app.dx = curr_pos[0] - float(self.cursor_pos[0])
         self.app.dy = curr_pos[1] - float(self.cursor_pos[1])
-        self.app.ui.position_label.setText("&nbsp;<b>X</b>: %.4f&nbsp;&nbsp;   "
-                                           "<b>Y</b>: %.4f&nbsp;" % (curr_pos[0], curr_pos[1]))
-        self.app.ui.rel_position_label.setText("<b>Dx</b>: %.4f&nbsp;&nbsp;  <b>Dy</b>: "
-                                               "%.4f&nbsp;&nbsp;&nbsp;&nbsp;" % (self.app.dx, self.app.dy))
+        self.app.ui.position_label.setText(
+            "&nbsp;<b>X</b>: %.4f&nbsp;&nbsp;   "
+            "<b>Y</b>: %.4f&nbsp;" % (curr_pos[0], curr_pos[1])
+        )
+        self.app.ui.rel_position_label.setText(
+            "<b>Dx</b>: %.4f&nbsp;&nbsp;  <b>Dy</b>: "
+            "%.4f&nbsp;&nbsp;&nbsp;&nbsp;" % (self.app.dx, self.app.dy)
+        )
 
         units = self.app.defaults["units"].lower()
-        self.app.plotcanvas.text_hud.text = \
-            'Dx:\t{:<.4f} [{:s}]\nDy:\t{:<.4f} [{:s}]\n\nX:  \t{:<.4f} [{:s}]\nY:  \t{:<.4f} [{:s}]'.format(
-                self.app.dx, units, self.app.dy, units, curr_pos[0], units, curr_pos[1], units)
+        self.app.plotcanvas.text_hud.text = "Dx:\t{:<.4f} [{:s}]\nDy:\t{:<.4f} [{:s}]\n\nX:  \t{:<.4f} [{:s}]\nY:  \t{:<.4f} [{:s}]".format(
+            self.app.dx, units, self.app.dy, units, curr_pos[0], units, curr_pos[1], units
+        )
 
-        if self.obj_type == 'excellon':
+        if self.obj_type == "excellon":
             color = "#FF7400"
             face_color = "#FF7400BF"
         else:
@@ -614,17 +668,21 @@ class ExclusionAreas(QtCore.QObject):
             if self.first_click:
                 self.app.delete_selection_shape()
 
-                self.app.draw_moving_selection_shape(old_coords=(self.cursor_pos[0], self.cursor_pos[1]),
-                                                     color=color,
-                                                     face_color=face_color,
-                                                     coords=(curr_pos[0], curr_pos[1]))
+                self.app.draw_moving_selection_shape(
+                    old_coords=(self.cursor_pos[0], self.cursor_pos[1]),
+                    color=color,
+                    face_color=face_color,
+                    coords=(curr_pos[0], curr_pos[1]),
+                )
         else:
             AppTool.delete_moving_selection_shape(self)
             AppTool.draw_moving_selection_shape_poly(
-                self, points=self.points,
+                self,
+                points=self.points,
                 color=color,
                 face_color=face_color,
-                data=(curr_pos[0], curr_pos[1]))
+                data=(curr_pos[0], curr_pos[1]),
+            )
 
     def on_clear_area_click(self):
         """
@@ -638,13 +696,15 @@ class ExclusionAreas(QtCore.QObject):
         # restore the default StyleSheet
         self.cnc_button.setStyleSheet("")
         # update the StyleSheet
-        self.cnc_button.setStyleSheet("""
+        self.cnc_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
-        self.cnc_button.setToolTip('%s' % _("Generate the CNC Job object."))
+                                """
+        )
+        self.cnc_button.setToolTip("%s" % _("Generate the CNC Job object."))
 
     def clear_shapes(self):
         """
@@ -654,7 +714,7 @@ class ExclusionAreas(QtCore.QObject):
         :rtype:
         """
         if self.exclusion_areas_storage:
-            self.app.inform.emit('%s' % _("All exclusion zones deleted."))
+            self.app.inform.emit("%s" % _("All exclusion zones deleted."))
         self.exclusion_areas_storage.clear()
         AppTool.delete_moving_selection_shape(self)
         self.app.delete_selection_shape()
@@ -676,7 +736,7 @@ class ExclusionAreas(QtCore.QObject):
             del self.exclusion_areas_storage[idx]
 
         # re-add what's left after deletion in first step
-        if self.obj_type == 'excellon':
+        if self.obj_type == "excellon":
             color = "#FF7400"
             face_color = "#FF7400BF"
         else:
@@ -687,29 +747,37 @@ class ExclusionAreas(QtCore.QObject):
         color_t = face_color[:-2] + str(hex(int(face_alpha * 255)))[2:]
 
         for geo_el in self.exclusion_areas_storage:
-            if isinstance(geo_el['shape'], Polygon):
+            if isinstance(geo_el["shape"], Polygon):
                 self.exclusion_shapes.add(
-                    geo_el['shape'], color=color, face_color=color_t, update=True, layer=0, tolerance=None)
+                    geo_el["shape"],
+                    color=color,
+                    face_color=color_t,
+                    update=True,
+                    layer=0,
+                    tolerance=None,
+                )
         if self.app.is_legacy is True:
             self.exclusion_shapes.redraw()
 
         # if there are still some exclusion areas in the storage
         if self.exclusion_areas_storage:
-            self.app.inform.emit('[success] %s' % _("Selected exclusion zones deleted."))
+            self.app.inform.emit("[success] %s" % _("Selected exclusion zones deleted."))
         else:
             # restore the default StyleSheet
             self.cnc_button.setStyleSheet("")
             # update the StyleSheet
-            self.cnc_button.setStyleSheet("""
+            self.cnc_button.setStyleSheet(
+                """
                                             QPushButton
                                             {
                                                 font-weight: bold;
                                             }
-                                            """)
-            self.cnc_button.setToolTip('%s' % _("Generate the CNC Job object."))
+                                            """
+            )
+            self.cnc_button.setToolTip("%s" % _("Generate the CNC Job object."))
 
             # there are no more exclusion areas in the storage, all have been selected and deleted
-            self.app.inform.emit('%s' % _("All exclusion zones deleted."))
+            self.app.inform.emit("%s" % _("All exclusion zones deleted."))
 
     def travel_coordinates(self, start_point, end_point, tooldia):
         """
@@ -734,17 +802,19 @@ class ExclusionAreas(QtCore.QObject):
 
         buffered_storage = []
         # add a little something to the half diameter, to make sure that we really don't enter in the exclusion zones
-        buffered_distance = (tooldia / 2.0) + (0.1 if self.app.defaults['units'] == 'MM' else 0.00393701)
+        buffered_distance = (tooldia / 2.0) + (
+            0.1 if self.app.defaults["units"] == "MM" else 0.00393701
+        )
 
         for area in self.exclusion_areas_storage:
             new_area = deepcopy(area)
-            new_area['shape'] = area['shape'].buffer(buffered_distance, join_style=2)
+            new_area["shape"] = area["shape"].buffer(buffered_distance, join_style=2)
             buffered_storage.append(new_area)
 
         # sort the Exclusion areas from the closest to the start_point to the farthest
         tmp = []
         for area in buffered_storage:
-            dist = Point(start_point).distance(area['shape'])
+            dist = Point(start_point).distance(area["shape"])
             tmp.append((dist, area))
         tmp.sort(key=lambda k: k[0])
 
@@ -752,7 +822,7 @@ class ExclusionAreas(QtCore.QObject):
 
         # process the ordered exclusion areas list
         for area in sorted_area_storage:
-            outline = area['shape'].exterior
+            outline = area["shape"].exterior
             if travel_line.intersects(outline):
                 intersection_pts = travel_line.intersection(outline)
 
@@ -763,7 +833,7 @@ class ExclusionAreas(QtCore.QObject):
                 entry_pt = nearest_point(origin_point, intersection_pts)
                 exit_pt = farthest_point(origin_point, intersection_pts)
 
-                if area['strategy'] == 'around':
+                if area["strategy"] == "around":
                     full_vertex_points = [Point(x) for x in list(outline.coords)]
 
                     # the last coordinate in outline, a LinearRing, is the closing one
@@ -814,23 +884,17 @@ class ExclusionAreas(QtCore.QObject):
                     for i in range(len(vertex_points)):
                         try:
                             start_line = LineString(
-                                [
-                                    start_point,
-                                    (vertex_points[i].x, vertex_points[i].y)
-                                ]
+                                [start_point, (vertex_points[i].x, vertex_points[i].y)]
                             )
                             end_line = LineString(
-                                [
-                                    end_point,
-                                    (vertex_points[i].x, vertex_points[i].y)
-                                ]
+                                [end_point, (vertex_points[i].x, vertex_points[i].y)]
                             )
                         except IndexError:
                             continue
 
-                        if not start_line.crosses(area['shape']):
+                        if not start_line.crosses(area["shape"]):
                             close_start_points.append(vertex_points[i])
-                        if not end_line.crosses(area['shape']):
+                        if not end_line.crosses(area["shape"]):
                             close_end_points.append(vertex_points[i])
 
                     closest_point_entry = nearest_point(entry_pt, close_start_points)
@@ -843,7 +907,7 @@ class ExclusionAreas(QtCore.QObject):
                     # exclusion area outline (Polygon.exterior)
                     vp_len = len(vertex_points)
                     if end_idx > start_idx:
-                        path_1 = vertex_points[start_idx:(end_idx + 1)]
+                        path_1 = vertex_points[start_idx : (end_idx + 1)]
                         path_2 = [vertex_points[start_idx]]
                         idx = start_idx
                         for __ in range(vp_len):
@@ -852,7 +916,7 @@ class ExclusionAreas(QtCore.QObject):
                             if idx == end_idx:
                                 break
                     else:
-                        path_1 = vertex_points[end_idx:(start_idx + 1)]
+                        path_1 = vertex_points[end_idx : (start_idx + 1)]
                         path_2 = [vertex_points[end_idx]]
                         idx = end_idx
                         for __ in range(vp_len):
@@ -885,7 +949,10 @@ class ExclusionAreas(QtCore.QObject):
                     ret_list += path_coords
 
                 else:
-                    path_coords = [[float(area['overz']), (entry_pt.x, entry_pt.y)], [None, (exit_pt.x, exit_pt.y)]]
+                    path_coords = [
+                        [float(area["overz"]), (entry_pt.x, entry_pt.y)],
+                        [None, (exit_pt.x, exit_pt.y)],
+                    ]
                     ret_list += path_coords
 
                 # create a new LineString to test again for possible other Exclusion zones
@@ -962,6 +1029,7 @@ def farthest_point(origin, points_list):
 #                 print(traceback.format_exc())
 #
 #         return voronoi_polygons
+
 
 def nearest_point(origin, points_list):
     """

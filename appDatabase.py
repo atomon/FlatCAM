@@ -1,6 +1,17 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
-from appGUI.GUIElements import FCEntry, FCButton, FCDoubleSpinner, FCComboBox, FCCheckBox, FCSpinner, \
-    FCTree, RadioSet, FCFileSaveDialog, FCLabel, FCComboBox2
+from appGUI.GUIElements import (
+    FCEntry,
+    FCButton,
+    FCDoubleSpinner,
+    FCComboBox,
+    FCCheckBox,
+    FCSpinner,
+    FCTree,
+    RadioSet,
+    FCFileSaveDialog,
+    FCLabel,
+    FCComboBox2,
+)
 from camlib import to_dict
 
 import sys
@@ -14,24 +25,24 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
 class ToolsDB2UI:
-    
+
     def __init__(self, app, grid_layout):
         self.app = app
         self.decimals = self.app.decimals
 
         self.offset_item_options = ["Path", "In", "Out", "Custom"]
-        self.type_item_options = ['Iso', 'Rough', 'Finish']
+        self.type_item_options = ["Iso", "Rough", "Finish"]
         self.tool_type_item_options = ["C1", "C2", "C3", "C4", "B", "V"]
 
         settings = QtCore.QSettings("Open Source", "FlatCAM")
         if settings.contains("machinist"):
-            self.machinist_setting = settings.value('machinist', type=int)
+            self.machinist_setting = settings.value("machinist", type=int)
         else:
             self.machinist_setting = 0
 
@@ -52,7 +63,9 @@ class ToolsDB2UI:
         # p.setColor(QtGui.QPalette.AlternateBase, QtGui.QColor(226, 237, 253) )
         # self.tree_widget.setPalette(p)
 
-        self.tree_widget.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+        self.tree_widget.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding
+        )
         tree_layout.addWidget(self.tree_widget)
 
         param_hlay = QtWidgets.QHBoxLayout()
@@ -71,91 +84,105 @@ class ToolsDB2UI:
 
         # Tool description box
         self.tool_description_box = QtWidgets.QGroupBox()
-        self.tool_description_box.setStyleSheet("""
+        self.tool_description_box.setStyleSheet(
+            """
         QGroupBox
         {
             font-size: 16px;
             font-weight: bold;
         }
-        """)
+        """
+        )
         self.description_vlay = QtWidgets.QVBoxLayout()
         self.tool_description_box.setTitle(_("Tool Description"))
         self.tool_description_box.setMinimumWidth(250)
 
         # Milling box
         self.milling_box = QtWidgets.QGroupBox()
-        self.milling_box.setStyleSheet("""
+        self.milling_box.setStyleSheet(
+            """
         QGroupBox
         {
             font-size: 16px;
             font-weight: bold;
         }
-        """)
+        """
+        )
         self.milling_vlay = QtWidgets.QVBoxLayout()
         self.milling_box.setTitle(_("Milling Parameters"))
         self.milling_box.setMinimumWidth(250)
 
         # NCC TOOL BOX
         self.ncc_box = QtWidgets.QGroupBox()
-        self.ncc_box.setStyleSheet("""
+        self.ncc_box.setStyleSheet(
+            """
                         QGroupBox
                         {
                             font-size: 16px;
                             font-weight: bold;
                         }
-                        """)
+                        """
+        )
         self.ncc_vlay = QtWidgets.QVBoxLayout()
         self.ncc_box.setTitle(_("NCC Parameters"))
         self.ncc_box.setMinimumWidth(250)
 
         # PAINT TOOL BOX
         self.paint_box = QtWidgets.QGroupBox()
-        self.paint_box.setStyleSheet("""
+        self.paint_box.setStyleSheet(
+            """
                         QGroupBox
                         {
                             font-size: 16px;
                             font-weight: bold;
                         }
-                        """)
+                        """
+        )
         self.paint_vlay = QtWidgets.QVBoxLayout()
         self.paint_box.setTitle(_("Paint Parameters"))
         self.paint_box.setMinimumWidth(250)
 
         # ISOLATION TOOL BOX
         self.iso_box = QtWidgets.QGroupBox()
-        self.iso_box.setStyleSheet("""
+        self.iso_box.setStyleSheet(
+            """
                      QGroupBox
                      {
                          font-size: 16px;
                          font-weight: bold;
                      }
-                     """)
+                     """
+        )
         self.iso_vlay = QtWidgets.QVBoxLayout()
         self.iso_box.setTitle(_("Isolation Parameters"))
         self.iso_box.setMinimumWidth(250)
 
         # DRILLING TOOL BOX
         self.drill_box = QtWidgets.QGroupBox()
-        self.drill_box.setStyleSheet("""
+        self.drill_box.setStyleSheet(
+            """
                      QGroupBox
                      {
                          font-size: 16px;
                          font-weight: bold;
                      }
-                     """)
+                     """
+        )
         self.drill_vlay = QtWidgets.QVBoxLayout()
         self.drill_box.setTitle(_("Drilling Parameters"))
         self.drill_box.setMinimumWidth(250)
 
         # CUTOUT TOOL BOX
         self.cutout_box = QtWidgets.QGroupBox()
-        self.cutout_box.setStyleSheet("""
+        self.cutout_box.setStyleSheet(
+            """
                      QGroupBox
                      {
                          font-size: 16px;
                          font-weight: bold;
                      }
-                     """)
+                     """
+        )
         self.cutout_vlay = QtWidgets.QVBoxLayout()
         self.cutout_box.setTitle(_("Cutout Parameters"))
         self.cutout_box.setMinimumWidth(250)
@@ -207,27 +234,29 @@ class ToolsDB2UI:
         self.description_vlay.addStretch()
 
         # Tool Name
-        self.name_label = FCLabel('<span style="color:red;"><b>%s:</b></span>' % _('Name'))
+        self.name_label = FCLabel('<span style="color:red;"><b>%s:</b></span>' % _("Name"))
         self.name_label.setToolTip(
-            _("Tool name.\n"
-              "This is not used in the app, it's function\n"
-              "is to serve as a note for the user."))
+            _(
+                "Tool name.\n"
+                "This is not used in the app, it's function\n"
+                "is to serve as a note for the user."
+            )
+        )
 
         self.name_entry = FCEntry()
-        self.name_entry.setObjectName('gdb_name')
+        self.name_entry.setObjectName("gdb_name")
 
         self.grid_tool.addWidget(self.name_label, 0, 0)
         self.grid_tool.addWidget(self.name_entry, 0, 1)
 
         # Tool Dia
-        self.dia_label = FCLabel('%s:' % _('Diameter'))
-        self.dia_label.setToolTip(
-            '%s.' % _("Tool Diameter"))
+        self.dia_label = FCLabel("%s:" % _("Diameter"))
+        self.dia_label.setToolTip("%s." % _("Tool Diameter"))
 
         self.dia_entry = FCDoubleSpinner()
         self.dia_entry.set_range(-10000.0000, 10000.0000)
         self.dia_entry.set_precision(self.decimals)
-        self.dia_entry.setObjectName('gdb_dia')
+        self.dia_entry.setObjectName("gdb_dia")
 
         self.grid_tool.addWidget(self.dia_label, 1, 0)
         self.grid_tool.addWidget(self.dia_entry, 1, 1)
@@ -235,16 +264,16 @@ class ToolsDB2UI:
         # Tool Tolerance
         self.tol_label = FCLabel("<b>%s:</b>" % _("Diameter Tolerance"))
         self.tol_label.setToolTip(
-            _("Tool tolerance. This tool will be used if the desired tool diameter\n"
-              "is within the tolerance specified here.")
+            _(
+                "Tool tolerance. This tool will be used if the desired tool diameter\n"
+                "is within the tolerance specified here."
+            )
         )
         self.grid_tool.addWidget(self.tol_label, 2, 0, 1, 2)
 
         # Tolerance Min Limit
-        self.min_limit_label = FCLabel('%s:' % _("Min"))
-        self.min_limit_label.setToolTip(
-            _("Set the tool tolerance minimum.")
-        )
+        self.min_limit_label = FCLabel("%s:" % _("Min"))
+        self.min_limit_label.setToolTip(_("Set the tool tolerance minimum."))
         self.tol_min_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.tol_min_entry.set_precision(self.decimals)
         self.tol_min_entry.set_range(0, 10000.0000)
@@ -255,10 +284,8 @@ class ToolsDB2UI:
         self.grid_tool.addWidget(self.tol_min_entry, 4, 1)
 
         # Tolerance Min Limit
-        self.max_limit_label = FCLabel('%s:' % _("Max"))
-        self.max_limit_label.setToolTip(
-            _("Set the tool tolerance maximum.")
-        )
+        self.max_limit_label = FCLabel("%s:" % _("Max"))
+        self.max_limit_label.setToolTip(_("Set the tool tolerance maximum."))
         self.tol_max_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.tol_max_entry.set_precision(self.decimals)
         self.tol_max_entry.set_range(0, 10000.0000)
@@ -269,14 +296,24 @@ class ToolsDB2UI:
         self.grid_tool.addWidget(self.tol_max_entry, 6, 1)
 
         # Tool Object Type
-        self.tool_op_label = FCLabel('<b>%s:</b>' % _('Operation'))
+        self.tool_op_label = FCLabel("<b>%s:</b>" % _("Operation"))
         self.tool_op_label.setToolTip(
-            _("The kind of Application Tool where this tool is to be used."))
+            _("The kind of Application Tool where this tool is to be used.")
+        )
 
         self.tool_op_combo = FCComboBox2()
         self.tool_op_combo.addItems(
-            [_("General"), _("Milling"), _("Drilling"), _('Isolation'), _('Paint'), _('NCC'), _('Cutout')])
-        self.tool_op_combo.setObjectName('gdb_tool_target')
+            [
+                _("General"),
+                _("Milling"),
+                _("Drilling"),
+                _("Isolation"),
+                _("Paint"),
+                _("NCC"),
+                _("Cutout"),
+            ]
+        )
+        self.tool_op_combo.setObjectName("gdb_tool_target")
 
         self.grid_tool.addWidget(self.tool_op_label, 8, 0)
         self.grid_tool.addWidget(self.tool_op_combo, 8, 1)
@@ -291,45 +328,44 @@ class ToolsDB2UI:
         self.milling_vlay.addStretch()
 
         # Tool Shape
-        self.shape_label = FCLabel('%s:' % _('Shape'))
+        self.shape_label = FCLabel("%s:" % _("Shape"))
         self.shape_label.setToolTip(
-            _("Tool Shape. \n"
-              "Can be:\n"
-              "C1 ... C4 = circular tool with x flutes\n"
-              "B = ball tip milling tool\n"
-              "V = v-shape milling tool"))
+            _(
+                "Tool Shape. \n"
+                "Can be:\n"
+                "C1 ... C4 = circular tool with x flutes\n"
+                "B = ball tip milling tool\n"
+                "V = v-shape milling tool"
+            )
+        )
 
         self.mill_shape_combo = FCComboBox()
         self.mill_shape_combo.addItems(self.tool_type_item_options)
-        self.mill_shape_combo.setObjectName('gdb_shape')
+        self.mill_shape_combo.setObjectName("gdb_shape")
 
         self.grid0.addWidget(self.shape_label, 2, 0)
         self.grid0.addWidget(self.mill_shape_combo, 2, 1)
 
         # V-Dia
-        self.vdia_label = FCLabel('%s:' % _("V-Dia"))
-        self.vdia_label.setToolTip(
-            _("V-Dia.\n"
-              "Diameter of the tip for V-Shape Tools."))
+        self.vdia_label = FCLabel("%s:" % _("V-Dia"))
+        self.vdia_label.setToolTip(_("V-Dia.\n" "Diameter of the tip for V-Shape Tools."))
 
         self.mill_vdia_entry = FCDoubleSpinner()
         self.mill_vdia_entry.set_range(0.0000, 10000.0000)
         self.mill_vdia_entry.set_precision(self.decimals)
-        self.mill_vdia_entry.setObjectName('gdb_vdia')
+        self.mill_vdia_entry.setObjectName("gdb_vdia")
 
         self.grid0.addWidget(self.vdia_label, 4, 0)
         self.grid0.addWidget(self.mill_vdia_entry, 4, 1)
 
         # V-Angle
-        self.vangle_label = FCLabel('%s:' % _("V-Angle"))
-        self.vangle_label.setToolTip(
-            _("V-Agle.\n"
-              "Angle at the tip for the V-Shape Tools."))
+        self.vangle_label = FCLabel("%s:" % _("V-Angle"))
+        self.vangle_label.setToolTip(_("V-Agle.\n" "Angle at the tip for the V-Shape Tools."))
 
         self.mill_vangle_entry = FCDoubleSpinner()
         self.mill_vangle_entry.set_range(-360.0, 360.0)
         self.mill_vangle_entry.set_precision(self.decimals)
-        self.mill_vangle_entry.setObjectName('gdb_vangle')
+        self.mill_vangle_entry.setObjectName("gdb_vangle")
 
         self.grid0.addWidget(self.vangle_label, 6, 0)
         self.grid0.addWidget(self.mill_vangle_entry, 6, 1)
@@ -340,48 +376,54 @@ class ToolsDB2UI:
         self.grid0.addWidget(separator_line, 8, 0, 1, 2)
 
         # Tool Type
-        self.type_label = FCLabel('%s:' % _("Tool Type"))
+        self.type_label = FCLabel("%s:" % _("Tool Type"))
         self.type_label.setToolTip(
-            _("Tool Type.\n"
-              "Can be:\n"
-              "Iso = isolation cut\n"
-              "Rough = rough cut, low feedrate, multiple passes\n"
-              "Finish = finishing cut, high feedrate"))
+            _(
+                "Tool Type.\n"
+                "Can be:\n"
+                "Iso = isolation cut\n"
+                "Rough = rough cut, low feedrate, multiple passes\n"
+                "Finish = finishing cut, high feedrate"
+            )
+        )
 
         self.mill_type_combo = FCComboBox()
         self.mill_type_combo.addItems(self.type_item_options)
-        self.mill_type_combo.setObjectName('gdb_type')
+        self.mill_type_combo.setObjectName("gdb_type")
 
         self.grid0.addWidget(self.type_label, 10, 0)
         self.grid0.addWidget(self.mill_type_combo, 10, 1)
 
         # Tool Offset
-        self.tooloffset_label = FCLabel('%s:' % _('Tool Offset'))
+        self.tooloffset_label = FCLabel("%s:" % _("Tool Offset"))
         self.tooloffset_label.setToolTip(
-            _("Tool Offset.\n"
-              "Can be of a few types:\n"
-              "Path = zero offset\n"
-              "In = offset inside by half of tool diameter\n"
-              "Out = offset outside by half of tool diameter\n"
-              "Custom = custom offset using the Custom Offset value"))
+            _(
+                "Tool Offset.\n"
+                "Can be of a few types:\n"
+                "Path = zero offset\n"
+                "In = offset inside by half of tool diameter\n"
+                "Out = offset outside by half of tool diameter\n"
+                "Custom = custom offset using the Custom Offset value"
+            )
+        )
 
         self.mill_tooloffset_combo = FCComboBox()
         self.mill_tooloffset_combo.addItems(self.offset_item_options)
-        self.mill_tooloffset_combo.setObjectName('gdb_tool_offset')
+        self.mill_tooloffset_combo.setObjectName("gdb_tool_offset")
 
         self.grid0.addWidget(self.tooloffset_label, 12, 0)
         self.grid0.addWidget(self.mill_tooloffset_combo, 12, 1)
 
         # Custom Offset
-        self.custom_offset_label = FCLabel('%s:' % _("Custom Offset"))
+        self.custom_offset_label = FCLabel("%s:" % _("Custom Offset"))
         self.custom_offset_label.setToolTip(
-            _("Custom Offset.\n"
-              "A value to be used as offset from the current path."))
+            _("Custom Offset.\n" "A value to be used as offset from the current path.")
+        )
 
         self.mill_custom_offset_entry = FCDoubleSpinner()
         self.mill_custom_offset_entry.set_range(-10000.0000, 10000.0000)
         self.mill_custom_offset_entry.set_precision(self.decimals)
-        self.mill_custom_offset_entry.setObjectName('gdb_custom_offset')
+        self.mill_custom_offset_entry.setObjectName("gdb_custom_offset")
 
         self.grid0.addWidget(self.custom_offset_label, 14, 0)
         self.grid0.addWidget(self.mill_custom_offset_entry, 14, 1)
@@ -392,90 +434,100 @@ class ToolsDB2UI:
         self.grid0.addWidget(separator_line, 16, 0, 1, 2)
 
         # Cut Z
-        self.cutz_label = FCLabel('%s:' % _("Cut Z"))
-        self.cutz_label.setToolTip(
-            _("Cutting Depth.\n"
-              "The depth at which to cut into material."))
+        self.cutz_label = FCLabel("%s:" % _("Cut Z"))
+        self.cutz_label.setToolTip(_("Cutting Depth.\n" "The depth at which to cut into material."))
 
         self.mill_cutz_entry = FCDoubleSpinner()
         self.mill_cutz_entry.set_range(-10000.0000, 10000.0000)
         self.mill_cutz_entry.set_precision(self.decimals)
-        self.mill_cutz_entry.setObjectName('gdb_cutz')
+        self.mill_cutz_entry.setObjectName("gdb_cutz")
 
         self.grid0.addWidget(self.cutz_label, 18, 0)
         self.grid0.addWidget(self.mill_cutz_entry, 18, 1)
 
         # Multi Depth
-        self.multidepth_label = FCLabel('%s:' % _("MultiDepth"))
+        self.multidepth_label = FCLabel("%s:" % _("MultiDepth"))
         self.multidepth_label.setToolTip(
-            _("Multi Depth.\n"
-              "Selecting this will allow cutting in multiple passes,\n"
-              "each pass adding a DPP parameter depth."))
+            _(
+                "Multi Depth.\n"
+                "Selecting this will allow cutting in multiple passes,\n"
+                "each pass adding a DPP parameter depth."
+            )
+        )
 
         self.mill_multidepth_cb = FCCheckBox()
-        self.mill_multidepth_cb.setObjectName('gdb_multidepth')
+        self.mill_multidepth_cb.setObjectName("gdb_multidepth")
 
         self.grid0.addWidget(self.multidepth_label, 20, 0)
         self.grid0.addWidget(self.mill_multidepth_cb, 20, 1)
 
         # Depth Per Pass
-        self.dpp_label = FCLabel('%s:' % _("DPP"))
+        self.dpp_label = FCLabel("%s:" % _("DPP"))
         self.dpp_label.setToolTip(
-            _("DPP. Depth per Pass.\n"
-              "The value used to cut into material on each pass."))
+            _("DPP. Depth per Pass.\n" "The value used to cut into material on each pass.")
+        )
 
         self.mill_multidepth_entry = FCDoubleSpinner()
         self.mill_multidepth_entry.set_range(-10000.0000, 10000.0000)
         self.mill_multidepth_entry.set_precision(self.decimals)
-        self.mill_multidepth_entry.setObjectName('gdb_multidepth_entry')
+        self.mill_multidepth_entry.setObjectName("gdb_multidepth_entry")
 
         self.grid0.addWidget(self.dpp_label, 22, 0)
         self.grid0.addWidget(self.mill_multidepth_entry, 22, 1)
 
         # Travel Z
-        self.travelz_label = FCLabel('%s:' % _("Travel Z"))
+        self.travelz_label = FCLabel("%s:" % _("Travel Z"))
         self.travelz_label.setToolTip(
-            _("Clearance Height.\n"
-              "Height at which the milling bit will travel between cuts,\n"
-              "above the surface of the material, avoiding all fixtures."))
+            _(
+                "Clearance Height.\n"
+                "Height at which the milling bit will travel between cuts,\n"
+                "above the surface of the material, avoiding all fixtures."
+            )
+        )
 
         self.mill_travelz_entry = FCDoubleSpinner()
         self.mill_travelz_entry.set_range(-10000.0000, 10000.0000)
         self.mill_travelz_entry.set_precision(self.decimals)
-        self.mill_travelz_entry.setObjectName('gdb_travelz')
+        self.mill_travelz_entry.setObjectName("gdb_travelz")
 
         self.grid0.addWidget(self.travelz_label, 24, 0)
         self.grid0.addWidget(self.mill_travelz_entry, 24, 1)
 
         # Extra Cut
-        self.ecut_label = FCLabel('%s:' % _("ExtraCut"))
+        self.ecut_label = FCLabel("%s:" % _("ExtraCut"))
         self.ecut_label.setToolTip(
-            _("Extra Cut.\n"
-              "If checked, after a isolation is finished an extra cut\n"
-              "will be added where the start and end of isolation meet\n"
-              "such as that this point is covered by this extra cut to\n"
-              "ensure a complete isolation."))
+            _(
+                "Extra Cut.\n"
+                "If checked, after a isolation is finished an extra cut\n"
+                "will be added where the start and end of isolation meet\n"
+                "such as that this point is covered by this extra cut to\n"
+                "ensure a complete isolation."
+            )
+        )
 
         self.mill_ecut_cb = FCCheckBox()
-        self.mill_ecut_cb.setObjectName('gdb_ecut')
+        self.mill_ecut_cb.setObjectName("gdb_ecut")
 
         self.grid0.addWidget(self.ecut_label, 26, 0)
         self.grid0.addWidget(self.mill_ecut_cb, 26, 1)
 
         # Extra Cut Length
-        self.ecut_length_label = FCLabel('%s:' % _("E-Cut Length"))
+        self.ecut_length_label = FCLabel("%s:" % _("E-Cut Length"))
         self.ecut_length_label.setToolTip(
-            _("Extra Cut length.\n"
-              "If checked, after a isolation is finished an extra cut\n"
-              "will be added where the start and end of isolation meet\n"
-              "such as that this point is covered by this extra cut to\n"
-              "ensure a complete isolation. This is the length of\n"
-              "the extra cut."))
+            _(
+                "Extra Cut length.\n"
+                "If checked, after a isolation is finished an extra cut\n"
+                "will be added where the start and end of isolation meet\n"
+                "such as that this point is covered by this extra cut to\n"
+                "ensure a complete isolation. This is the length of\n"
+                "the extra cut."
+            )
+        )
 
         self.mill_ecut_length_entry = FCDoubleSpinner()
         self.mill_ecut_length_entry.set_range(0.0000, 10000.0000)
         self.mill_ecut_length_entry.set_precision(self.decimals)
-        self.mill_ecut_length_entry.setObjectName('gdb_ecut_length')
+        self.mill_ecut_length_entry.setObjectName("gdb_ecut_length")
 
         self.grid0.addWidget(self.ecut_length_label, 28, 0)
         self.grid0.addWidget(self.mill_ecut_length_entry, 28, 1)
@@ -486,45 +538,46 @@ class ToolsDB2UI:
         self.grid0.addWidget(separator_line, 30, 0, 1, 2)
 
         # Feedrate X-Y
-        self.frxy_label = FCLabel('%s:' % _("Feedrate X-Y"))
+        self.frxy_label = FCLabel("%s:" % _("Feedrate X-Y"))
         self.frxy_label.setToolTip(
-            _("Feedrate X-Y. Feedrate\n"
-              "The speed on XY plane used while cutting into material."))
+            _("Feedrate X-Y. Feedrate\n" "The speed on XY plane used while cutting into material.")
+        )
 
         self.mill_frxy_entry = FCDoubleSpinner()
         self.mill_frxy_entry.set_range(-9910000.0000, 9910000.0000)
         self.mill_frxy_entry.set_precision(self.decimals)
-        self.mill_frxy_entry.setObjectName('gdb_frxy')
+        self.mill_frxy_entry.setObjectName("gdb_frxy")
 
         self.grid0.addWidget(self.frxy_label, 32, 0)
         self.grid0.addWidget(self.mill_frxy_entry, 32, 1)
 
         # Feedrate Z
-        self.frz_label = FCLabel('%s:' % _("Feedrate Z"))
-        self.frz_label.setToolTip(
-            _("Feedrate Z\n"
-              "The speed on Z plane."))
+        self.frz_label = FCLabel("%s:" % _("Feedrate Z"))
+        self.frz_label.setToolTip(_("Feedrate Z\n" "The speed on Z plane."))
 
         self.mill_frz_entry = FCDoubleSpinner()
         self.mill_frz_entry.set_range(-9910000.0000, 9910000.0000)
         self.mill_frz_entry.set_precision(self.decimals)
-        self.mill_frz_entry.setObjectName('gdb_frz')
+        self.mill_frz_entry.setObjectName("gdb_frz")
 
         self.grid0.addWidget(self.frz_label, 34, 0)
         self.grid0.addWidget(self.mill_frz_entry, 34, 1)
 
         # Feedrate Rapids
-        self.frapids_label = FCLabel('%s:' % _("FR Rapids"))
+        self.frapids_label = FCLabel("%s:" % _("FR Rapids"))
         self.frapids_label.setToolTip(
-            _("FR Rapids. Feedrate Rapids\n"
-              "Speed used while moving as fast as possible.\n"
-              "This is used only by some devices that can't use\n"
-              "the G0 g-code command. Mostly 3D printers."))
+            _(
+                "FR Rapids. Feedrate Rapids\n"
+                "Speed used while moving as fast as possible.\n"
+                "This is used only by some devices that can't use\n"
+                "the G0 g-code command. Mostly 3D printers."
+            )
+        )
 
         self.mill_frapids_entry = FCDoubleSpinner()
         self.mill_frapids_entry.set_range(0.0000, 10000.0000)
         self.mill_frapids_entry.set_precision(self.decimals)
-        self.mill_frapids_entry.setObjectName('gdb_frapids')
+        self.mill_frapids_entry.setObjectName("gdb_frapids")
 
         self.grid0.addWidget(self.frapids_label, 36, 0)
         self.grid0.addWidget(self.mill_frapids_entry, 36, 1)
@@ -535,43 +588,49 @@ class ToolsDB2UI:
         self.grid0.addWidget(separator_line, 38, 0, 1, 2)
 
         # Spindle Spped
-        self.spindle_label = FCLabel('%s:' % _("Spindle Speed"))
+        self.spindle_label = FCLabel("%s:" % _("Spindle Speed"))
         self.spindle_label.setToolTip(
-            _("Spindle Speed.\n"
-              "If it's left empty it will not be used.\n"
-              "The speed of the spindle in RPM."))
+            _(
+                "Spindle Speed.\n"
+                "If it's left empty it will not be used.\n"
+                "The speed of the spindle in RPM."
+            )
+        )
 
         self.mill_spindle_entry = FCDoubleSpinner()
         self.mill_spindle_entry.set_range(-9910000.0000, 9910000.0000)
         self.mill_spindle_entry.set_precision(self.decimals)
-        self.mill_spindle_entry.setObjectName('gdb_spindle')
+        self.mill_spindle_entry.setObjectName("gdb_spindle")
 
         self.grid0.addWidget(self.spindle_label, 40, 0)
         self.grid0.addWidget(self.mill_spindle_entry, 40, 1)
 
         # Dwell
-        self.dwell_label = FCLabel('%s:' % _("Dwell"))
+        self.dwell_label = FCLabel("%s:" % _("Dwell"))
         self.dwell_label.setToolTip(
-            _("Dwell.\n"
-              "Check this if a delay is needed to allow\n"
-              "the spindle motor to reach its set speed."))
+            _(
+                "Dwell.\n"
+                "Check this if a delay is needed to allow\n"
+                "the spindle motor to reach its set speed."
+            )
+        )
 
         self.mill_dwell_cb = FCCheckBox()
-        self.mill_dwell_cb.setObjectName('gdb_dwell')
+        self.mill_dwell_cb.setObjectName("gdb_dwell")
 
         self.grid0.addWidget(self.dwell_label, 42, 0)
         self.grid0.addWidget(self.mill_dwell_cb, 42, 1)
 
         # Dwell Time
-        self.dwelltime_label = FCLabel('%s:' % _("Dwelltime"))
+        self.dwelltime_label = FCLabel("%s:" % _("Dwelltime"))
         self.dwelltime_label.setToolTip(
-            _("Dwell Time.\n"
-              "A delay used to allow the motor spindle reach its set speed."))
+            _("Dwell Time.\n" "A delay used to allow the motor spindle reach its set speed.")
+        )
 
         self.mill_dwelltime_entry = FCDoubleSpinner()
         self.mill_dwelltime_entry.set_range(0.0000, 10000.0000)
         self.mill_dwelltime_entry.set_precision(self.decimals)
-        self.mill_dwelltime_entry.setObjectName('gdb_dwelltime')
+        self.mill_dwelltime_entry.setObjectName("gdb_dwelltime")
 
         self.grid0.addWidget(self.dwelltime_label, 44, 0)
         self.grid0.addWidget(self.mill_dwelltime_entry, 44, 1)
@@ -587,37 +646,45 @@ class ToolsDB2UI:
         self.ncc_vlay.addStretch()
 
         # Operation
-        op_label = FCLabel('%s:' % _('Operation'))
+        op_label = FCLabel("%s:" % _("Operation"))
         op_label.setToolTip(
-            _("The 'Operation' can be:\n"
-              "- Isolation -> will ensure that the non-copper clearing is always complete.\n"
-              "If it's not successful then the non-copper clearing will fail, too.\n"
-              "- Clear -> the regular non-copper clearing.")
+            _(
+                "The 'Operation' can be:\n"
+                "- Isolation -> will ensure that the non-copper clearing is always complete.\n"
+                "If it's not successful then the non-copper clearing will fail, too.\n"
+                "- Clear -> the regular non-copper clearing."
+            )
         )
 
-        self.ncc_op_radio = RadioSet([
-            {"label": _("Clear"), "value": "clear"},
-            {"label": _("Isolation"), "value": "iso"}
-        ], orientation='horizontal', stretch=False)
+        self.ncc_op_radio = RadioSet(
+            [{"label": _("Clear"), "value": "clear"}, {"label": _("Isolation"), "value": "iso"}],
+            orientation="horizontal",
+            stretch=False,
+        )
         self.ncc_op_radio.setObjectName("gdb_n_operation")
 
         self.grid2.addWidget(op_label, 13, 0)
         self.grid2.addWidget(self.ncc_op_radio, 13, 1)
 
         # Milling Type Radio Button
-        self.milling_type_label = FCLabel('%s:' % _('Milling Type'))
+        self.milling_type_label = FCLabel("%s:" % _("Milling Type"))
         self.milling_type_label.setToolTip(
-            _("Milling type:\n"
-              "- climb / best for precision milling and to reduce tool usage\n"
-              "- conventional / useful when there is no backlash compensation")
+            _(
+                "Milling type:\n"
+                "- climb / best for precision milling and to reduce tool usage\n"
+                "- conventional / useful when there is no backlash compensation"
+            )
         )
 
-        self.ncc_milling_type_radio = RadioSet([{'label': _('Climb'), 'value': 'cl'},
-                                                {'label': _('Conventional'), 'value': 'cv'}])
+        self.ncc_milling_type_radio = RadioSet(
+            [{"label": _("Climb"), "value": "cl"}, {"label": _("Conventional"), "value": "cv"}]
+        )
         self.ncc_milling_type_radio.setToolTip(
-            _("Milling type:\n"
-              "- climb / best for precision milling and to reduce tool usage\n"
-              "- conventional / useful when there is no backlash compensation")
+            _(
+                "Milling type:\n"
+                "- climb / best for precision milling and to reduce tool usage\n"
+                "- conventional / useful when there is no backlash compensation"
+            )
         )
         self.ncc_milling_type_radio.setObjectName("gdb_n_milling_type")
 
@@ -625,17 +692,19 @@ class ToolsDB2UI:
         self.grid2.addWidget(self.ncc_milling_type_radio, 14, 1)
 
         # Overlap Entry
-        nccoverlabel = FCLabel('%s:' % _('Overlap'))
+        nccoverlabel = FCLabel("%s:" % _("Overlap"))
         nccoverlabel.setToolTip(
-            _("How much (percentage) of the tool width to overlap each tool pass.\n"
-              "Adjust the value starting with lower values\n"
-              "and increasing it if areas that should be processed are still \n"
-              "not processed.\n"
-              "Lower values = faster processing, faster execution on CNC.\n"
-              "Higher values = slow processing and slow execution on CNC\n"
-              "due of too many paths.")
+            _(
+                "How much (percentage) of the tool width to overlap each tool pass.\n"
+                "Adjust the value starting with lower values\n"
+                "and increasing it if areas that should be processed are still \n"
+                "not processed.\n"
+                "Lower values = faster processing, faster execution on CNC.\n"
+                "Higher values = slow processing and slow execution on CNC\n"
+                "due of too many paths."
+            )
         )
-        self.ncc_overlap_entry = FCDoubleSpinner(suffix='%')
+        self.ncc_overlap_entry = FCDoubleSpinner(suffix="%")
         self.ncc_overlap_entry.set_precision(self.decimals)
         self.ncc_overlap_entry.setWrapping(True)
         self.ncc_overlap_entry.setRange(0.000, 99.9999)
@@ -646,10 +715,8 @@ class ToolsDB2UI:
         self.grid2.addWidget(self.ncc_overlap_entry, 15, 1)
 
         # Margin
-        nccmarginlabel = FCLabel('%s:' % _('Margin'))
-        nccmarginlabel.setToolTip(
-            _("Bounding box margin.")
-        )
+        nccmarginlabel = FCLabel("%s:" % _("Margin"))
+        nccmarginlabel.setToolTip(_("Bounding box margin."))
         self.ncc_margin_entry = FCDoubleSpinner()
         self.ncc_margin_entry.set_precision(self.decimals)
         self.ncc_margin_entry.set_range(-10000.0000, 10000.0000)
@@ -659,51 +726,51 @@ class ToolsDB2UI:
         self.grid2.addWidget(self.ncc_margin_entry, 16, 1)
 
         # Method
-        methodlabel = FCLabel('%s:' % _('Method'))
+        methodlabel = FCLabel("%s:" % _("Method"))
         methodlabel.setToolTip(
-            _("Algorithm for copper clearing:\n"
-              "- Standard: Fixed step inwards.\n"
-              "- Seed-based: Outwards from seed.\n"
-              "- Line-based: Parallel lines.")
+            _(
+                "Algorithm for copper clearing:\n"
+                "- Standard: Fixed step inwards.\n"
+                "- Seed-based: Outwards from seed.\n"
+                "- Line-based: Parallel lines."
+            )
         )
 
         self.ncc_method_combo = FCComboBox2()
-        self.ncc_method_combo.addItems(
-            [_("Standard"), _("Seed"), _("Lines"), _("Combo")]
-        )
+        self.ncc_method_combo.addItems([_("Standard"), _("Seed"), _("Lines"), _("Combo")])
         self.ncc_method_combo.setObjectName("gdb_n_method")
 
         self.grid2.addWidget(methodlabel, 17, 0)
         self.grid2.addWidget(self.ncc_method_combo, 17, 1)
 
         # Connect lines
-        self.ncc_connect_cb = FCCheckBox('%s' % _("Connect"))
+        self.ncc_connect_cb = FCCheckBox("%s" % _("Connect"))
         self.ncc_connect_cb.setObjectName("gdb_n_connect")
 
         self.ncc_connect_cb.setToolTip(
-            _("Draw lines between resulting\n"
-              "segments to minimize tool lifts.")
+            _("Draw lines between resulting\n" "segments to minimize tool lifts.")
         )
         self.grid2.addWidget(self.ncc_connect_cb, 18, 0)
 
         # Contour
-        self.ncc_contour_cb = FCCheckBox('%s' % _("Contour"))
+        self.ncc_contour_cb = FCCheckBox("%s" % _("Contour"))
         self.ncc_contour_cb.setObjectName("gdb_n_contour")
 
         self.ncc_contour_cb.setToolTip(
-            _("Cut around the perimeter of the polygon\n"
-              "to trim rough edges.")
+            _("Cut around the perimeter of the polygon\n" "to trim rough edges.")
         )
         self.grid2.addWidget(self.ncc_contour_cb, 18, 1)
 
         # ## NCC Offset choice
-        self.ncc_choice_offset_cb = FCCheckBox('%s' % _("Offset"))
+        self.ncc_choice_offset_cb = FCCheckBox("%s" % _("Offset"))
         self.ncc_choice_offset_cb.setObjectName("gdb_n_offset")
 
         self.ncc_choice_offset_cb.setToolTip(
-            _("If used, it will add an offset to the copper features.\n"
-              "The copper clearing will finish to a distance\n"
-              "from the copper features.")
+            _(
+                "If used, it will add an offset to the copper features.\n"
+                "The copper clearing will finish to a distance\n"
+                "from the copper features."
+            )
         )
         self.grid2.addWidget(self.ncc_choice_offset_cb, 19, 0)
 
@@ -714,8 +781,8 @@ class ToolsDB2UI:
         self.ncc_offset_spinner.setWrapping(True)
         self.ncc_offset_spinner.setObjectName("gdb_n_offset_value")
 
-        units = self.app.defaults['units'].upper()
-        if units == 'MM':
+        units = self.app.defaults["units"].upper()
+        if units == "MM":
             self.ncc_offset_spinner.setSingleStep(0.1)
         else:
             self.ncc_offset_spinner.setSingleStep(0.01)
@@ -733,52 +800,54 @@ class ToolsDB2UI:
         self.paint_vlay.addStretch()
 
         # Overlap
-        ovlabel = FCLabel('%s:' % _('Overlap'))
+        ovlabel = FCLabel("%s:" % _("Overlap"))
         ovlabel.setToolTip(
-            _("How much (percentage) of the tool width to overlap each tool pass.\n"
-              "Adjust the value starting with lower values\n"
-              "and increasing it if areas that should be processed are still \n"
-              "not processed.\n"
-              "Lower values = faster processing, faster execution on CNC.\n"
-              "Higher values = slow processing and slow execution on CNC\n"
-              "due of too many paths.")
+            _(
+                "How much (percentage) of the tool width to overlap each tool pass.\n"
+                "Adjust the value starting with lower values\n"
+                "and increasing it if areas that should be processed are still \n"
+                "not processed.\n"
+                "Lower values = faster processing, faster execution on CNC.\n"
+                "Higher values = slow processing and slow execution on CNC\n"
+                "due of too many paths."
+            )
         )
-        self.paint_overlap_entry = FCDoubleSpinner(suffix='%')
+        self.paint_overlap_entry = FCDoubleSpinner(suffix="%")
         self.paint_overlap_entry.set_precision(3)
         self.paint_overlap_entry.setWrapping(True)
         self.paint_overlap_entry.setRange(0.0000, 99.9999)
         self.paint_overlap_entry.setSingleStep(0.1)
-        self.paint_overlap_entry.setObjectName('gdb_p_overlap')
+        self.paint_overlap_entry.setObjectName("gdb_p_overlap")
 
         self.grid3.addWidget(ovlabel, 1, 0)
         self.grid3.addWidget(self.paint_overlap_entry, 1, 1)
 
         # Margin
-        marginlabel = FCLabel('%s:' % _('Offset'))
+        marginlabel = FCLabel("%s:" % _("Offset"))
         marginlabel.setToolTip(
-            _("Distance by which to avoid\n"
-              "the edges of the polygon to\n"
-              "be painted.")
+            _("Distance by which to avoid\n" "the edges of the polygon to\n" "be painted.")
         )
         self.paint_offset_entry = FCDoubleSpinner()
         self.paint_offset_entry.set_precision(self.decimals)
         self.paint_offset_entry.set_range(-10000.0000, 10000.0000)
-        self.paint_offset_entry.setObjectName('gdb_p_offset')
+        self.paint_offset_entry.setObjectName("gdb_p_offset")
 
         self.grid3.addWidget(marginlabel, 2, 0)
         self.grid3.addWidget(self.paint_offset_entry, 2, 1)
 
         # Method
-        methodlabel = FCLabel('%s:' % _('Method'))
+        methodlabel = FCLabel("%s:" % _("Method"))
         methodlabel.setToolTip(
-            _("Algorithm for painting:\n"
-              "- Standard: Fixed step inwards.\n"
-              "- Seed-based: Outwards from seed.\n"
-              "- Line-based: Parallel lines.\n"
-              "- Laser-lines: Active only for Gerber objects.\n"
-              "Will create lines that follow the traces.\n"
-              "- Combo: In case of failure a new method will be picked from the above\n"
-              "in the order specified.")
+            _(
+                "Algorithm for painting:\n"
+                "- Standard: Fixed step inwards.\n"
+                "- Seed-based: Outwards from seed.\n"
+                "- Line-based: Parallel lines.\n"
+                "- Laser-lines: Active only for Gerber objects.\n"
+                "Will create lines that follow the traces.\n"
+                "- Combo: In case of failure a new method will be picked from the above\n"
+                "in the order specified."
+            )
         )
 
         self.paint_method_combo = FCComboBox2()
@@ -788,24 +857,22 @@ class ToolsDB2UI:
         idx = self.paint_method_combo.findText(_("Laser_lines"))
         self.paint_method_combo.model().item(idx).setEnabled(False)
 
-        self.paint_method_combo.setObjectName('gdb_p_method')
+        self.paint_method_combo.setObjectName("gdb_p_method")
 
         self.grid3.addWidget(methodlabel, 7, 0)
         self.grid3.addWidget(self.paint_method_combo, 7, 1)
 
         # Connect lines
-        self.path_connect_cb = FCCheckBox('%s' % _("Connect"))
-        self.path_connect_cb.setObjectName('gdb_p_connect')
+        self.path_connect_cb = FCCheckBox("%s" % _("Connect"))
+        self.path_connect_cb.setObjectName("gdb_p_connect")
         self.path_connect_cb.setToolTip(
-            _("Draw lines between resulting\n"
-              "segments to minimize tool lifts.")
+            _("Draw lines between resulting\n" "segments to minimize tool lifts.")
         )
 
-        self.paint_contour_cb = FCCheckBox('%s' % _("Contour"))
-        self.paint_contour_cb.setObjectName('gdb_p_contour')
+        self.paint_contour_cb = FCCheckBox("%s" % _("Contour"))
+        self.paint_contour_cb.setObjectName("gdb_p_contour")
         self.paint_contour_cb.setToolTip(
-            _("Cut around the perimeter of the polygon\n"
-              "to trim rough edges.")
+            _("Cut around the perimeter of the polygon\n" "to trim rough edges.")
         )
 
         self.grid3.addWidget(self.path_connect_cb, 10, 0)
@@ -822,10 +889,9 @@ class ToolsDB2UI:
         self.iso_vlay.addStretch()
 
         # Passes
-        passlabel = FCLabel('%s:' % _('Passes'))
+        passlabel = FCLabel("%s:" % _("Passes"))
         passlabel.setToolTip(
-            _("Width of the isolation gap in\n"
-              "number (integer) of tool widths.")
+            _("Width of the isolation gap in\n" "number (integer) of tool widths.")
         )
         self.iso_passes_entry = FCSpinner()
         self.iso_passes_entry.set_range(1, 999)
@@ -835,11 +901,11 @@ class ToolsDB2UI:
         self.grid4.addWidget(self.iso_passes_entry, 0, 1)
 
         # Overlap Entry
-        overlabel = FCLabel('%s:' % _('Overlap'))
+        overlabel = FCLabel("%s:" % _("Overlap"))
         overlabel.setToolTip(
             _("How much (percentage) of the tool width to overlap each tool pass.")
         )
-        self.iso_overlap_entry = FCDoubleSpinner(suffix='%')
+        self.iso_overlap_entry = FCDoubleSpinner(suffix="%")
         self.iso_overlap_entry.set_precision(self.decimals)
         self.iso_overlap_entry.setWrapping(True)
         self.iso_overlap_entry.set_range(0.0000, 99.9999)
@@ -850,19 +916,24 @@ class ToolsDB2UI:
         self.grid4.addWidget(self.iso_overlap_entry, 2, 1)
 
         # Milling Type Radio Button
-        self.iso_milling_type_label = FCLabel('%s:' % _('Milling Type'))
+        self.iso_milling_type_label = FCLabel("%s:" % _("Milling Type"))
         self.iso_milling_type_label.setToolTip(
-            _("Milling type:\n"
-              "- climb / best for precision milling and to reduce tool usage\n"
-              "- conventional / useful when there is no backlash compensation")
+            _(
+                "Milling type:\n"
+                "- climb / best for precision milling and to reduce tool usage\n"
+                "- conventional / useful when there is no backlash compensation"
+            )
         )
 
-        self.iso_milling_type_radio = RadioSet([{'label': _('Climb'), 'value': 'cl'},
-                                                {'label': _('Conventional'), 'value': 'cv'}])
+        self.iso_milling_type_radio = RadioSet(
+            [{"label": _("Climb"), "value": "cl"}, {"label": _("Conventional"), "value": "cv"}]
+        )
         self.iso_milling_type_radio.setToolTip(
-            _("Milling type:\n"
-              "- climb / best for precision milling and to reduce tool usage\n"
-              "- conventional / useful when there is no backlash compensation")
+            _(
+                "Milling type:\n"
+                "- climb / best for precision milling and to reduce tool usage\n"
+                "- conventional / useful when there is no backlash compensation"
+            )
         )
         self.iso_milling_type_radio.setObjectName("gdb_i_milling_type")
 
@@ -870,37 +941,49 @@ class ToolsDB2UI:
         self.grid4.addWidget(self.iso_milling_type_radio, 4, 1)
 
         # Follow
-        self.follow_label = FCLabel('%s:' % _('Follow'))
+        self.follow_label = FCLabel("%s:" % _("Follow"))
         self.follow_label.setToolTip(
-            _("Generate a 'Follow' geometry.\n"
-              "This means that it will cut through\n"
-              "the middle of the trace.")
+            _(
+                "Generate a 'Follow' geometry.\n"
+                "This means that it will cut through\n"
+                "the middle of the trace."
+            )
         )
 
         self.iso_follow_cb = FCCheckBox()
-        self.iso_follow_cb.setToolTip(_("Generate a 'Follow' geometry.\n"
-                                        "This means that it will cut through\n"
-                                        "the middle of the trace."))
+        self.iso_follow_cb.setToolTip(
+            _(
+                "Generate a 'Follow' geometry.\n"
+                "This means that it will cut through\n"
+                "the middle of the trace."
+            )
+        )
         self.iso_follow_cb.setObjectName("gdb_i_follow")
 
         self.grid4.addWidget(self.follow_label, 6, 0)
         self.grid4.addWidget(self.iso_follow_cb, 6, 1)
 
         # Isolation Type
-        self.iso_type_label = FCLabel('%s:' % _('Isolation Type'))
+        self.iso_type_label = FCLabel("%s:" % _("Isolation Type"))
         self.iso_type_label.setToolTip(
-            _("Choose how the isolation will be executed:\n"
-              "- 'Full' -> complete isolation of polygons\n"
-              "- 'Ext' -> will isolate only on the outside\n"
-              "- 'Int' -> will isolate only on the inside\n"
-              "'Exterior' isolation is almost always possible\n"
-              "(with the right tool) but 'Interior'\n"
-              "isolation can be done only when there is an opening\n"
-              "inside of the polygon (e.g polygon is a 'doughnut' shape).")
+            _(
+                "Choose how the isolation will be executed:\n"
+                "- 'Full' -> complete isolation of polygons\n"
+                "- 'Ext' -> will isolate only on the outside\n"
+                "- 'Int' -> will isolate only on the inside\n"
+                "'Exterior' isolation is almost always possible\n"
+                "(with the right tool) but 'Interior'\n"
+                "isolation can be done only when there is an opening\n"
+                "inside of the polygon (e.g polygon is a 'doughnut' shape)."
+            )
         )
-        self.iso_type_radio = RadioSet([{'label': _('Full'), 'value': 'full'},
-                                        {'label': _('Ext'), 'value': 'ext'},
-                                        {'label': _('Int'), 'value': 'int'}])
+        self.iso_type_radio = RadioSet(
+            [
+                {"label": _("Full"), "value": "full"},
+                {"label": _("Ext"), "value": "ext"},
+                {"label": _("Int"), "value": "int"},
+            ]
+        )
         self.iso_type_radio.setObjectName("gdb_i_iso_type")
 
         self.grid4.addWidget(self.iso_type_label, 8, 0)
@@ -916,11 +999,8 @@ class ToolsDB2UI:
         self.drill_vlay.addStretch()
 
         # Cut Z
-        self.cutzlabel = FCLabel('%s:' % _('Cut Z'))
-        self.cutzlabel.setToolTip(
-            _("Drill depth (negative)\n"
-              "below the copper surface.")
-        )
+        self.cutzlabel = FCLabel("%s:" % _("Cut Z"))
+        self.cutzlabel.setToolTip(_("Drill depth (negative)\n" "below the copper surface."))
 
         self.drill_cutz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_cutz_entry.set_precision(self.decimals)
@@ -937,11 +1017,13 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_cutz_entry, 4, 1)
 
         # Tool Offset
-        self.tool_offset_label = FCLabel('%s:' % _('Offset Z'))
+        self.tool_offset_label = FCLabel("%s:" % _("Offset Z"))
         self.tool_offset_label.setToolTip(
-            _("Some drill bits (the larger ones) need to drill deeper\n"
-              "to create the desired exit hole diameter due of the tip shape.\n"
-              "The value here can compensate the Cut Z parameter.")
+            _(
+                "Some drill bits (the larger ones) need to drill deeper\n"
+                "to create the desired exit hole diameter due of the tip shape.\n"
+                "The value here can compensate the Cut Z parameter."
+            )
         )
 
         self.drill_offset_entry = FCDoubleSpinner(callback=self.confirmation_message)
@@ -953,7 +1035,7 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_offset_entry, 6, 1)
 
         # Multi-Depth
-        self.multidepth_drill_label = FCLabel('%s:' % _("MultiDepth"))
+        self.multidepth_drill_label = FCLabel("%s:" % _("MultiDepth"))
         self.multidepth_drill_label.setToolTip(
             _(
                 "Use multiple passes to limit\n"
@@ -969,10 +1051,10 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_mpass_cb, 7, 1)
 
         # Depth Per Pass
-        self.dpp_drill_label = FCLabel('%s:' % _("DPP"))
+        self.dpp_drill_label = FCLabel("%s:" % _("DPP"))
         self.dpp_drill_label.setToolTip(
-            _("DPP. Depth per Pass.\n"
-              "The value used to cut into material on each pass."))
+            _("DPP. Depth per Pass.\n" "The value used to cut into material on each pass.")
+        )
         self.drill_maxdepth_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_maxdepth_entry.set_precision(self.decimals)
         self.drill_maxdepth_entry.set_range(0, 10000.0000)
@@ -985,11 +1067,8 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_maxdepth_entry, 8, 1)
 
         # Travel Z (z_move)
-        self.travelzlabel = FCLabel('%s:' % _('Travel Z'))
-        self.travelzlabel.setToolTip(
-            _("Tool height when travelling\n"
-              "across the XY plane.")
-        )
+        self.travelzlabel = FCLabel("%s:" % _("Travel Z"))
+        self.travelzlabel.setToolTip(_("Tool height when travelling\n" "across the XY plane."))
 
         self.drill_travelz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_travelz_entry.set_precision(self.decimals)
@@ -1011,12 +1090,14 @@ class ToolsDB2UI:
         self.grid5.addWidget(separator_line, 12, 0, 1, 2)
 
         # Excellon Feedrate Z
-        self.frzlabel = FCLabel('%s:' % _('Feedrate Z'))
+        self.frzlabel = FCLabel("%s:" % _("Feedrate Z"))
         self.frzlabel.setToolTip(
-            _("Tool speed while drilling\n"
-              "(in units per minute).\n"
-              "So called 'Plunge' feedrate.\n"
-              "This is for linear move G01.")
+            _(
+                "Tool speed while drilling\n"
+                "(in units per minute).\n"
+                "So called 'Plunge' feedrate.\n"
+                "This is for linear move G01."
+            )
         )
         self.drill_feedrate_z_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_feedrate_z_entry.set_precision(self.decimals)
@@ -1028,13 +1109,15 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_feedrate_z_entry, 14, 1)
 
         # Excellon Rapid Feedrate
-        self.feedrate_rapid_label = FCLabel('%s:' % _('Feedrate Rapids'))
+        self.feedrate_rapid_label = FCLabel("%s:" % _("Feedrate Rapids"))
         self.feedrate_rapid_label.setToolTip(
-            _("Tool speed while drilling\n"
-              "(in units per minute).\n"
-              "This is for the rapid move G00.\n"
-              "It is useful only for Marlin,\n"
-              "ignore for any other cases.")
+            _(
+                "Tool speed while drilling\n"
+                "(in units per minute).\n"
+                "This is for the rapid move G00.\n"
+                "It is useful only for Marlin,\n"
+                "ignore for any other cases."
+            )
         )
         self.drill_feedrate_rapid_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_feedrate_rapid_entry.set_precision(self.decimals)
@@ -1051,11 +1134,8 @@ class ToolsDB2UI:
         self.grid5.addWidget(separator_line, 18, 0, 1, 2)
 
         # Spindlespeed
-        self.spindle_label = FCLabel('%s:' % _('Spindle speed'))
-        self.spindle_label.setToolTip(
-            _("Speed of the spindle\n"
-              "in RPM (optional)")
-        )
+        self.spindle_label = FCLabel("%s:" % _("Spindle speed"))
+        self.spindle_label.setToolTip(_("Speed of the spindle\n" "in RPM (optional)"))
 
         self.drill_spindlespeed_entry = FCSpinner(callback=self.confirmation_message_int)
         self.drill_spindlespeed_entry.set_range(0, 1000000)
@@ -1066,11 +1146,14 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_spindlespeed_entry, 20, 1)
 
         # Dwell
-        self.dwell_drill_label = FCLabel('%s:' % _("Dwell"))
+        self.dwell_drill_label = FCLabel("%s:" % _("Dwell"))
         self.dwell_drill_label.setToolTip(
-            _("Dwell.\n"
-              "Check this if a delay is needed to allow\n"
-              "the spindle motor to reach its set speed."))
+            _(
+                "Dwell.\n"
+                "Check this if a delay is needed to allow\n"
+                "the spindle motor to reach its set speed."
+            )
+        )
 
         self.drill_dwell_cb = FCCheckBox()
         self.drill_dwell_cb.setObjectName("gdb_e_dwell")
@@ -1079,10 +1162,10 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_dwell_cb, 21, 1)
 
         # Dwelltime
-        self.dwelltime_drill_lbl = FCLabel('%s:' % _('Dwelltime'))
+        self.dwelltime_drill_lbl = FCLabel("%s:" % _("Dwelltime"))
         self.dwelltime_drill_lbl.setToolTip(
-            _("Dwell Time.\n"
-              "A delay used to allow the motor spindle reach its set speed."))
+            _("Dwell Time.\n" "A delay used to allow the motor spindle reach its set speed.")
+        )
         self.drill_dwelltime_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_dwelltime_entry.set_precision(self.decimals)
         self.drill_dwelltime_entry.set_range(0.0, 10000.0000)
@@ -1098,23 +1181,27 @@ class ToolsDB2UI:
         self.grid5.addWidget(separator_line, 24, 0, 1, 2)
 
         # Drill slots
-        self.drill_slots_drill_lbl = FCLabel('%s:' % _('Drill slots'))
+        self.drill_slots_drill_lbl = FCLabel("%s:" % _("Drill slots"))
         self.drill_slots_drill_lbl.setToolTip(
             _("If the selected tool has slots then they will be drilled.")
         )
         self.drill_slots_cb = FCCheckBox()
         self.drill_slots_cb.setObjectName("gdb_e_drill_slots")
 
-        self.grid5.addWidget(self.drill_slots_drill_lbl, 26, 0,)
+        self.grid5.addWidget(
+            self.drill_slots_drill_lbl,
+            26,
+            0,
+        )
         self.grid5.addWidget(self.drill_slots_cb, 26, 1)
 
         # Drill Overlap
-        self.drill_overlap_label = FCLabel('%s:' % _('Overlap'))
+        self.drill_overlap_label = FCLabel("%s:" % _("Overlap"))
         self.drill_overlap_label.setToolTip(
             _("How much (percentage) of the tool diameter to overlap previous drill hole.")
         )
 
-        self.drill_overlap_entry = FCDoubleSpinner(suffix='%', callback=self.confirmation_message)
+        self.drill_overlap_entry = FCDoubleSpinner(suffix="%", callback=self.confirmation_message)
         self.drill_overlap_entry.set_precision(self.decimals)
         self.drill_overlap_entry.set_range(0.0, 100.0000)
         self.drill_overlap_entry.setSingleStep(0.1)
@@ -1125,10 +1212,12 @@ class ToolsDB2UI:
         self.grid5.addWidget(self.drill_overlap_entry, 28, 1)
 
         # Last drill in slot
-        self.last_drill_drill_lbl = FCLabel('%s:' % _('Last drill'))
+        self.last_drill_drill_lbl = FCLabel("%s:" % _("Last drill"))
         self.last_drill_drill_lbl.setToolTip(
-            _("If the slot length is not completely covered by drill holes,\n"
-              "add a drill hole on the slot end point.")
+            _(
+                "If the slot length is not completely covered by drill holes,\n"
+                "add a drill hole on the slot end point."
+            )
         )
 
         self.drill_last_drill_cb = FCCheckBox()
@@ -1151,13 +1240,15 @@ class ToolsDB2UI:
         self.cutout_margin_entry.set_range(-10000.0000, 10000.0000)
         self.cutout_margin_entry.setSingleStep(0.1)
         self.cutout_margin_entry.set_precision(self.decimals)
-        self.cutout_margin_entry.setObjectName('gdb_ct_margin')
+        self.cutout_margin_entry.setObjectName("gdb_ct_margin")
 
-        self.cutout_margin_label = FCLabel('%s:' % _("Margin"))
+        self.cutout_margin_label = FCLabel("%s:" % _("Margin"))
         self.cutout_margin_label.setToolTip(
-            _("Margin over bounds. A positive value here\n"
-              "will make the cutout of the PCB further from\n"
-              "the actual PCB border")
+            _(
+                "Margin over bounds. A positive value here\n"
+                "will make the cutout of the PCB further from\n"
+                "the actual PCB border"
+            )
         )
         self.grid6.addWidget(self.cutout_margin_label, 11, 0)
         self.grid6.addWidget(self.cutout_margin_entry, 11, 1)
@@ -1165,49 +1256,52 @@ class ToolsDB2UI:
         # Gapsize
         self.cutout_gapsize = FCDoubleSpinner(callback=self.confirmation_message)
         self.cutout_gapsize.set_precision(self.decimals)
-        self.cutout_gapsize.setObjectName('gdb_ct_gapsize')
+        self.cutout_gapsize.setObjectName("gdb_ct_gapsize")
 
-        self.cutout_gapsize_label = FCLabel('%s:' % _("Gap size"))
+        self.cutout_gapsize_label = FCLabel("%s:" % _("Gap size"))
         self.cutout_gapsize_label.setToolTip(
-            _("The size of the bridge gaps in the cutout\n"
-              "used to keep the board connected to\n"
-              "the surrounding material (the one \n"
-              "from which the PCB is cutout).")
+            _(
+                "The size of the bridge gaps in the cutout\n"
+                "used to keep the board connected to\n"
+                "the surrounding material (the one \n"
+                "from which the PCB is cutout)."
+            )
         )
         self.grid6.addWidget(self.cutout_gapsize_label, 13, 0)
         self.grid6.addWidget(self.cutout_gapsize, 13, 1)
 
         # Gap Type
-        self.gaptype_label = FCLabel('%s:' % _("Gap type"))
+        self.gaptype_label = FCLabel("%s:" % _("Gap type"))
         self.gaptype_label.setToolTip(
-            _("The type of gap:\n"
-              "- Bridge -> the cutout will be interrupted by bridges\n"
-              "- Thin -> same as 'bridge' but it will be thinner by partially milling the gap\n"
-              "- M-Bites -> 'Mouse Bites' - same as 'bridge' but covered with drill holes")
+            _(
+                "The type of gap:\n"
+                "- Bridge -> the cutout will be interrupted by bridges\n"
+                "- Thin -> same as 'bridge' but it will be thinner by partially milling the gap\n"
+                "- M-Bites -> 'Mouse Bites' - same as 'bridge' but covered with drill holes"
+            )
         )
 
         self.cutout_gaptype_radio = RadioSet(
             [
-                {'label': _('Bridge'), 'value': 'b'},
-                {'label': _('Thin'), 'value': 'bt'},
-                {'label': "M-Bites", 'value': 'mb'}
+                {"label": _("Bridge"), "value": "b"},
+                {"label": _("Thin"), "value": "bt"},
+                {"label": "M-Bites", "value": "mb"},
             ],
-            stretch=True
+            stretch=True,
         )
-        self.cutout_gaptype_radio.setObjectName('gdb_ct_gap_type')
+        self.cutout_gaptype_radio.setObjectName("gdb_ct_gap_type")
 
         self.grid6.addWidget(self.gaptype_label, 15, 0)
         self.grid6.addWidget(self.cutout_gaptype_radio, 15, 1)
 
         # Thin gaps Depth
-        self.thin_depth_label = FCLabel('%s:' % _("Depth"))
+        self.thin_depth_label = FCLabel("%s:" % _("Depth"))
         self.thin_depth_label.setToolTip(
-            _("The depth until the milling is done\n"
-              "in order to thin the gaps.")
+            _("The depth until the milling is done\n" "in order to thin the gaps.")
         )
         self.cutout_thin_depth_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.cutout_thin_depth_entry.set_precision(self.decimals)
-        self.cutout_thin_depth_entry.setObjectName('gdb_ct_gap_depth')
+        self.cutout_thin_depth_entry.setObjectName("gdb_ct_gap_depth")
 
         if self.machinist_setting == 0:
             self.cutout_thin_depth_entry.setRange(-10000.0000, -0.00001)
@@ -1219,31 +1313,29 @@ class ToolsDB2UI:
         self.grid6.addWidget(self.cutout_thin_depth_entry, 17, 1)
 
         # Mouse Bites Tool Diameter
-        self.mb_dia_label = FCLabel('%s:' % _("Tool Diameter"))
-        self.mb_dia_label.setToolTip(
-            _("The drill hole diameter when doing mouse bites.")
-        )
+        self.mb_dia_label = FCLabel("%s:" % _("Tool Diameter"))
+        self.mb_dia_label.setToolTip(_("The drill hole diameter when doing mouse bites."))
         self.cutout_mb_dia_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.cutout_mb_dia_entry.set_precision(self.decimals)
         self.cutout_mb_dia_entry.setRange(0, 100.0000)
-        self.cutout_mb_dia_entry.setObjectName('gdb_ct_mb_dia')
+        self.cutout_mb_dia_entry.setObjectName("gdb_ct_mb_dia")
 
         self.grid6.addWidget(self.mb_dia_label, 19, 0)
         self.grid6.addWidget(self.cutout_mb_dia_entry, 19, 1)
 
         # Mouse Bites Holes Spacing
-        self.mb_spacing_label = FCLabel('%s:' % _("Spacing"))
+        self.mb_spacing_label = FCLabel("%s:" % _("Spacing"))
         self.mb_spacing_label.setToolTip(
             _("The spacing between drill holes when doing mouse bites.")
         )
         self.cutout_mb_spacing_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.cutout_mb_spacing_entry.set_precision(self.decimals)
         self.cutout_mb_spacing_entry.setRange(0, 100.0000)
-        self.cutout_mb_spacing_entry.setObjectName('gdb_ct_mb_spacing')
+        self.cutout_mb_spacing_entry.setObjectName("gdb_ct_mb_spacing")
 
         self.grid6.addWidget(self.mb_spacing_label, 21, 0)
         self.grid6.addWidget(self.cutout_mb_spacing_entry, 21, 1)
-        
+
         # How gaps wil be rendered:
         # lr    - left + right
         # tb    - top + bottom
@@ -1253,35 +1345,39 @@ class ToolsDB2UI:
         # 8     - 2*left + 2*right +2*top + 2*bottom
 
         # Surrounding convex box shape
-        self.cutout_convex_box = FCCheckBox('%s' % _("Convex Shape"))
+        self.cutout_convex_box = FCCheckBox("%s" % _("Convex Shape"))
         # self.convex_box_label = FCLabel('%s' % _("Convex Sh."))
         self.cutout_convex_box.setToolTip(
-            _("Create a convex shape surrounding the entire PCB.\n"
-              "Used only if the source object type is Gerber.")
+            _(
+                "Create a convex shape surrounding the entire PCB.\n"
+                "Used only if the source object type is Gerber."
+            )
         )
-        self.cutout_convex_box.setObjectName('gdb_ct_convex')
+        self.cutout_convex_box.setObjectName("gdb_ct_convex")
 
         self.grid6.addWidget(self.cutout_convex_box, 23, 0, 1, 2)
 
         # Gaps
-        self.cutout_gaps_label = FCLabel('%s:' % _('Gaps'))
+        self.cutout_gaps_label = FCLabel("%s:" % _("Gaps"))
         self.cutout_gaps_label.setToolTip(
-            _("Number of gaps used for the Automatic cutout.\n"
-              "There can be maximum 8 bridges/gaps.\n"
-              "The choices are:\n"
-              "- None  - no gaps\n"
-              "- lr    - left + right\n"
-              "- tb    - top + bottom\n"
-              "- 4     - left + right +top + bottom\n"
-              "- 2lr   - 2*left + 2*right\n"
-              "- 2tb  - 2*top + 2*bottom\n"
-              "- 8     - 2*left + 2*right +2*top + 2*bottom")
+            _(
+                "Number of gaps used for the Automatic cutout.\n"
+                "There can be maximum 8 bridges/gaps.\n"
+                "The choices are:\n"
+                "- None  - no gaps\n"
+                "- lr    - left + right\n"
+                "- tb    - top + bottom\n"
+                "- 4     - left + right +top + bottom\n"
+                "- 2lr   - 2*left + 2*right\n"
+                "- 2tb  - 2*top + 2*bottom\n"
+                "- 8     - 2*left + 2*right +2*top + 2*bottom"
+            )
         )
 
         self.cutout_gaps = FCComboBox()
-        gaps_items = ['None', 'LR', 'TB', '4', '2LR', '2TB', '8']
+        gaps_items = ["None", "LR", "TB", "4", "2LR", "2TB", "8"]
         self.cutout_gaps.addItems(gaps_items)
-        self.cutout_gaps.setObjectName('gdb_ct_gaps')
+        self.cutout_gaps.setObjectName("gdb_ct_gaps")
 
         self.grid6.addWidget(self.cutout_gaps_label, 25, 0)
         self.grid6.addWidget(self.cutout_gaps, 25, 1)
@@ -1304,11 +1400,13 @@ class ToolsDB2UI:
         self.buttons_frame.show()
 
         self.add_entry_btn = FCButton(_("Add Tool in DB"))
-        self.add_entry_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/plus16.png'))
+        self.add_entry_btn.setIcon(QtGui.QIcon(self.app.resource_location + "/plus16.png"))
         self.add_entry_btn.setToolTip(
-            _("Add a new tool in the Tools Database.\n"
-              "It will be used in the Geometry UI.\n"
-              "You can edit it after it is added.")
+            _(
+                "Add a new tool in the Tools Database.\n"
+                "It will be used in the Geometry UI.\n"
+                "You can edit it after it is added."
+            )
         )
         self.buttons_box.addWidget(self.add_entry_btn)
 
@@ -1321,46 +1419,44 @@ class ToolsDB2UI:
         # self.buttons_box.addWidget(add_fct_entry_btn)
 
         self.remove_entry_btn = FCButton(_("Delete Tool from DB"))
-        self.remove_entry_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/trash16.png'))
-        self.remove_entry_btn.setToolTip(
-            _("Remove a selection of tools in the Tools Database.")
-        )
+        self.remove_entry_btn.setIcon(QtGui.QIcon(self.app.resource_location + "/trash16.png"))
+        self.remove_entry_btn.setToolTip(_("Remove a selection of tools in the Tools Database."))
         self.buttons_box.addWidget(self.remove_entry_btn)
 
         self.export_db_btn = FCButton(_("Export DB"))
-        self.export_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/export.png'))
-        self.export_db_btn.setToolTip(
-            _("Save the Tools Database to a custom text file.")
-        )
+        self.export_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + "/export.png"))
+        self.export_db_btn.setToolTip(_("Save the Tools Database to a custom text file."))
         self.buttons_box.addWidget(self.export_db_btn)
 
         self.import_db_btn = FCButton(_("Import DB"))
-        self.import_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/import.png'))
+        self.import_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + "/import.png"))
         self.import_db_btn.setToolTip(
             _("Load the Tools Database information's from a custom text file.")
         )
         self.buttons_box.addWidget(self.import_db_btn)
 
         self.save_db_btn = FCButton(_("Save DB"))
-        self.save_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
-        self.save_db_btn.setToolTip(
-            _("Save the Tools Database information's.")
-        )
+        self.save_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + "/save_as.png"))
+        self.save_db_btn.setToolTip(_("Save the Tools Database information's."))
         self.buttons_box.addWidget(self.save_db_btn)
 
         self.add_tool_from_db = FCButton(_("Transfer the Tool"))
         self.add_tool_from_db.setToolTip(
-            _("Insert a new tool in the Tools Table of the\n"
-              "object/application tool after selecting a tool\n"
-              "in the Tools Database.")
+            _(
+                "Insert a new tool in the Tools Table of the\n"
+                "object/application tool after selecting a tool\n"
+                "in the Tools Database."
+            )
         )
-        self.add_tool_from_db.setStyleSheet("""
+        self.add_tool_from_db.setStyleSheet(
+            """
                                             QPushButton
                                             {
                                                 font-weight: bold;
                                                 color: green;
                                             }
-                                            """)
+                                            """
+        )
         self.add_tool_from_db.hide()
 
         self.cancel_tool_from_db = FCButton(_("Cancel"))
@@ -1376,21 +1472,28 @@ class ToolsDB2UI:
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
-        
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
+
 
 class ToolsDB2(QtWidgets.QWidget):
 
@@ -1407,7 +1510,7 @@ class ToolsDB2(QtWidgets.QWidget):
 
         self.tools_db_changed_flag = False
 
-        '''
+        """
         dict to hold all the tools in the Tools DB
         format:
         {
@@ -1421,10 +1524,10 @@ class ToolsDB2(QtWidgets.QWidget):
                 'data': dict()
             }
         }
-        '''
+        """
         self.db_tool_dict = {}
 
-        self.old_color = QtGui.QColor('black')
+        self.old_color = QtGui.QColor("black")
 
         # ##############################################################################
         # ##############################################################################
@@ -1444,170 +1547,147 @@ class ToolsDB2(QtWidgets.QWidget):
         # ##############################################################################
 
         self.form_fields = {
-            "tool_target":      self.ui.tool_op_combo,
-            "tol_min":          self.ui.tol_min_entry,
-            "tol_max":          self.ui.tol_max_entry,
-            "name":             self.ui.name_entry,
-            "tooldia":          self.ui.dia_entry,
-
+            "tool_target": self.ui.tool_op_combo,
+            "tol_min": self.ui.tol_min_entry,
+            "tol_max": self.ui.tol_max_entry,
+            "name": self.ui.name_entry,
+            "tooldia": self.ui.dia_entry,
             # Milling
-            "tool_type":        self.ui.mill_shape_combo,
-            "cutz":             self.ui.mill_cutz_entry,
-            "multidepth":       self.ui.mill_multidepth_cb,
-            "depthperpass":     self.ui.mill_multidepth_entry,
-            "travelz":          self.ui.mill_travelz_entry,
-            "feedrate":         self.ui.mill_frxy_entry,
-            "feedrate_z":       self.ui.mill_frz_entry,
-            "spindlespeed":     self.ui.mill_spindle_entry,
-            "dwell":            self.ui.mill_dwell_cb,
-            "dwelltime":        self.ui.mill_dwelltime_entry,
-
-            "type":             self.ui.mill_type_combo,
-            "offset":           self.ui.mill_tooloffset_combo,
-            "offset_value":     self.ui.mill_custom_offset_entry,
-            "vtipdia":          self.ui.mill_vdia_entry,
-            "vtipangle":        self.ui.mill_vangle_entry,
-            "feedrate_rapid":   self.ui.mill_frapids_entry,
-            "extracut":         self.ui.mill_ecut_cb,
-            "extracut_length":  self.ui.mill_ecut_length_entry,
-
+            "tool_type": self.ui.mill_shape_combo,
+            "cutz": self.ui.mill_cutz_entry,
+            "multidepth": self.ui.mill_multidepth_cb,
+            "depthperpass": self.ui.mill_multidepth_entry,
+            "travelz": self.ui.mill_travelz_entry,
+            "feedrate": self.ui.mill_frxy_entry,
+            "feedrate_z": self.ui.mill_frz_entry,
+            "spindlespeed": self.ui.mill_spindle_entry,
+            "dwell": self.ui.mill_dwell_cb,
+            "dwelltime": self.ui.mill_dwelltime_entry,
+            "type": self.ui.mill_type_combo,
+            "offset": self.ui.mill_tooloffset_combo,
+            "offset_value": self.ui.mill_custom_offset_entry,
+            "vtipdia": self.ui.mill_vdia_entry,
+            "vtipangle": self.ui.mill_vangle_entry,
+            "feedrate_rapid": self.ui.mill_frapids_entry,
+            "extracut": self.ui.mill_ecut_cb,
+            "extracut_length": self.ui.mill_ecut_length_entry,
             # NCC
-            "tools_ncc_operation":      self.ui.ncc_op_radio,
-            "tools_ncc_milling_type":   self.ui.ncc_milling_type_radio,
-            "tools_ncc_overlap":        self.ui.ncc_overlap_entry,
-            "tools_ncc_margin":         self.ui.ncc_margin_entry,
-            "tools_ncc_method":         self.ui.ncc_method_combo,
-            "tools_ncc_connect":        self.ui.ncc_connect_cb,
-            "tools_ncc_contour":        self.ui.ncc_contour_cb,
-            "tools_ncc_offset_choice":  self.ui.ncc_choice_offset_cb,
-            "tools_ncc_offset_value":   self.ui.ncc_offset_spinner,
-
+            "tools_ncc_operation": self.ui.ncc_op_radio,
+            "tools_ncc_milling_type": self.ui.ncc_milling_type_radio,
+            "tools_ncc_overlap": self.ui.ncc_overlap_entry,
+            "tools_ncc_margin": self.ui.ncc_margin_entry,
+            "tools_ncc_method": self.ui.ncc_method_combo,
+            "tools_ncc_connect": self.ui.ncc_connect_cb,
+            "tools_ncc_contour": self.ui.ncc_contour_cb,
+            "tools_ncc_offset_choice": self.ui.ncc_choice_offset_cb,
+            "tools_ncc_offset_value": self.ui.ncc_offset_spinner,
             # Paint
-            "tools_paint_overlap":      self.ui.paint_overlap_entry,
-            "tools_paint_offset":       self.ui.paint_offset_entry,
-            "tools_paint_method":       self.ui.paint_method_combo,
-            "tools_paint_connect":      self.ui.path_connect_cb,
-            "tools_paint_contour":      self.ui.paint_contour_cb,
-
+            "tools_paint_overlap": self.ui.paint_overlap_entry,
+            "tools_paint_offset": self.ui.paint_offset_entry,
+            "tools_paint_method": self.ui.paint_method_combo,
+            "tools_paint_connect": self.ui.path_connect_cb,
+            "tools_paint_contour": self.ui.paint_contour_cb,
             # Isolation
-            "tools_iso_passes":         self.ui.iso_passes_entry,
-            "tools_iso_overlap":        self.ui.iso_overlap_entry,
-            "tools_iso_milling_type":   self.ui.iso_milling_type_radio,
-            "tools_iso_follow":         self.ui.iso_follow_cb,
-            "tools_iso_isotype":        self.ui.iso_type_radio,
-
+            "tools_iso_passes": self.ui.iso_passes_entry,
+            "tools_iso_overlap": self.ui.iso_overlap_entry,
+            "tools_iso_milling_type": self.ui.iso_milling_type_radio,
+            "tools_iso_follow": self.ui.iso_follow_cb,
+            "tools_iso_isotype": self.ui.iso_type_radio,
             # Drilling
-            "tools_drill_cutz":             self.ui.drill_cutz_entry,
-            "tools_drill_multidepth":       self.ui.drill_mpass_cb,
-            "tools_drill_depthperpass":     self.ui.drill_maxdepth_entry,
-            "tools_drill_travelz":          self.ui.drill_travelz_entry,
-            "tools_drill_feedrate_z":       self.ui.drill_feedrate_z_entry,
-
-            "tools_drill_feedrate_rapid":   self.ui.drill_feedrate_rapid_entry,
-            "tools_drill_spindlespeed":     self.ui.drill_spindlespeed_entry,
-            "tools_drill_dwell":            self.ui.drill_dwell_cb,
-            "tools_drill_dwelltime":        self.ui.drill_dwelltime_entry,
-
-            "tools_drill_offset":           self.ui.drill_offset_entry,
-            "tools_drill_drill_slots":      self.ui.drill_slots_cb,
-            "tools_drill_drill_overlap":    self.ui.drill_overlap_entry,
-            "tools_drill_last_drill":       self.ui.drill_last_drill_cb,
-
+            "tools_drill_cutz": self.ui.drill_cutz_entry,
+            "tools_drill_multidepth": self.ui.drill_mpass_cb,
+            "tools_drill_depthperpass": self.ui.drill_maxdepth_entry,
+            "tools_drill_travelz": self.ui.drill_travelz_entry,
+            "tools_drill_feedrate_z": self.ui.drill_feedrate_z_entry,
+            "tools_drill_feedrate_rapid": self.ui.drill_feedrate_rapid_entry,
+            "tools_drill_spindlespeed": self.ui.drill_spindlespeed_entry,
+            "tools_drill_dwell": self.ui.drill_dwell_cb,
+            "tools_drill_dwelltime": self.ui.drill_dwelltime_entry,
+            "tools_drill_offset": self.ui.drill_offset_entry,
+            "tools_drill_drill_slots": self.ui.drill_slots_cb,
+            "tools_drill_drill_overlap": self.ui.drill_overlap_entry,
+            "tools_drill_last_drill": self.ui.drill_last_drill_cb,
             # Cutout
-            "tools_cutout_margin":          self.ui.cutout_margin_entry,
-            "tools_cutout_gapsize":         self.ui.cutout_gapsize,
-            "tools_cutout_gaps_ff":         self.ui.cutout_gaps,
-            "tools_cutout_convexshape":     self.ui.cutout_convex_box,
-
-            "tools_cutout_gap_type":        self.ui.cutout_gaptype_radio,
-            "tools_cutout_gap_depth":       self.ui.cutout_thin_depth_entry,
-            "tools_cutout_mb_dia":          self.ui.cutout_mb_dia_entry,
-            "tools_cutout_mb_spacing":      self.ui.cutout_mb_spacing_entry,
-
+            "tools_cutout_margin": self.ui.cutout_margin_entry,
+            "tools_cutout_gapsize": self.ui.cutout_gapsize,
+            "tools_cutout_gaps_ff": self.ui.cutout_gaps,
+            "tools_cutout_convexshape": self.ui.cutout_convex_box,
+            "tools_cutout_gap_type": self.ui.cutout_gaptype_radio,
+            "tools_cutout_gap_depth": self.ui.cutout_thin_depth_entry,
+            "tools_cutout_mb_dia": self.ui.cutout_mb_dia_entry,
+            "tools_cutout_mb_spacing": self.ui.cutout_mb_spacing_entry,
         }
 
         self.name2option = {
-            "gdb_tool_target":      "tool_target",
-            "gdb_tol_min":          "tol_min",
-            "gdb_tol_max":          "tol_max",
-
-            "gdb_name":             "name",
-            "gdb_dia":              "tooldia",
-
+            "gdb_tool_target": "tool_target",
+            "gdb_tol_min": "tol_min",
+            "gdb_tol_max": "tol_max",
+            "gdb_name": "name",
+            "gdb_dia": "tooldia",
             # Milling
-            "gdb_shape":            "tool_type",
-            "gdb_cutz":             "cutz",
-            "gdb_multidepth":       "multidepth",
+            "gdb_shape": "tool_type",
+            "gdb_cutz": "cutz",
+            "gdb_multidepth": "multidepth",
             "gdb_multidepth_entry": "depthperpass",
-            "gdb_travelz":           "travelz",
-            "gdb_frxy":             "feedrate",
-            "gdb_frz":              "feedrate_z",
-            "gdb_spindle":          "spindlespeed",
-            "gdb_dwell":            "dwell",
-            "gdb_dwelltime":        "dwelltime",
-
-            "gdb_type":             "type",
-            "gdb_tool_offset":      "offset",
-            "gdb_custom_offset":    "offset_value",
-            "gdb_vdia":             "vtipdia",
-            "gdb_vangle":           "vtipangle",
-            "gdb_frapids":          "feedrate_rapid",
-            "gdb_ecut":             "extracut",
-            "gdb_ecut_length":      "extracut_length",
-
+            "gdb_travelz": "travelz",
+            "gdb_frxy": "feedrate",
+            "gdb_frz": "feedrate_z",
+            "gdb_spindle": "spindlespeed",
+            "gdb_dwell": "dwell",
+            "gdb_dwelltime": "dwelltime",
+            "gdb_type": "type",
+            "gdb_tool_offset": "offset",
+            "gdb_custom_offset": "offset_value",
+            "gdb_vdia": "vtipdia",
+            "gdb_vangle": "vtipangle",
+            "gdb_frapids": "feedrate_rapid",
+            "gdb_ecut": "extracut",
+            "gdb_ecut_length": "extracut_length",
             # NCC
-            "gdb_n_operation":      "tools_ncc_operation",
-            "gdb_n_overlap":        "tools_ncc_overlap",
-            "gdb_n_margin":         "tools_ncc_margin",
-            "gdb_n_method":         "tools_ncc_method",
-            "gdb_n_connect":        "tools_ncc_connect",
-            "gdb_n_contour":        "tools_ncc_contour",
-            "gdb_n_offset":         "tools_ncc_offset_choice",
-            "gdb_n_offset_value":   "tools_ncc_offset_value",
-            "gdb_n_milling_type":   "tools_ncc_milling_type",
-
+            "gdb_n_operation": "tools_ncc_operation",
+            "gdb_n_overlap": "tools_ncc_overlap",
+            "gdb_n_margin": "tools_ncc_margin",
+            "gdb_n_method": "tools_ncc_method",
+            "gdb_n_connect": "tools_ncc_connect",
+            "gdb_n_contour": "tools_ncc_contour",
+            "gdb_n_offset": "tools_ncc_offset_choice",
+            "gdb_n_offset_value": "tools_ncc_offset_value",
+            "gdb_n_milling_type": "tools_ncc_milling_type",
             # Paint
-            'gdb_p_overlap':        "tools_paint_overlap",
-            'gdb_p_offset':         "tools_paint_offset",
-            'gdb_p_method':         "tools_paint_method",
-            'gdb_p_connect':        "tools_paint_connect",
-            'gdb_p_contour':        "tools_paint_contour",
-
+            "gdb_p_overlap": "tools_paint_overlap",
+            "gdb_p_offset": "tools_paint_offset",
+            "gdb_p_method": "tools_paint_method",
+            "gdb_p_connect": "tools_paint_connect",
+            "gdb_p_contour": "tools_paint_contour",
             # Isolation
-            "gdb_i_passes":         "tools_iso_passes",
-            "gdb_i_overlap":        "tools_iso_overlap",
-            "gdb_i_milling_type":   "tools_iso_milling_type",
-            "gdb_i_follow":         "tools_iso_follow",
-            "gdb_i_iso_type":       "tools_iso_isotype",
-
+            "gdb_i_passes": "tools_iso_passes",
+            "gdb_i_overlap": "tools_iso_overlap",
+            "gdb_i_milling_type": "tools_iso_milling_type",
+            "gdb_i_follow": "tools_iso_follow",
+            "gdb_i_iso_type": "tools_iso_isotype",
             # Drilling
-            "gdb_e_cutz":               "tools_drill_cutz",
-            "gdb_e_multidepth":         "tools_drill_multidepth",
-            "gdb_e_depthperpass":       "tools_drill_depthperpass",
-            "gdb_e_travelz":            "tools_drill_travelz",
-
-            "gdb_e_feedratez":          "tools_drill_feedrate_z",
-            "gdb_e_fr_rapid":           "tools_drill_feedrate_rapid",
-            "gdb_e_spindlespeed":       "tools_drill_spindlespeed",
-            "gdb_e_dwell":              "tools_drill_dwell",
-            "gdb_e_dwelltime":          "tools_drill_dwelltime",
-
-            "gdb_e_offset":             "tools_drill_offset",
-            "gdb_e_drill_slots":        "tools_drill_drill_slots",
-            "gdb_e_drill_slots_over":   "tools_drill_drill_overlap",
-            "gdb_e_drill_last_drill":   "tools_drill_last_drill",
-
+            "gdb_e_cutz": "tools_drill_cutz",
+            "gdb_e_multidepth": "tools_drill_multidepth",
+            "gdb_e_depthperpass": "tools_drill_depthperpass",
+            "gdb_e_travelz": "tools_drill_travelz",
+            "gdb_e_feedratez": "tools_drill_feedrate_z",
+            "gdb_e_fr_rapid": "tools_drill_feedrate_rapid",
+            "gdb_e_spindlespeed": "tools_drill_spindlespeed",
+            "gdb_e_dwell": "tools_drill_dwell",
+            "gdb_e_dwelltime": "tools_drill_dwelltime",
+            "gdb_e_offset": "tools_drill_offset",
+            "gdb_e_drill_slots": "tools_drill_drill_slots",
+            "gdb_e_drill_slots_over": "tools_drill_drill_overlap",
+            "gdb_e_drill_last_drill": "tools_drill_last_drill",
             # Cutout
-            "gdb_ct_margin":            "tools_cutout_margin",
-            "gdb_ct_gapsize":           "tools_cutout_gapsize",
-            "gdb_ct_gaps":              "tools_cutout_gaps_ff",
-            "gdb_ct_convex":            "tools_cutout_convexshape",
-
-            "gdb_ct_gap_type":          "tools_cutout_gap_type",
-            "gdb_ct_gap_depth":         "tools_cutout_gap_depth",
-            "gdb_ct_mb_dia":            "tools_cutout_mb_dia",
-            "gdb_ct_mb_spacing":        "tools_cutout_mb_spacing"
-
+            "gdb_ct_margin": "tools_cutout_margin",
+            "gdb_ct_gapsize": "tools_cutout_gapsize",
+            "gdb_ct_gaps": "tools_cutout_gaps_ff",
+            "gdb_ct_convex": "tools_cutout_convexshape",
+            "gdb_ct_gap_type": "tools_cutout_gap_type",
+            "gdb_ct_gap_depth": "tools_cutout_gap_depth",
+            "gdb_ct_mb_dia": "tools_cutout_mb_dia",
+            "gdb_ct_mb_spacing": "tools_cutout_mb_spacing",
         }
 
         self.current_toolid = None
@@ -1643,18 +1723,26 @@ class ToolsDB2(QtWidgets.QWidget):
     def on_menu_request(self, pos):
 
         menu = QtWidgets.QMenu()
-        add_tool = menu.addAction(QtGui.QIcon(self.app.resource_location + '/plus16.png'), _("Add to DB"))
+        add_tool = menu.addAction(
+            QtGui.QIcon(self.app.resource_location + "/plus16.png"), _("Add to DB")
+        )
         add_tool.triggered.connect(self.on_tool_add)
 
-        copy_tool = menu.addAction(QtGui.QIcon(self.app.resource_location + '/copy16.png'), _("Copy from DB"))
+        copy_tool = menu.addAction(
+            QtGui.QIcon(self.app.resource_location + "/copy16.png"), _("Copy from DB")
+        )
         copy_tool.triggered.connect(self.on_tool_copy)
 
-        delete_tool = menu.addAction(QtGui.QIcon(self.app.resource_location + '/delete32.png'), _("Delete from DB"))
+        delete_tool = menu.addAction(
+            QtGui.QIcon(self.app.resource_location + "/delete32.png"), _("Delete from DB")
+        )
         delete_tool.triggered.connect(self.on_tool_delete)
 
         # sep = menu.addSeparator()
 
-        save_changes = menu.addAction(QtGui.QIcon(self.app.resource_location + '/save_as.png'), _("Save changes"))
+        save_changes = menu.addAction(
+            QtGui.QIcon(self.app.resource_location + "/save_as.png"), _("Save changes")
+        )
         save_changes.triggered.connect(self.on_save_changes)
 
         # tree_item = self.ui.tree_widget.itemAt(pos)
@@ -1662,7 +1750,7 @@ class ToolsDB2(QtWidgets.QWidget):
 
     def on_save_changes(self):
         widget_name = self.app_ui.plot_tab_area.currentWidget().objectName()
-        if widget_name == 'database_tab':
+        if widget_name == "database_tab":
             # Tools DB saved, update flag
             self.app.tools_db_changed_flag = False
             self.app.tools_db_tab.on_save_tools_db()
@@ -1693,11 +1781,11 @@ class ToolsDB2(QtWidgets.QWidget):
                         self.form_fields[form_key].set_value(dict_storage[form_key])
                     except Exception as e:
                         print(str(e))
-                if storage_key == 'data':
+                if storage_key == "data":
                     for data_key in dict_storage[storage_key]:
                         if form_key == data_key:
                             try:
-                                self.form_fields[form_key].set_value(dict_storage['data'][data_key])
+                                self.form_fields[form_key].set_value(dict_storage["data"][data_key])
                             except Exception as e:
                                 print(str(e))
         self.ui_connect()
@@ -1715,8 +1803,8 @@ class ToolsDB2(QtWidgets.QWidget):
                 new_option_value = self.form_fields[option_changed].get_value()
                 if option_changed in tooluid_val:
                     tooluid_val[option_changed] = new_option_value
-                if option_changed in tooluid_val['data']:
-                    tooluid_val['data'][option_changed] = new_option_value
+                if option_changed in tooluid_val["data"]:
+                    tooluid_val["data"][option_changed] = new_option_value
         self.ui_connect()
 
     def setup_db_ui(self):
@@ -1734,7 +1822,7 @@ class ToolsDB2(QtWidgets.QWidget):
                 tools = f.read()
         except IOError:
             self.app.log.error("Could not load tools DB file.")
-            self.app.inform.emit('[ERROR] %s' % _("Could not load the file."))
+            self.app.inform.emit("[ERROR] %s" % _("Could not load the file."))
             return
 
         try:
@@ -1742,10 +1830,10 @@ class ToolsDB2(QtWidgets.QWidget):
         except Exception:
             e = sys.exc_info()[0]
             self.app.log.error(str(e))
-            self.app.inform.emit('[ERROR] %s' % _("Failed to parse Tools DB file."))
+            self.app.inform.emit("[ERROR] %s" % _("Failed to parse Tools DB file."))
             return
 
-        self.app.inform.emit('[success] %s: %s' % (_("Loaded Tools DB from"), filename))
+        self.app.inform.emit("[success] %s: %s" % (_("Loaded Tools DB from"), filename))
 
         self.build_db_ui()
 
@@ -1762,25 +1850,27 @@ class ToolsDB2(QtWidgets.QWidget):
             row = nr_crt
             nr_crt += 1
 
-            t_name = dict_val['name']
+            t_name = dict_val["name"]
             try:
                 # self.add_tool_table_line(row, name=t_name, tooldict=dict_val)
                 self.ui.tree_widget.blockSignals(True)
                 try:
-                    self.ui.tree_widget.addParentEditable(parent=parent, title=[str(row+1), t_name], editable=True)
+                    self.ui.tree_widget.addParentEditable(
+                        parent=parent, title=[str(row + 1), t_name], editable=True
+                    )
                 except Exception as e:
-                    print('FlatCAMCoomn.ToolDB2.build_db_ui() -> ', str(e))
+                    print("FlatCAMCoomn.ToolDB2.build_db_ui() -> ", str(e))
                 self.ui.tree_widget.blockSignals(False)
             except Exception as e:
                 self.app.log.debug("ToolDB.build_db_ui.add_tool_table_line() --> %s" % str(e))
 
         if self.current_toolid is None or self.current_toolid < 1:
             if self.db_tool_dict:
-                self.storage_to_form(self.db_tool_dict['1'])
+                self.storage_to_form(self.db_tool_dict["1"])
 
                 # Enable appGUI
                 try:
-                    self.on_tool_target_changed(val=self.db_tool_dict['1']['data']['tool_target'])
+                    self.on_tool_target_changed(val=self.db_tool_dict["1"]["data"]["tool_target"])
                 except KeyError:
                     self.on_tool_target_changed(val=_("General"))
 
@@ -1818,7 +1908,7 @@ class ToolsDB2(QtWidgets.QWidget):
 
         self.ui.tool_description_box.setEnabled(True)
         if self.db_tool_dict:
-            if tool_target == 0:    # _("General")
+            if tool_target == 0:  # _("General")
                 self.ui.milling_box.setEnabled(True)
                 self.ui.ncc_box.setEnabled(True)
                 self.ui.paint_box.setEnabled(True)
@@ -1840,33 +1930,33 @@ class ToolsDB2(QtWidgets.QWidget):
                 self.ui.drill_box.hide()
                 self.ui.cutout_box.hide()
 
-                if tool_target == 1:    # _("Milling")
+                if tool_target == 1:  # _("Milling")
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 2:    # _("Drilling")
+                if tool_target == 2:  # _("Drilling")
                     self.ui.drill_box.setEnabled(True)
                     self.ui.drill_box.show()
 
-                if tool_target == 3:    # _("Isolation")
+                if tool_target == 3:  # _("Isolation")
                     self.ui.iso_box.setEnabled(True)
                     self.ui.iso_box.show()
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 4:    # _("Paint")
+                if tool_target == 4:  # _("Paint")
                     self.ui.paint_box.setEnabled(True)
                     self.ui.paint_box.show()
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 5:    # _("NCC")
+                if tool_target == 5:  # _("NCC")
                     self.ui.ncc_box.setEnabled(True)
                     self.ui.ncc_box.show()
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 6:    # _("Cutout")
+                if tool_target == 6:  # _("Cutout")
                     self.ui.cutout_box.setEnabled(True)
                     self.ui.cutout_box.show()
                     self.ui.milling_box.setEnabled(True)
@@ -1879,136 +1969,129 @@ class ToolsDB2(QtWidgets.QWidget):
         """
 
         default_data = {}
-        default_data.update({
-            "plot":             True,
-            "tool_target": 0,   # _("General")
-            "tol_min": 0.0,
-            "tol_max": 0.0,
-
-            # Milling
-            "cutz":             float(self.app.defaults["geometry_cutz"]),
-            "multidepth":       self.app.defaults["geometry_multidepth"],
-            "depthperpass":     float(self.app.defaults["geometry_depthperpass"]),
-            "vtipdia":          float(self.app.defaults["geometry_vtipdia"]),
-            "vtipangle":        float(self.app.defaults["geometry_vtipangle"]),
-            "travelz":          float(self.app.defaults["geometry_travelz"]),
-            "feedrate":         float(self.app.defaults["geometry_feedrate"]),
-            "feedrate_z":       float(self.app.defaults["geometry_feedrate_z"]),
-            "feedrate_rapid":   float(self.app.defaults["geometry_feedrate_rapid"]),
-            "spindlespeed":     self.app.defaults["geometry_spindlespeed"],
-            "dwell":            self.app.defaults["geometry_dwell"],
-            "dwelltime":        float(self.app.defaults["geometry_dwelltime"]),
-            "ppname_g":         self.app.defaults["geometry_ppname_g"],
-            "extracut":         self.app.defaults["geometry_extracut"],
-            "extracut_length":  float(self.app.defaults["geometry_extracut_length"]),
-            "toolchange":       self.app.defaults["geometry_toolchange"],
-            "toolchangexy":     self.app.defaults["geometry_toolchangexy"],
-            "toolchangez":      float(self.app.defaults["geometry_toolchangez"]),
-            "startz":           self.app.defaults["geometry_startz"],
-            "endz":             float(self.app.defaults["geometry_endz"]),
-            "endxy":            self.app.defaults["geometry_endxy"],
-            "search_time":      int(self.app.defaults["geometry_search_time"]),
-            "z_pdepth":         float(self.app.defaults["geometry_z_pdepth"]),
-            "f_plunge":         float(self.app.defaults["geometry_f_plunge"]),
-
-            "spindledir":               self.app.defaults["geometry_spindledir"],
-            "optimization_type":        self.app.defaults["geometry_optimization_type"],
-            "feedrate_probe":           self.app.defaults["geometry_feedrate_probe"],
-
-            "segx":             self.app.defaults["geometry_segx"],
-            "segy":             self.app.defaults["geometry_segy"],
-            "area_exclusion":   self.app.defaults["geometry_area_exclusion"],
-            "area_shape":       self.app.defaults["geometry_area_shape"],
-            "area_strategy":    self.app.defaults["geometry_area_strategy"],
-            "area_overz":       self.app.defaults["geometry_area_overz"],
-            "polish":           self.app.defaults["geometry_polish"],
-            "polish_dia":       self.app.defaults["geometry_polish_dia"],
-            "polish_pressure":  self.app.defaults["geometry_polish_pressure"],
-            "polish_travelz":   self.app.defaults["geometry_polish_travelz"],
-            "polish_margin":    self.app.defaults["geometry_polish_margin"],
-            "polish_overlap":   self.app.defaults["geometry_polish_overlap"],
-            "polish_method":    self.app.defaults["geometry_polish_method"],
-
-            # NCC
-            "tools_ncc_operation":       self.app.defaults["tools_ncc_operation"],
-            "tools_ncc_milling_type":    self.app.defaults["tools_ncc_milling_type"],
-            "tools_ncc_overlap":         float(self.app.defaults["tools_ncc_overlap"]),
-            "tools_ncc_margin":          float(self.app.defaults["tools_ncc_margin"]),
-            "tools_ncc_method":          self.app.defaults["tools_ncc_method"],
-            "tools_ncc_connect":         self.app.defaults["tools_ncc_connect"],
-            "tools_ncc_contour":         self.app.defaults["tools_ncc_contour"],
-            "tools_ncc_offset_choice":  self.app.defaults["tools_ncc_offset_choice"],
-            "tools_ncc_offset_value":   float(self.app.defaults["tools_ncc_offset_value"]),
-
-            # Paint
-            "tools_paint_overlap":       float(self.app.defaults["tools_paint_overlap"]),
-            "tools_paint_offset":        float(self.app.defaults["tools_paint_offset"]),
-            "tools_paint_method":        self.app.defaults["tools_paint_method"],
-            "tools_paint_connect":        self.app.defaults["tools_paint_connect"],
-            "tools_paint_contour":       self.app.defaults["tools_paint_contour"],
-
-            # Isolation
-            "tools_iso_passes":         int(self.app.defaults["tools_iso_passes"]),
-            "tools_iso_overlap":        float(self.app.defaults["tools_iso_overlap"]),
-            "tools_iso_milling_type":   self.app.defaults["tools_iso_milling_type"],
-            "tools_iso_follow":         self.app.defaults["tools_iso_follow"],
-            "tools_iso_isotype":        self.app.defaults["tools_iso_isotype"],
-
-            # Drilling
-            "tools_drill_cutz":             float(self.app.defaults["tools_drill_cutz"]),
-            "tools_drill_multidepth":       self.app.defaults["tools_drill_multidepth"],
-            "tools_drill_depthperpass":     float(self.app.defaults["tools_drill_depthperpass"]),
-            "tools_drill_travelz":          float(self.app.defaults["tools_drill_travelz"]),
-
-            "tools_drill_feedrate_z":       float(self.app.defaults["tools_drill_feedrate_z"]),
-            "tools_drill_feedrate_rapid":   float(self.app.defaults["tools_drill_feedrate_rapid"]),
-            "tools_drill_spindlespeed":     float(self.app.defaults["tools_drill_spindlespeed"]),
-            "tools_drill_dwell":            self.app.defaults["tools_drill_dwell"],
-
-            "tools_drill_offset":           float(self.app.defaults["tools_drill_offset"]),
-            "tools_drill_drill_slots":      self.app.defaults["tools_drill_drill_slots"],
-            "tools_drill_drill_overlap":    float(self.app.defaults["tools_drill_drill_overlap"]),
-            "tools_drill_last_drill":       self.app.defaults["tools_drill_last_drill"],
-
-            # Cutout
-            "tools_cutout_margin":          float(self.app.defaults["tools_cutout_margin"]),
-            "tools_cutout_gapsize":         float(self.app.defaults["tools_cutout_gapsize"]),
-            "tools_cutout_gaps_ff":         self.app.defaults["tools_cutout_gaps_ff"],
-            "tools_cutout_convexshape":     self.app.defaults["tools_cutout_convexshape"],
-
-            "tools_cutout_gap_type":        self.app.defaults["tools_cutout_gap_type"],
-            "tools_cutout_gap_depth":       float(self.app.defaults["tools_cutout_gap_depth"]),
-            "tools_cutout_mb_dia":          float(self.app.defaults["tools_cutout_mb_dia"]),
-            "tools_cutout_mb_spacing":      float(self.app.defaults["tools_cutout_mb_spacing"])
-        })
+        default_data.update(
+            {
+                "plot": True,
+                "tool_target": 0,  # _("General")
+                "tol_min": 0.0,
+                "tol_max": 0.0,
+                # Milling
+                "cutz": float(self.app.defaults["geometry_cutz"]),
+                "multidepth": self.app.defaults["geometry_multidepth"],
+                "depthperpass": float(self.app.defaults["geometry_depthperpass"]),
+                "vtipdia": float(self.app.defaults["geometry_vtipdia"]),
+                "vtipangle": float(self.app.defaults["geometry_vtipangle"]),
+                "travelz": float(self.app.defaults["geometry_travelz"]),
+                "feedrate": float(self.app.defaults["geometry_feedrate"]),
+                "feedrate_z": float(self.app.defaults["geometry_feedrate_z"]),
+                "feedrate_rapid": float(self.app.defaults["geometry_feedrate_rapid"]),
+                "spindlespeed": self.app.defaults["geometry_spindlespeed"],
+                "dwell": self.app.defaults["geometry_dwell"],
+                "dwelltime": float(self.app.defaults["geometry_dwelltime"]),
+                "ppname_g": self.app.defaults["geometry_ppname_g"],
+                "extracut": self.app.defaults["geometry_extracut"],
+                "extracut_length": float(self.app.defaults["geometry_extracut_length"]),
+                "toolchange": self.app.defaults["geometry_toolchange"],
+                "toolchangexy": self.app.defaults["geometry_toolchangexy"],
+                "toolchangez": float(self.app.defaults["geometry_toolchangez"]),
+                "startz": self.app.defaults["geometry_startz"],
+                "endz": float(self.app.defaults["geometry_endz"]),
+                "endxy": self.app.defaults["geometry_endxy"],
+                "search_time": int(self.app.defaults["geometry_search_time"]),
+                "z_pdepth": float(self.app.defaults["geometry_z_pdepth"]),
+                "f_plunge": float(self.app.defaults["geometry_f_plunge"]),
+                "spindledir": self.app.defaults["geometry_spindledir"],
+                "optimization_type": self.app.defaults["geometry_optimization_type"],
+                "feedrate_probe": self.app.defaults["geometry_feedrate_probe"],
+                "segx": self.app.defaults["geometry_segx"],
+                "segy": self.app.defaults["geometry_segy"],
+                "area_exclusion": self.app.defaults["geometry_area_exclusion"],
+                "area_shape": self.app.defaults["geometry_area_shape"],
+                "area_strategy": self.app.defaults["geometry_area_strategy"],
+                "area_overz": self.app.defaults["geometry_area_overz"],
+                "polish": self.app.defaults["geometry_polish"],
+                "polish_dia": self.app.defaults["geometry_polish_dia"],
+                "polish_pressure": self.app.defaults["geometry_polish_pressure"],
+                "polish_travelz": self.app.defaults["geometry_polish_travelz"],
+                "polish_margin": self.app.defaults["geometry_polish_margin"],
+                "polish_overlap": self.app.defaults["geometry_polish_overlap"],
+                "polish_method": self.app.defaults["geometry_polish_method"],
+                # NCC
+                "tools_ncc_operation": self.app.defaults["tools_ncc_operation"],
+                "tools_ncc_milling_type": self.app.defaults["tools_ncc_milling_type"],
+                "tools_ncc_overlap": float(self.app.defaults["tools_ncc_overlap"]),
+                "tools_ncc_margin": float(self.app.defaults["tools_ncc_margin"]),
+                "tools_ncc_method": self.app.defaults["tools_ncc_method"],
+                "tools_ncc_connect": self.app.defaults["tools_ncc_connect"],
+                "tools_ncc_contour": self.app.defaults["tools_ncc_contour"],
+                "tools_ncc_offset_choice": self.app.defaults["tools_ncc_offset_choice"],
+                "tools_ncc_offset_value": float(self.app.defaults["tools_ncc_offset_value"]),
+                # Paint
+                "tools_paint_overlap": float(self.app.defaults["tools_paint_overlap"]),
+                "tools_paint_offset": float(self.app.defaults["tools_paint_offset"]),
+                "tools_paint_method": self.app.defaults["tools_paint_method"],
+                "tools_paint_connect": self.app.defaults["tools_paint_connect"],
+                "tools_paint_contour": self.app.defaults["tools_paint_contour"],
+                # Isolation
+                "tools_iso_passes": int(self.app.defaults["tools_iso_passes"]),
+                "tools_iso_overlap": float(self.app.defaults["tools_iso_overlap"]),
+                "tools_iso_milling_type": self.app.defaults["tools_iso_milling_type"],
+                "tools_iso_follow": self.app.defaults["tools_iso_follow"],
+                "tools_iso_isotype": self.app.defaults["tools_iso_isotype"],
+                # Drilling
+                "tools_drill_cutz": float(self.app.defaults["tools_drill_cutz"]),
+                "tools_drill_multidepth": self.app.defaults["tools_drill_multidepth"],
+                "tools_drill_depthperpass": float(self.app.defaults["tools_drill_depthperpass"]),
+                "tools_drill_travelz": float(self.app.defaults["tools_drill_travelz"]),
+                "tools_drill_feedrate_z": float(self.app.defaults["tools_drill_feedrate_z"]),
+                "tools_drill_feedrate_rapid": float(
+                    self.app.defaults["tools_drill_feedrate_rapid"]
+                ),
+                "tools_drill_spindlespeed": float(self.app.defaults["tools_drill_spindlespeed"]),
+                "tools_drill_dwell": self.app.defaults["tools_drill_dwell"],
+                "tools_drill_offset": float(self.app.defaults["tools_drill_offset"]),
+                "tools_drill_drill_slots": self.app.defaults["tools_drill_drill_slots"],
+                "tools_drill_drill_overlap": float(self.app.defaults["tools_drill_drill_overlap"]),
+                "tools_drill_last_drill": self.app.defaults["tools_drill_last_drill"],
+                # Cutout
+                "tools_cutout_margin": float(self.app.defaults["tools_cutout_margin"]),
+                "tools_cutout_gapsize": float(self.app.defaults["tools_cutout_gapsize"]),
+                "tools_cutout_gaps_ff": self.app.defaults["tools_cutout_gaps_ff"],
+                "tools_cutout_convexshape": self.app.defaults["tools_cutout_convexshape"],
+                "tools_cutout_gap_type": self.app.defaults["tools_cutout_gap_type"],
+                "tools_cutout_gap_depth": float(self.app.defaults["tools_cutout_gap_depth"]),
+                "tools_cutout_mb_dia": float(self.app.defaults["tools_cutout_mb_dia"]),
+                "tools_cutout_mb_spacing": float(self.app.defaults["tools_cutout_mb_spacing"]),
+            }
+        )
 
         temp = []
         for k, v in self.db_tool_dict.items():
-            if "new_tool_" in v['name']:
-                temp.append(float(v['name'].rpartition('_')[2]))
+            if "new_tool_" in v["name"]:
+                temp.append(float(v["name"].rpartition("_")[2]))
 
         if temp:
             new_name = "new_tool_%d" % int(max(temp) + 1)
         else:
             new_name = "new_tool_1"
 
-        dict_elem = {'name': new_name}
+        dict_elem = {"name": new_name}
         if type(self.app.defaults["geometry_cnctooldia"]) == float:
-            dict_elem['tooldia'] = self.app.defaults["geometry_cnctooldia"]
+            dict_elem["tooldia"] = self.app.defaults["geometry_cnctooldia"]
         else:
             try:
                 tools_string = self.app.defaults["geometry_cnctooldia"].split(",")
-                tools_diameters = [eval(a) for a in tools_string if a != '']
-                dict_elem['tooldia'] = tools_diameters[0] if tools_diameters else 0.0
+                tools_diameters = [eval(a) for a in tools_string if a != ""]
+                dict_elem["tooldia"] = tools_diameters[0] if tools_diameters else 0.0
             except Exception as e:
                 self.app.log.debug("ToolDB.on_tool_add() --> %s" % str(e))
                 return
 
-        dict_elem['offset'] = 'Path'
-        dict_elem['offset_value'] = 0.0
-        dict_elem['type'] = 'Rough'
-        dict_elem['tool_type'] = 'C1'
-        dict_elem['data'] = default_data
+        dict_elem["offset"] = "Path"
+        dict_elem["offset_value"] = 0.0
+        dict_elem["type"] = "Rough"
+        dict_elem["tool_type"] = "C1"
+        dict_elem["data"] = default_data
 
         new_toolid = len(self.db_tool_dict) + 1
         self.db_tool_dict[str(new_toolid)] = deepcopy(dict_elem)
@@ -2024,8 +2107,8 @@ class ToolsDB2(QtWidgets.QWidget):
             self.ui.tree_widget.setCurrentItem(last_item)
             last_item.setSelected(True)
 
-        self.on_tool_target_changed(val=dict_elem['data']['tool_target'])
-        self.app.inform.emit('[success] %s' % _("Tool added to DB."))
+        self.on_tool_target_changed(val=dict_elem["data"]["tool_target"])
+        self.app.inform.emit("[success] %s" % _("Tool added to DB."))
 
     def on_tool_copy(self):
         """
@@ -2041,9 +2124,7 @@ class ToolsDB2(QtWidgets.QWidget):
                     new_tool_id += 1
                     new_key = str(new_tool_id)
 
-                    self.db_tool_dict.update({
-                        new_key: deepcopy(dict_val)
-                    })
+                    self.db_tool_dict.update({new_key: deepcopy(dict_val)})
 
         self.current_toolid = new_tool_id
 
@@ -2058,7 +2139,7 @@ class ToolsDB2(QtWidgets.QWidget):
             last_item.setSelected(True)
 
         self.on_tools_db_edited()
-        self.app.inform.emit('[success] %s' % _("Tool copied from Tools DB."))
+        self.app.inform.emit("[success] %s" % _("Tool copied from Tools DB."))
 
     def on_tool_delete(self):
         """
@@ -2085,48 +2166,53 @@ class ToolsDB2(QtWidgets.QWidget):
             self.ui.tree_widget.setCurrentItem(first_item)
             first_item.setSelected(True)
 
-        self.app.inform.emit('[success] %s' % _("Tool removed from Tools DB."))
+        self.app.inform.emit("[success] %s" % _("Tool removed from Tools DB."))
 
     def on_export_tools_db_file(self):
         self.app.defaults.report_usage("on_export_tools_db_file")
         self.app.log.debug("on_export_tools_db_file()")
 
-        date = str(datetime.today()).rpartition('.')[0]
-        date = ''.join(c for c in date if c not in ':-')
-        date = date.replace(' ', '_')
+        date = str(datetime.today()).rpartition(".")[0]
+        date = "".join(c for c in date if c not in ":-")
+        date = date.replace(" ", "_")
 
         filter__ = "Text File (*.TXT);;All Files (*.*)"
 
         filename, _f = FCFileSaveDialog.get_saved_filename(
             caption=_("Export Tools Database"),
-            directory='{l_save}/FlatCAM_{n}_{date}'.format(l_save=str(self.app.get_last_save_folder()),
-                                                           n=_("Tools_Database"),
-                                                           date=date),
-            ext_filter=filter__)
+            directory="{l_save}/FlatCAM_{n}_{date}".format(
+                l_save=str(self.app.get_last_save_folder()), n=_("Tools_Database"), date=date
+            ),
+            ext_filter=filter__,
+        )
 
         filename = str(filename)
 
         if filename == "":
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled."))
             return
         else:
             try:
-                f = open(filename, 'w')
+                f = open(filename, "w")
                 f.close()
             except PermissionError:
-                self.app.inform.emit('[WARNING] %s' %
-                                     _("Permission denied, saving not possible.\n"
-                                       "Most likely another app is holding the file open and not accessible."))
+                self.app.inform.emit(
+                    "[WARNING] %s"
+                    % _(
+                        "Permission denied, saving not possible.\n"
+                        "Most likely another app is holding the file open and not accessible."
+                    )
+                )
                 return
             except IOError:
-                self.app.log.debug('Creating a new Tools DB file ...')
-                f = open(filename, 'w')
+                self.app.log.debug("Creating a new Tools DB file ...")
+                f = open(filename, "w")
                 f.close()
             except Exception:
                 e = sys.exc_info()[0]
                 self.app.log.error("Could not load Tools DB file.")
                 self.app.log.error(str(e))
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _("Could not load the file."))
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Could not load the file."))
                 return
 
             # Save update options
@@ -2137,30 +2223,34 @@ class ToolsDB2(QtWidgets.QWidget):
                         json.dump(self.db_tool_dict, f, default=to_dict, indent=2)
                 except Exception as e:
                     self.app.log.debug("App.on_save_tools_db() --> %s" % str(e))
-                    self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed to write Tools DB to file."))
+                    self.app.inform.emit(
+                        "[ERROR_NOTCL] %s" % _("Failed to write Tools DB to file.")
+                    )
                     return
             except Exception:
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed to write Tools DB to file."))
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed to write Tools DB to file."))
                 return
 
-        self.app.inform.emit('[success] %s: %s' % (_("Exported Tools DB to"), filename))
+        self.app.inform.emit("[success] %s: %s" % (_("Exported Tools DB to"), filename))
 
     def on_import_tools_db_file(self):
         self.app.defaults.report_usage("on_import_tools_db_file")
         self.app.log.debug("on_import_tools_db_file()")
 
         filter__ = "Text File (*.TXT);;All Files (*.*)"
-        filename, _f = QtWidgets.QFileDialog.getOpenFileName(caption=_("Import FlatCAM Tools DB"), filter=filter__)
+        filename, _f = QtWidgets.QFileDialog.getOpenFileName(
+            caption=_("Import FlatCAM Tools DB"), filter=filter__
+        )
 
         if filename == "":
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled."))
         else:
             try:
                 with open(filename) as f:
                     tools_in_db = f.read()
             except IOError:
                 self.app.log.error("Could not load Tools DB file.")
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _("Could not load the file."))
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Could not load the file."))
                 return
 
             try:
@@ -2168,10 +2258,10 @@ class ToolsDB2(QtWidgets.QWidget):
             except Exception:
                 e = sys.exc_info()[0]
                 self.app.log.error(str(e))
-                self.app.inform.emit('[ERROR] %s' % _("Failed to parse Tools DB file."))
+                self.app.inform.emit("[ERROR] %s" % _("Failed to parse Tools DB file."))
                 return
 
-            self.app.inform.emit('[success] %s: %s' % (_("Loaded Tools DB from"), filename))
+            self.app.inform.emit("[success] %s: %s" % (_("Loaded Tools DB from"), filename))
             self.build_db_ui()
             self.update_storage()
 
@@ -2188,53 +2278,63 @@ class ToolsDB2(QtWidgets.QWidget):
 
                 # clean the dictionary and leave only keys of interest
                 for tool_id in self.db_tool_dict.keys():
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] != _('General'):
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] != _("General"):
                         continue
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Milling'):
-                        for k in list(self.db_tool_dict[tool_id]['data'].keys()):
-                            if str(k).startswith('tools_'):
-                                self.db_tool_dict[tool_id]['data'].pop(k, None)
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] == _("Milling"):
+                        for k in list(self.db_tool_dict[tool_id]["data"].keys()):
+                            if str(k).startswith("tools_"):
+                                self.db_tool_dict[tool_id]["data"].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Drilling'):
-                        for k in list(self.db_tool_dict[tool_id]['data'].keys()):
-                            if str(k).startswith('tools_'):
-                                if str(k).startswith('tools_drill') or str(k).startswith('tools_mill'):
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] == _("Drilling"):
+                        for k in list(self.db_tool_dict[tool_id]["data"].keys()):
+                            if str(k).startswith("tools_"):
+                                if str(k).startswith("tools_drill") or str(k).startswith(
+                                    "tools_mill"
+                                ):
                                     pass
                                 else:
-                                    self.db_tool_dict[tool_id]['data'].pop(k, None)
+                                    self.db_tool_dict[tool_id]["data"].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Isolation'):
-                        for k in list(self.db_tool_dict[tool_id]['data'].keys()):
-                            if str(k).startswith('tools_'):
-                                if str(k).startswith('tools_iso') or str(k).startswith('tools_mill'):
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] == _("Isolation"):
+                        for k in list(self.db_tool_dict[tool_id]["data"].keys()):
+                            if str(k).startswith("tools_"):
+                                if str(k).startswith("tools_iso") or str(k).startswith(
+                                    "tools_mill"
+                                ):
                                     pass
                                 else:
-                                    self.db_tool_dict[tool_id]['data'].pop(k, None)
+                                    self.db_tool_dict[tool_id]["data"].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Paint'):
-                        for k in list(self.db_tool_dict[tool_id]['data'].keys()):
-                            if str(k).startswith('tools_'):
-                                if str(k).startswith('tools_paint') or str(k).startswith('tools_mill'):
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] == _("Paint"):
+                        for k in list(self.db_tool_dict[tool_id]["data"].keys()):
+                            if str(k).startswith("tools_"):
+                                if str(k).startswith("tools_paint") or str(k).startswith(
+                                    "tools_mill"
+                                ):
                                     pass
                                 else:
-                                    self.db_tool_dict[tool_id]['data'].pop(k, None)
-                                    
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('NCC'):
-                        for k in list(self.db_tool_dict[tool_id]['data'].keys()):
-                            if str(k).startswith('tools_'):
-                                if str(k).startswith('tools_ncc') or str(k).startswith('tools_mill'):
-                                    pass
-                                else:
-                                    self.db_tool_dict[tool_id]['data'].pop(k, None)
+                                    self.db_tool_dict[tool_id]["data"].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Cutout'):
-                        for k in list(self.db_tool_dict[tool_id]['data'].keys()):
-                            if str(k).startswith('tools_'):
-                                if str(k).startswith('tools_cutout') or str(k).startswith('tools_mill'):
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] == _("NCC"):
+                        for k in list(self.db_tool_dict[tool_id]["data"].keys()):
+                            if str(k).startswith("tools_"):
+                                if str(k).startswith("tools_ncc") or str(k).startswith(
+                                    "tools_mill"
+                                ):
                                     pass
                                 else:
-                                    self.db_tool_dict[tool_id]['data'].pop(k, None)
+                                    self.db_tool_dict[tool_id]["data"].pop(k, None)
+
+                    if self.db_tool_dict[tool_id]["data"]["tool_target"] == _("Cutout"):
+                        for k in list(self.db_tool_dict[tool_id]["data"].keys()):
+                            if str(k).startswith("tools_"):
+                                if str(k).startswith("tools_cutout") or str(k).startswith(
+                                    "tools_mill"
+                                ):
+                                    pass
+                                else:
+                                    self.db_tool_dict[tool_id]["data"].pop(k, None)
 
                 # Save Tools DB in a file
                 try:
@@ -2243,18 +2343,20 @@ class ToolsDB2(QtWidgets.QWidget):
                     f.close()
                 except Exception as e:
                     self.app.log.debug("ToolsDB.on_save_tools_db() --> %s" % str(e))
-                    self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed to write Tools DB to file."))
+                    self.app.inform.emit(
+                        "[ERROR_NOTCL] %s" % _("Failed to write Tools DB to file.")
+                    )
                     return
 
                 if not silent:
-                    self.app.inform.emit('[success] %s' % _("Saved Tools DB."))
+                    self.app.inform.emit("[success] %s" % _("Saved Tools DB."))
 
     def on_save_db_btn_click(self):
         self.app.tools_db_changed_flag = False
         self.on_save_tools_db()
 
     def on_calculate_tooldia(self):
-        if self.ui.mill_shape_combo.get_value() == 'V':
+        if self.ui.mill_shape_combo.get_value() == "V":
             tip_dia = float(self.ui.mill_vdia_entry.get_value())
             half_tip_angle = float(self.ui.mill_vangle_entry.get_value()) / 2.0
             cut_z = float(self.ui.mill_cutz_entry.get_value())
@@ -2386,8 +2488,9 @@ class ToolsDB2(QtWidgets.QWidget):
         try:
             wdg = self.sender()
 
-            assert isinstance(wdg, QtWidgets.QWidget) or isinstance(wdg, QtWidgets.QAction), \
-                "Expected a QWidget got %s" % type(wdg)
+            assert isinstance(wdg, QtWidgets.QWidget) or isinstance(
+                wdg, QtWidgets.QAction
+            ), "Expected a QWidget got %s" % type(wdg)
 
             if wdg is None:
                 return
@@ -2419,169 +2522,173 @@ class ToolsDB2(QtWidgets.QWidget):
 
         len_sel_rows = len(sel_rows)
         if len_sel_rows > 1:
-            msg = '[ERROR_NOTCL] %s: %s' % \
-                  (_("To change tool properties select only one tool. Tools currently selected"), str(len_sel_rows))
+            msg = "[ERROR_NOTCL] %s: %s" % (
+                _("To change tool properties select only one tool. Tools currently selected"),
+                str(len_sel_rows),
+            )
             self.app.inform.emit(msg)
-            old_value = self.db_tool_dict[tool_id]['data'][self.name2option[wdg_name]]
+            old_value = self.db_tool_dict[tool_id]["data"][self.name2option[wdg_name]]
             wdg.set_value(old_value)
             wdg.clearFocus()
             return
         # #############################################################################################################
 
         if wdg_name == "gdb_name":
-            self.db_tool_dict[tool_id]['name'] = val
+            self.db_tool_dict[tool_id]["name"] = val
         elif wdg_name == "gdb_dia":
-            self.db_tool_dict[tool_id]['tooldia'] = val
+            self.db_tool_dict[tool_id]["tooldia"] = val
         elif wdg_name == "gdb_tool_offset":
-            self.db_tool_dict[tool_id]['offset'] = val
+            self.db_tool_dict[tool_id]["offset"] = val
         elif wdg_name == "gdb_custom_offset":
-            self.db_tool_dict[tool_id]['offset_value'] = val
+            self.db_tool_dict[tool_id]["offset_value"] = val
         elif wdg_name == "gdb_type":
-            self.db_tool_dict[tool_id]['type'] = val
+            self.db_tool_dict[tool_id]["type"] = val
         elif wdg_name == "gdb_shape":
-            self.db_tool_dict[tool_id]['tool_type'] = val
+            self.db_tool_dict[tool_id]["tool_type"] = val
         else:
             # Milling Tool
             if wdg_name == "gdb_tool_target":
-                self.db_tool_dict[tool_id]['data']['tool_target'] = val
+                self.db_tool_dict[tool_id]["data"]["tool_target"] = val
             elif wdg_name == "gdb_tol_min":
-                self.db_tool_dict[tool_id]['data']['tol_min'] = val
+                self.db_tool_dict[tool_id]["data"]["tol_min"] = val
             elif wdg_name == "gdb_tol_max":
-                self.db_tool_dict[tool_id]['data']['tol_max'] = val
+                self.db_tool_dict[tool_id]["data"]["tol_max"] = val
 
             elif wdg_name == "gdb_cutz":
-                self.db_tool_dict[tool_id]['data']['cutz'] = val
+                self.db_tool_dict[tool_id]["data"]["cutz"] = val
             elif wdg_name == "gdb_multidepth":
-                self.db_tool_dict[tool_id]['data']['multidepth'] = val
+                self.db_tool_dict[tool_id]["data"]["multidepth"] = val
             elif wdg_name == "gdb_multidepth_entry":
-                self.db_tool_dict[tool_id]['data']['depthperpass'] = val
+                self.db_tool_dict[tool_id]["data"]["depthperpass"] = val
 
             elif wdg_name == "gdb_travelz":
-                self.db_tool_dict[tool_id]['data']['travelz'] = val
+                self.db_tool_dict[tool_id]["data"]["travelz"] = val
             elif wdg_name == "gdb_frxy":
-                self.db_tool_dict[tool_id]['data']['feedrate'] = val
+                self.db_tool_dict[tool_id]["data"]["feedrate"] = val
             elif wdg_name == "gdb_frz":
-                self.db_tool_dict[tool_id]['data']['feedrate_z'] = val
+                self.db_tool_dict[tool_id]["data"]["feedrate_z"] = val
             elif wdg_name == "gdb_spindle":
-                self.db_tool_dict[tool_id]['data']['spindlespeed'] = val
+                self.db_tool_dict[tool_id]["data"]["spindlespeed"] = val
             elif wdg_name == "gdb_dwell":
-                self.db_tool_dict[tool_id]['data']['dwell'] = val
+                self.db_tool_dict[tool_id]["data"]["dwell"] = val
             elif wdg_name == "gdb_dwelltime":
-                self.db_tool_dict[tool_id]['data']['dwelltime'] = val
+                self.db_tool_dict[tool_id]["data"]["dwelltime"] = val
 
             elif wdg_name == "gdb_vdia":
-                self.db_tool_dict[tool_id]['data']['vtipdia'] = val
+                self.db_tool_dict[tool_id]["data"]["vtipdia"] = val
             elif wdg_name == "gdb_vangle":
-                self.db_tool_dict[tool_id]['data']['vtipangle'] = val
+                self.db_tool_dict[tool_id]["data"]["vtipangle"] = val
             elif wdg_name == "gdb_frapids":
-                self.db_tool_dict[tool_id]['data']['feedrate_rapid'] = val
+                self.db_tool_dict[tool_id]["data"]["feedrate_rapid"] = val
             elif wdg_name == "gdb_ecut":
-                self.db_tool_dict[tool_id]['data']['extracut'] = val
+                self.db_tool_dict[tool_id]["data"]["extracut"] = val
             elif wdg_name == "gdb_ecut_length":
-                self.db_tool_dict[tool_id]['data']['extracut_length'] = val
+                self.db_tool_dict[tool_id]["data"]["extracut_length"] = val
 
             # NCC Tool
             elif wdg_name == "gdb_n_operation":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_operation'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_operation"] = val
             elif wdg_name == "gdb_n_overlap":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_overlap'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_overlap"] = val
             elif wdg_name == "gdb_n_margin":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_margin'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_margin"] = val
             elif wdg_name == "gdb_n_method":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_method'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_method"] = val
             elif wdg_name == "gdb_n_connect":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_connect'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_connect"] = val
             elif wdg_name == "gdb_n_contour":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_contour'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_contour"] = val
             elif wdg_name == "gdb_n_offset":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_offset_choice'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_offset_choice"] = val
             elif wdg_name == "gdb_n_offset_value":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_offset_value'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_offset_value"] = val
             elif wdg_name == "gdb_n_milling_type":
-                self.db_tool_dict[tool_id]['data']['tools_ncc_milling_type'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_ncc_milling_type"] = val
 
             # Paint Tool
             elif wdg_name == "gdb_p_overlap":
-                self.db_tool_dict[tool_id]['data']['tools_paint_overlap'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_paint_overlap"] = val
             elif wdg_name == "gdb_p_offset":
-                self.db_tool_dict[tool_id]['data']['tools_paint_offset'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_paint_offset"] = val
             elif wdg_name == "gdb_p_method":
-                self.db_tool_dict[tool_id]['data']['tools_paint_method'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_paint_method"] = val
             elif wdg_name == "gdb_p_connect":
-                self.db_tool_dict[tool_id]['data']['tools_paint_connect'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_paint_connect"] = val
             elif wdg_name == "gdb_p_contour":
-                self.db_tool_dict[tool_id]['data']['tools_paint_contour'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_paint_contour"] = val
 
             # Isolation Tool
             elif wdg_name == "gdb_i_passes":
-                self.db_tool_dict[tool_id]['data']['tools_iso_passes'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_iso_passes"] = val
             elif wdg_name == "gdb_i_overlap":
-                self.db_tool_dict[tool_id]['data']['tools_iso_overlap'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_iso_overlap"] = val
             elif wdg_name == "gdb_i_milling_type":
-                self.db_tool_dict[tool_id]['data']['tools_iso_milling_type'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_iso_milling_type"] = val
             elif wdg_name == "gdb_i_follow":
-                self.db_tool_dict[tool_id]['data']['tools_iso_follow'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_iso_follow"] = val
             elif wdg_name == "gdb_i_iso_type":
-                self.db_tool_dict[tool_id]['data']['tools_iso_isotype'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_iso_isotype"] = val
 
             # Drilling Tool
             elif wdg_name == "gdb_e_cutz":
-                self.db_tool_dict[tool_id]['data']['tools_drill_cutz'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_cutz"] = val
             elif wdg_name == "gdb_e_multidepth":
-                self.db_tool_dict[tool_id]['data']['tools_drill_multidepth'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_multidepth"] = val
             elif wdg_name == "gdb_e_depthperpass":
-                self.db_tool_dict[tool_id]['data']['tools_drill_depthperpass'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_depthperpass"] = val
             elif wdg_name == "gdb_e_travelz":
-                self.db_tool_dict[tool_id]['data']['tools_drill_travelz'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_travelz"] = val
 
             elif wdg_name == "gdb_e_feedratez":
-                self.db_tool_dict[tool_id]['data']['tools_drill_feedrate_z'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_feedrate_z"] = val
             elif wdg_name == "gdb_e_fr_rapid":
-                self.db_tool_dict[tool_id]['data']['tools_drill_feedrate_rapid'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_feedrate_rapid"] = val
             elif wdg_name == "gdb_e_spindlespeed":
-                self.db_tool_dict[tool_id]['data']['tools_drill_spindlespeed'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_spindlespeed"] = val
             elif wdg_name == "gdb_e_dwell":
-                self.db_tool_dict[tool_id]['data']['tools_drill_dwell'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_dwell"] = val
             elif wdg_name == "gdb_e_dwelltime":
-                self.db_tool_dict[tool_id]['data']['tools_drill_dwelltime'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_dwelltime"] = val
 
             elif wdg_name == "gdb_e_offset":
-                self.db_tool_dict[tool_id]['data']['tools_drill_offset'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_offset"] = val
             elif wdg_name == "gdb_e_drill_slots":
-                self.db_tool_dict[tool_id]['data']['tools_drill_drill_slots'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_drill_slots"] = val
             elif wdg_name == "gdb_e_drill_slots_over":
-                self.db_tool_dict[tool_id]['data']['tools_drill_drill_overlap'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_drill_overlap"] = val
             elif wdg_name == "gdb_e_drill_last_drill":
-                self.db_tool_dict[tool_id]['data']['tools_drill_last_drill'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_drill_last_drill"] = val
 
             # Cutout Tool
             elif wdg_name == "gdb_ct_margin":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_margin'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_margin"] = val
             elif wdg_name == "gdb_ct_gapsize":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_gapsize'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_gapsize"] = val
             elif wdg_name == "gdb_ct_gaps":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_gaps_ff'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_gaps_ff"] = val
             elif wdg_name == "gdb_ct_convex":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_convexshape'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_convexshape"] = val
 
             elif wdg_name == "gdb_ct_gap_type":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_gap_type'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_gap_type"] = val
             elif wdg_name == "gdb_ct_gap_depth":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_gap_depth'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_gap_depth"] = val
             elif wdg_name == "gdb_ct_mb_dia":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_mb_dia'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_mb_dia"] = val
             elif wdg_name == "gdb_ct_mb_spacing":
-                self.db_tool_dict[tool_id]['data']['tools_cutout_mb_spacing'] = val
+                self.db_tool_dict[tool_id]["data"]["tools_cutout_mb_spacing"] = val
 
         self.on_tools_db_edited()
 
     def on_tool_requested_from_app(self):
         if not self.ui.tree_widget.selectedItems():
-            self.app.inform.emit('[WARNING_NOTCL] %s...' % _("No Tool/row selected in the Tools Database table"))
+            self.app.inform.emit(
+                "[WARNING_NOTCL] %s..." % _("No Tool/row selected in the Tools Database table")
+            )
             return
 
         if not self.db_tool_dict:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Tools DB empty."))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Tools DB empty."))
             return
 
         for item in self.ui.tree_widget.selectedItems():
@@ -2602,13 +2709,13 @@ class ToolsDB2(QtWidgets.QWidget):
 
         for idx in range(self.app.ui.plot_tab_area.count()):
             if self.app.ui.plot_tab_area.tabText(idx) == _("Tools Database"):
-                self.app.ui.plot_tab_area.tabBar.setTabTextColor(idx, QtGui.QColor('red'))
+                self.app.ui.plot_tab_area.tabBar.setTabTextColor(idx, QtGui.QColor("red"))
 
         self.ui.save_db_btn.setStyleSheet("QPushButton {color: red;}")
 
         self.tools_db_changed_flag = True
         if silent is None:
-            msg = '[WARNING_NOTCL] %s' % _("Tools in Tools Database edited but not saved.")
+            msg = "[WARNING_NOTCL] %s" % _("Tools in Tools Database edited but not saved.")
             self.app.inform[str, bool].emit(msg, False)
 
     def on_cancel_tool(self):
@@ -2617,7 +2724,7 @@ class ToolsDB2(QtWidgets.QWidget):
                 wdg = self.app_ui.plot_tab_area.widget(idx)
                 wdg.deleteLater()
                 self.app_ui.plot_tab_area.removeTab(idx)
-        self.app.inform.emit('%s' % _("Cancelled adding tool from DB."))
+        self.app.inform.emit("%s" % _("Cancelled adding tool from DB."))
 
     # def resize_new_tool_table_widget(self, min_size, max_size):
     #     """

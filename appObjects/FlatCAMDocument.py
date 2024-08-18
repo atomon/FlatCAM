@@ -17,8 +17,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -26,6 +26,7 @@ class DocumentObject(FlatCAMObj):
     """
     Represents a Document object.
     """
+
     optionChanged = QtCore.pyqtSignal(str)
     ui_type = DocumentObjectUI
 
@@ -36,11 +37,11 @@ class DocumentObject(FlatCAMObj):
         FlatCAMObj.__init__(self, name)
 
         self.kind = "document"
-        self.units = ''
+        self.units = ""
 
-        self.ser_attrs = ['options', 'kind', 'source_file']
-        self.source_file = ''
-        self.doc_code = ''
+        self.ser_attrs = ["options", "kind", "source_file"]
+        self.source_file = ""
+        self.doc_code = ""
 
         self.font_name = None
         self.font_italic = None
@@ -50,41 +51,45 @@ class DocumentObject(FlatCAMObj):
         self.document_editor_tab = None
 
         self._read_only = False
-        self.units_found = self.app.defaults['units']
+        self.units_found = self.app.defaults["units"]
 
     def set_ui(self, ui):
         FlatCAMObj.set_ui(self, ui)
         log.debug("DocumentObject.set_ui()")
 
-        assert isinstance(self.ui, DocumentObjectUI), \
-            "Expected a DocumentObjectUI, got %s" % type(self.ui)
+        assert isinstance(self.ui, DocumentObjectUI), "Expected a DocumentObjectUI, got %s" % type(
+            self.ui
+        )
 
-        self.units = self.app.defaults['units'].upper()
-        self.units_found = self.app.defaults['units']
+        self.units = self.app.defaults["units"].upper()
+        self.units_found = self.app.defaults["units"]
 
         # Fill form fields only on object create
         self.to_form()
 
         # Show/Hide Advanced Options
-        if self.app.defaults["global_app_level"] == 'b':
+        if self.app.defaults["global_app_level"] == "b":
             self.ui.level.setText('<span style="color:green;"><b>%s</b></span>' % _("Basic"))
         else:
             self.ui.level.setText('<span style="color:red;"><b>%s</b></span>' % _("Advanced"))
 
         self.document_editor_tab = AppTextEditor(app=self.app)
-        stylesheet = """
+        stylesheet = (
+            """
                         QTextEdit {selection-background-color:%s;
                                    selection-color:white;
                         }
-                     """ % self.app.defaults["document_sel_color"]
+                     """
+            % self.app.defaults["document_sel_color"]
+        )
 
         self.document_editor_tab.code_editor.setStyleSheet(stylesheet)
 
         self.document_editor_tab.buttonRun.hide()
 
-        self.ui.autocomplete_cb.set_value(self.app.defaults['document_autocompleter'])
-        self.on_autocomplete_changed(state=self.app.defaults['document_autocompleter'])
-        self.on_tab_size_change(val=self.app.defaults['document_tab_size'])
+        self.ui.autocomplete_cb.set_value(self.app.defaults["document_autocompleter"])
+        self.on_autocomplete_changed(state=self.app.defaults["document_autocompleter"])
+        self.on_tab_size_change(val=self.app.defaults["document_tab_size"])
 
         flt = "FlatCAM Docs (*.FlatDoc);;All Files (*.*)"
 
@@ -92,9 +97,13 @@ class DocumentObject(FlatCAMObj):
         # ######################## SIGNALS #####################################
         # ######################################################################
         self.document_editor_tab.buttonOpen.clicked.disconnect()
-        self.document_editor_tab.buttonOpen.clicked.connect(lambda: self.document_editor_tab.handleOpen(filt=flt))
+        self.document_editor_tab.buttonOpen.clicked.connect(
+            lambda: self.document_editor_tab.handleOpen(filt=flt)
+        )
         self.document_editor_tab.buttonSave.clicked.disconnect()
-        self.document_editor_tab.buttonSave.clicked.connect(lambda: self.document_editor_tab.handleSaveGCode(filt=flt))
+        self.document_editor_tab.buttonSave.clicked.connect(
+            lambda: self.document_editor_tab.handleSaveGCode(filt=flt)
+        )
 
         self.document_editor_tab.code_editor.textChanged.connect(self.on_text_changed)
 
@@ -109,9 +118,15 @@ class DocumentObject(FlatCAMObj):
         self.ui.sel_color_entry.editingFinished.connect(self.on_selection_color_entry)
         self.ui.sel_color_button.clicked.connect(self.on_selection_color_button)
 
-        self.ui.al_left_tb.clicked.connect(lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignLeft))
-        self.ui.al_center_tb.clicked.connect(lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignCenter))
-        self.ui.al_right_tb.clicked.connect(lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignRight))
+        self.ui.al_left_tb.clicked.connect(
+            lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignLeft)
+        )
+        self.ui.al_center_tb.clicked.connect(
+            lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignCenter)
+        )
+        self.ui.al_right_tb.clicked.connect(
+            lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignRight)
+        )
         self.ui.al_justify_tb.clicked.connect(
             lambda: self.document_editor_tab.code_editor.setAlignment(Qt.AlignJustify)
         )
@@ -120,26 +135,32 @@ class DocumentObject(FlatCAMObj):
         self.ui.tab_size_spinner.returnPressed.connect(self.on_tab_size_change)
         # #######################################################################
 
-        self.ui.font_color_entry.set_value(self.app.defaults['document_font_color'])
+        self.ui.font_color_entry.set_value(self.app.defaults["document_font_color"])
         self.ui.font_color_button.setStyleSheet(
-            "background-color:%s" % str(self.app.defaults['document_font_color']))
+            "background-color:%s" % str(self.app.defaults["document_font_color"])
+        )
 
-        self.ui.sel_color_entry.set_value(self.app.defaults['document_sel_color'])
+        self.ui.sel_color_entry.set_value(self.app.defaults["document_sel_color"])
         self.ui.sel_color_button.setStyleSheet(
-            "background-color:%s" % self.app.defaults['document_sel_color'])
+            "background-color:%s" % self.app.defaults["document_sel_color"]
+        )
 
-        self.ui.font_size_cb.setCurrentIndex(int(self.app.defaults['document_font_size']))
+        self.ui.font_size_cb.setCurrentIndex(int(self.app.defaults["document_font_size"]))
 
         # self.document_editor_tab.handleTextChanged()
-        self.ser_attrs = ['options', 'kind', 'source_file']
+        self.ser_attrs = ["options", "kind", "source_file"]
 
         if Qt.mightBeRichText(self.source_file):
             # self.document_editor_tab.code_editor.setHtml(self.source_file)
-            self.document_editor_tab.load_text(self.source_file, move_to_start=True, clear_text=True, as_html=True)
+            self.document_editor_tab.load_text(
+                self.source_file, move_to_start=True, clear_text=True, as_html=True
+            )
         else:
             # for line in self.source_file.splitlines():
             #     self.document_editor_tab.code_editor.append(line)
-            self.document_editor_tab.load_text(self.source_file, move_to_start=True, clear_text=True, as_html=False)
+            self.document_editor_tab.load_text(
+                self.source_file, move_to_start=True, clear_text=True, as_html=False
+            )
 
         self.build_ui()
 
@@ -160,14 +181,14 @@ class DocumentObject(FlatCAMObj):
 
         # try to not add too many times a tab that it is already installed
         for idx in range(self.app.ui.plot_tab_area.count()):
-            if self.app.ui.plot_tab_area.widget(idx).objectName() == self.options['name']:
+            if self.app.ui.plot_tab_area.widget(idx).objectName() == self.options["name"]:
                 tab_here = True
                 break
 
         # add the tab if it is not already added
         if tab_here is False:
-            self.app.ui.plot_tab_area.addTab(self.document_editor_tab, '%s' % _("Document Editor"))
-            self.document_editor_tab.setObjectName(self.options['name'])
+            self.app.ui.plot_tab_area.addTab(self.document_editor_tab, "%s" % _("Document Editor"))
+            self.document_editor_tab.setObjectName(self.options["name"])
 
         # Switch plot_area to CNCJob tab
         self.app.ui.plot_tab_area.setCurrentWidget(self.document_editor_tab)
@@ -189,7 +210,7 @@ class DocumentObject(FlatCAMObj):
 
         tab_balue = int(self.ui.tab_size_spinner.get_value())
         self.document_editor_tab.code_editor.setTabStopWidth(tab_balue)
-        self.app.defaults['document_tab_size'] = tab_balue
+        self.app.defaults["document_tab_size"] = tab_balue
 
         self.ui.tab_size_spinner.returnPressed.connect(self.on_tab_size_change)
 
@@ -205,7 +226,9 @@ class DocumentObject(FlatCAMObj):
 
     def font_size(self):
         # self.document_editor_tab.code_editor.selectAll()
-        self.document_editor_tab.code_editor.setFontPointSize(float(self.ui.font_size_cb.get_value()))
+        self.document_editor_tab.code_editor.setFontPointSize(
+            float(self.ui.font_size_cb.get_value())
+        )
 
     def on_bold_button(self):
         if self.ui.font_bold_tb.isChecked():
@@ -233,11 +256,13 @@ class DocumentObject(FlatCAMObj):
 
     # Setting font colors handlers
     def on_font_color_entry(self):
-        self.app.defaults['document_font_color'] = self.ui.font_color_entry.get_value()
-        self.ui.font_color_button.setStyleSheet("background-color:%s" % str(self.app.defaults['document_font_color']))
+        self.app.defaults["document_font_color"] = self.ui.font_color_entry.get_value()
+        self.ui.font_color_button.setStyleSheet(
+            "background-color:%s" % str(self.app.defaults["document_font_color"])
+        )
 
     def on_font_color_button(self):
-        current_color = QtGui.QColor(self.app.defaults['document_font_color'])
+        current_color = QtGui.QColor(self.app.defaults["document_font_color"])
 
         c_dialog = QtWidgets.QColorDialog()
         font_color = c_dialog.getColor(initial=current_color)
@@ -250,15 +275,17 @@ class DocumentObject(FlatCAMObj):
 
         new_val = str(font_color.name())
         self.ui.font_color_entry.set_value(new_val)
-        self.app.defaults['document_font_color'] = new_val
+        self.app.defaults["document_font_color"] = new_val
 
     # Setting selection colors handlers
     def on_selection_color_entry(self):
-        self.app.defaults['document_sel_color'] = self.ui.sel_color_entry.get_value()
-        self.ui.sel_color_button.setStyleSheet("background-color:%s" % str(self.app.defaults['document_sel_color']))
+        self.app.defaults["document_sel_color"] = self.ui.sel_color_entry.get_value()
+        self.ui.sel_color_button.setStyleSheet(
+            "background-color:%s" % str(self.app.defaults["document_sel_color"])
+        )
 
     def on_selection_color_button(self):
-        current_color = QtGui.QColor(self.app.defaults['document_sel_color'])
+        current_color = QtGui.QColor(self.app.defaults["document_sel_color"])
 
         c_dialog = QtWidgets.QColorDialog()
         sel_color = c_dialog.getColor(initial=current_color)
@@ -268,7 +295,7 @@ class DocumentObject(FlatCAMObj):
 
         p = QtGui.QPalette()
         p.setColor(QtGui.QPalette.Highlight, sel_color)
-        p.setColor(QtGui.QPalette.HighlightedText, QtGui.QColor('white'))
+        p.setColor(QtGui.QPalette.HighlightedText, QtGui.QColor("white"))
 
         self.document_editor_tab.code_editor.setPalette(p)
 
@@ -276,7 +303,7 @@ class DocumentObject(FlatCAMObj):
 
         new_val = str(sel_color.name())
         self.ui.sel_color_entry.set_value(new_val)
-        self.app.defaults['document_sel_color'] = new_val
+        self.app.defaults["document_sel_color"] = new_val
 
     def mirror(self, axis, point):
         pass

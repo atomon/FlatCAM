@@ -13,11 +13,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class TclCommandGetPath(TclCommand):
@@ -29,27 +29,24 @@ class TclCommandGetPath(TclCommand):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['get_path']
+    aliases = ["get_path"]
 
-    description = '%s %s' % ("--", "Get the default Tcl Shell folder path.")
+    description = "%s %s" % ("--", "Get the default Tcl Shell folder path.")
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-    ])
+    arg_names = collections.OrderedDict([])
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-    ])
+    option_types = collections.OrderedDict([])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
     required = []
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Will get the folder path used as a fallback path for opening files.",
-        'args': collections.OrderedDict([
-        ]),
-        'examples': ['get_path']
+        "main": "Will get the folder path used as a fallback path for opening files.",
+        "args": collections.OrderedDict([]),
+        "examples": ["get_path"],
     }
 
     def execute(self, args, unnamed_args):

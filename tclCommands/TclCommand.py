@@ -21,9 +21,7 @@ class TclCommand(object):
 
     # Dictionary of types from Tcl command, needs to be ordered
     # OrderedDict should be like collections.OrderedDict([(key,value),(key2,value2)])
-    arg_names = collections.OrderedDict([
-        ('name', str)
-    ])
+    arg_names = collections.OrderedDict([("name", str)])
 
     # dictionary of types from Tcl command, needs to be ordered.
     # This  is  for options  like -optionname value.
@@ -31,17 +29,16 @@ class TclCommand(object):
     option_types = collections.OrderedDict()
 
     # List of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name']
+    required = ["name"]
 
     # Structured help for current command, args needs to be ordered
     # OrderedDict should be like collections.OrderedDict([(key,value),(key2,value2)])
     help = {
-        'main': "undefined help.",
-        'args': collections.OrderedDict([
-            ('argumentname', 'undefined help.'),
-            ('optionname', 'undefined help.')
-        ]),
-        'examples': []
+        "main": "undefined help.",
+        "args": collections.OrderedDict(
+            [("argumentname", "undefined help."), ("optionname", "undefined help.")]
+        ),
+        "examples": [],
     }
 
     # Original incoming arguments into command
@@ -51,10 +48,10 @@ class TclCommand(object):
         self.app = app
 
         if self.app is None:
-            raise TypeError('Expected app to be FlatCAMApp instance.')
+            raise TypeError("Expected app to be FlatCAMApp instance.")
 
         if not isinstance(self.app, app_Main.App):
-            raise TypeError('Expected FlatCAMApp, got %s.' % type(app))
+            raise TypeError("Expected FlatCAMApp, got %s." % type(app))
 
         self.log = self.app.log
         self.error_info = None
@@ -98,7 +95,7 @@ class TclCommand(object):
 
             command_string = []
 
-            for arg_key, arg_type in list(self.help['args'].items()):
+            for arg_key, arg_type in list(self.help["args"].items()):
                 command_string.append(get_decorated_argument(arg_key, arg_type, True))
 
             return "> " + alias_name + " " + " ".join(command_string)
@@ -111,7 +108,7 @@ class TclCommand(object):
             :param in_command:
             :return:
             """
-            option_symbol = ''
+            option_symbol = ""
 
             if help_key in self.arg_names:
                 arg_type = self.arg_names[help_key]
@@ -120,42 +117,51 @@ class TclCommand(object):
                 in_command_name = help_key
 
             elif help_key in self.option_types:
-                option_symbol = '-'
+                option_symbol = "-"
                 arg_type = self.option_types[help_key]
                 type_name = str(arg_type.__name__)
                 in_command_name = option_symbol + help_key + " <" + type_name + ">"
 
             else:
-                option_symbol = ''
-                type_name = '?'
+                option_symbol = ""
+                type_name = "?"
                 in_command_name = option_symbol + help_key + " <" + type_name + ">"
 
             if in_command:
                 if help_key in self.required:
                     return in_command_name
                 else:
-                    return '[' + in_command_name + "]"
+                    return "[" + in_command_name + "]"
             else:
                 if help_key in self.required:
                     return "\t" + option_symbol + help_key + " <" + type_name + ">: " + help_text
                 else:
-                    return "\t[" + option_symbol + help_key + " <" + type_name + ">: " + help_text + "]"
+                    return (
+                        "\t["
+                        + option_symbol
+                        + help_key
+                        + " <"
+                        + type_name
+                        + ">: "
+                        + help_text
+                        + "]"
+                    )
 
         def get_decorated_example(example_item):
             return "> " + example_item
 
-        help_string = [self.help['main']]
+        help_string = [self.help["main"]]
         for alias in self.aliases:
             help_string.append(get_decorated_command(alias))
 
-        for key, value in list(self.help['args'].items()):
+        for key, value in list(self.help["args"].items()):
             help_string.append(get_decorated_argument(key, value))
 
         # timeout is unique for signaled commands (this is not best oop practice, but much easier for now)
         if isinstance(self, TclCommandSignaled):
             help_string.append("\t[-timeout <int>: Max wait for job timeout before error.]")
 
-        for example in self.help['examples']:
+        for example in self.help["examples"]:
             help_string.append(get_decorated_example(example))
 
         return "\n".join(help_string)
@@ -180,7 +186,7 @@ class TclCommand(object):
         option_name = None
 
         for i in range(n):
-            match = re.search(r'^-([a-zA-Z].*)', args[i])
+            match = re.search(r"^-([a-zA-Z].*)", args[i])
             if match:
                 # assert option_name is None
                 if option_name is not None:
@@ -222,18 +228,20 @@ class TclCommand(object):
                 try:
                     named_args[key] = arg_type(argument)
                 except Exception as e:
-                    self.raise_tcl_error("Cannot cast named argument '%s' to type %s  with exception '%s'."
-                                         % (key, arg_type, str(e)))
+                    self.raise_tcl_error(
+                        "Cannot cast named argument '%s' to type %s  with exception '%s'."
+                        % (key, arg_type, str(e))
+                    )
             else:
                 unnamed_args.append(argument)
             idx += 1
 
         # check options
         for key in options:
-            if key not in self.option_types and key != 'timeout':
-                self.raise_tcl_error('Unknown parameter: %s' % key)
+            if key not in self.option_types and key != "timeout":
+                self.raise_tcl_error("Unknown parameter: %s" % key)
             try:
-                if key != 'timeout':
+                if key != "timeout":
                     # None options are allowed; if None then the defaults are used
                     # - must be implemented in the Tcl commands
                     if options[key] is not None:
@@ -243,8 +251,10 @@ class TclCommand(object):
                 else:
                     named_args[key] = int(options[key])
             except Exception as e:
-                self.raise_tcl_error("Cannot cast argument '-%s' to type '%s' with exception '%s'."
-                                     % (key, self.option_types[key], str(e)))
+                self.raise_tcl_error(
+                    "Cannot cast argument '-%s' to type '%s' with exception '%s'."
+                    % (key, self.option_types[key], str(e))
+                )
 
         # check required arguments
         for key in self.required:
@@ -315,17 +325,17 @@ class TclCommand(object):
 
 class TclCommandSignaled(TclCommand):
     """
-        !!! I left it here only  for demonstration !!!
-        Go to TclCommandCncjob and  into class definition put
-            class TclCommandCncjob(TclCommandSignaled):
-        also change
-            obj.generatecncjob(use_thread = False, **args)
-        to
-            obj.generatecncjob(use_thread = True, **args)
+    !!! I left it here only  for demonstration !!!
+    Go to TclCommandCncjob and  into class definition put
+        class TclCommandCncjob(TclCommandSignaled):
+    also change
+        obj.generatecncjob(use_thread = False, **args)
+    to
+        obj.generatecncjob(use_thread = True, **args)
 
 
-        This class is  child of  TclCommand and is used for commands  which create  new objects
-        it handles  all necessary stuff about blocking and passing exceptions
+    This class is  child of  TclCommand and is used for commands  which create  new objects
+    it handles  all necessary stuff about blocking and passing exceptions
     """
 
     @abc.abstractmethod
@@ -368,10 +378,10 @@ class TclCommandSignaled(TclCommand):
             # Termination by exception in thread
             self.app.thread_exception.connect(loop.quit)
 
-            status = {'timed_out': False}
+            status = {"timed_out": False}
 
             def report_quit():
-                status['timed_out'] = True
+                status["timed_out"] = True
                 loop.quit()
 
             yield
@@ -383,6 +393,7 @@ class TclCommandSignaled(TclCommand):
             def except_hook(type_, value, traceback_):
                 ex.append(value)
                 oeh(type_, value, traceback_)
+
             sys.excepthook = except_hook
 
             # Terminate on timeout
@@ -398,20 +409,22 @@ class TclCommandSignaled(TclCommand):
             if ex:
                 raise ex[0]
 
-            if status['timed_out']:
-                self.app.shell.raise_tcl_unknown_error("Operation timed outed! Consider increasing option "
-                                                       "'-timeout <miliseconds>' for command or "
-                                                       "'set_sys global_background_timeout <miliseconds>'.")
+            if status["timed_out"]:
+                self.app.shell.raise_tcl_unknown_error(
+                    "Operation timed outed! Consider increasing option "
+                    "'-timeout <miliseconds>' for command or "
+                    "'set_sys global_background_timeout <miliseconds>'."
+                )
 
         try:
             self.log.debug("TCL command '%s' executed." % str(type(self).__name__))
             self.original_args = args
             args, unnamed_args = self.check_args(args)
-            if 'timeout' in args:
-                passed_timeout = args['timeout']
-                del args['timeout']
+            if "timeout" in args:
+                passed_timeout = args["timeout"]
+                del args["timeout"]
             else:
-                passed_timeout = self.app.defaults['global_background_timeout']
+                passed_timeout = self.app.defaults["global_background_timeout"]
 
             # set detail for processing, it will be there until next open or close
             self.app.shell.open_processing(self.get_current_command())
@@ -427,7 +440,9 @@ class TclCommandSignaled(TclCommand):
                 # every TclCommandNewObject ancestor  support  timeout as parameter,
                 # but it does not mean anything for child itself
                 # when operation  will be  really long is good  to set it higher then defqault 30s
-                self.app.worker_task.emit({'fcn': self.execute_call, 'params': [args, unnamed_args]})
+                self.app.worker_task.emit(
+                    {"fcn": self.execute_call, "params": [args, unnamed_args]}
+                )
 
             return self.output
 

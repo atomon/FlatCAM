@@ -15,7 +15,7 @@ from PyQt5.QtCore import QSettings
 
 import gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 # import builtins
 #
@@ -24,32 +24,32 @@ log = logging.getLogger('base')
 
 # ISO639-1 codes from here: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 languages_dict = {
-    'zh': 'Chinese',
-    'de': 'German',
-    'en': 'English',
-    'es': 'Spanish',
-    'fr': 'French',
-    'it': 'Italian',
-    'pt_BR': 'Brazilian Portuguese',
-    'ro': 'Romanian',
-    'ru': 'Russian',
-    'tr': 'Turkish',
+    "zh": "Chinese",
+    "de": "German",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "it": "Italian",
+    "pt_BR": "Brazilian Portuguese",
+    "ro": "Romanian",
+    "ru": "Russian",
+    "tr": "Turkish",
 }
 
 translations = {}
 
-languages_path_search = ''
+languages_path_search = ""
 
 
 def load_languages():
     available_translations = []
-    languages_path_search = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'locale')
+    languages_path_search = os.path.join(os.path.dirname(os.path.abspath(__file__)), "locale")
 
     try:
         available_translations = next(os.walk(languages_path_search))[1]
     except StopIteration:
         if not available_translations:
-            languages_path_search = os.path.join(str(Path(__file__).parents[1]), 'locale')
+            languages_path_search = os.path.join(str(Path(__file__).parents[1]), "locale")
             try:
                 available_translations = next(os.walk(languages_path_search))[1]
             except StopIteration:
@@ -65,11 +65,11 @@ def load_languages():
 
 
 def languages_dir():
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'locale')
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "locale")
 
 
 def languages_dir_cx_freeze():
-    return os.path.join(Path(__file__).parents[1], 'locale')
+    return os.path.join(Path(__file__).parents[1], "locale")
 
 
 def on_language_apply_click(app, restart=False):
@@ -83,29 +83,31 @@ def on_language_apply_click(app, restart=False):
 
     theme_settings = QSettings("Open Source", "FlatCAM")
     if theme_settings.contains("theme"):
-        theme = theme_settings.value('theme', type=str)
+        theme = theme_settings.value("theme", type=str)
     else:
-        theme = 'white'
+        theme = "white"
 
-    if theme == 'white':
-        resource_loc = 'assets/resources'
+    if theme == "white":
+        resource_loc = "assets/resources"
     else:
-        resource_loc = 'assets/resources'
+        resource_loc = "assets/resources"
 
     # do nothing if trying to apply the language that is the current language (already applied).
     settings = QSettings("Open Source", "FlatCAM")
     if settings.contains("language"):
-        current_language = settings.value('language', type=str)
+        current_language = settings.value("language", type=str)
         if current_language == name:
             return
 
     if restart:
         msgbox = QtWidgets.QMessageBox()
         msgbox.setText(_("The application will restart."))
-        msgbox.setInformativeText('%s %s?' %
-                                  (_("Are you sure do you want to change the current language to"), name.capitalize()))
-        msgbox.setWindowTitle('%s ...' % _("Apply Language"))
-        msgbox.setWindowIcon(QtGui.QIcon(resource_loc + '/language32.png'))
+        msgbox.setInformativeText(
+            "%s %s?"
+            % (_("Are you sure do you want to change the current language to"), name.capitalize())
+        )
+        msgbox.setWindowTitle("%s ..." % _("Apply Language"))
+        msgbox.setWindowIcon(QtGui.QIcon(resource_loc + "/language32.png"))
         msgbox.setIcon(QtWidgets.QMessageBox.Question)
 
         bt_yes = msgbox.addButton(_("Yes"), QtWidgets.QMessageBox.YesRole)
@@ -120,7 +122,7 @@ def on_language_apply_click(app, restart=False):
         else:
             settings = QSettings("Open Source", "FlatCAM")
             saved_language = name
-            settings.setValue('language', saved_language)
+            settings.setValue("language", saved_language)
             # This will write the setting to the platform specific storage.
             del settings
 
@@ -128,17 +130,17 @@ def on_language_apply_click(app, restart=False):
 
 
 def apply_language(domain, lang=None):
-    lang_code = ''
+    lang_code = ""
 
     if lang is None:
         settings = QSettings("Open Source", "FlatCAM")
         if settings.contains("language"):
-            name = settings.value('language')
+            name = settings.value("language")
         else:
-            name = 'English'
+            name = "English"
             # in case the 'language' parameter is not in QSettings add it to QSettings and it's value is
             # the default language, English
-            settings.setValue('language', 'English')
+            settings.setValue("language", "English")
 
             # This will write the setting to the platform specific storage.
             del settings
@@ -150,18 +152,22 @@ def apply_language(domain, lang=None):
             # break and then use the current key as language
             break
 
-    if lang_code == '':
+    if lang_code == "":
         return "no language"
     else:
         try:
-            current_lang = gettext.translation(str(domain), localedir=languages_dir(), languages=[lang_code])
+            current_lang = gettext.translation(
+                str(domain), localedir=languages_dir(), languages=[lang_code]
+            )
             current_lang.install()
         except Exception as e:
-            log.debug("FlatCAMTranslation.apply_language() --> %s. Perhaps is Cx_freeze-ed?" % str(e))
+            log.debug(
+                "FlatCAMTranslation.apply_language() --> %s. Perhaps is Cx_freeze-ed?" % str(e)
+            )
             try:
-                current_lang = gettext.translation(str(domain),
-                                                   localedir=languages_dir_cx_freeze(),
-                                                   languages=[lang_code])
+                current_lang = gettext.translation(
+                    str(domain), localedir=languages_dir_cx_freeze(), languages=[lang_code]
+                )
                 current_lang.install()
             except Exception as e:
                 log.debug("FlatCAMTranslation.apply_language() --> %s" % str(e))
@@ -178,14 +184,14 @@ def restart_program(app, ask=None):
 
     theme_settings = QSettings("Open Source", "FlatCAM")
     if theme_settings.contains("theme"):
-        theme = theme_settings.value('theme', type=str)
+        theme = theme_settings.value("theme", type=str)
     else:
-        theme = 'white'
+        theme = "white"
 
-    if theme == 'white':
-        resource_loc = 'assets/resources'
+    if theme == "white":
+        resource_loc = "assets/resources"
     else:
-        resource_loc = 'assets/resources'
+        resource_loc = "assets/resources"
 
     # try to quit the Socket opened by ArgsThread class
     try:
@@ -203,15 +209,19 @@ def restart_program(app, ask=None):
 
     if app.should_we_save and app.collection.get_list() or ask is True:
         msgbox = QtWidgets.QMessageBox()
-        msgbox.setText(_("There are files/objects modified in FlatCAM. "
-                         "\n"
-                         "Do you want to Save the project?"))
+        msgbox.setText(
+            _(
+                "There are files/objects modified in FlatCAM. "
+                "\n"
+                "Do you want to Save the project?"
+            )
+        )
         msgbox.setWindowTitle(_("Save changes"))
-        msgbox.setWindowIcon(QtGui.QIcon(resource_loc + '/save_as.png'))
+        msgbox.setWindowIcon(QtGui.QIcon(resource_loc + "/save_as.png"))
         msgbox.setIcon(QtWidgets.QMessageBox.Question)
 
-        bt_yes = msgbox.addButton(_('Yes'), QtWidgets.QMessageBox.YesRole)
-        bt_no = msgbox.addButton(_('No'), QtWidgets.QMessageBox.NoRole)
+        bt_yes = msgbox.addButton(_("Yes"), QtWidgets.QMessageBox.YesRole)
+        bt_no = msgbox.addButton(_("No"), QtWidgets.QMessageBox.NoRole)
 
         msgbox.setDefaultButton(bt_yes)
         msgbox.exec_()

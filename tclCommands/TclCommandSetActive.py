@@ -12,30 +12,32 @@ class TclCommandSetActive(TclCommand):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['set_active']
+    aliases = ["set_active"]
 
-    description = '%s %s' % ("--", "Sets a FlatCAM object as active (selected).")
+    description = "%s %s" % ("--", "Sets a FlatCAM object as active (selected).")
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('name', str),
-    ])
+    arg_names = collections.OrderedDict(
+        [
+            ("name", str),
+        ]
+    )
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-
-    ])
+    option_types = collections.OrderedDict([])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name']
+    required = ["name"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': 'Sets a FlatCAM object as active (selected).',
-        'args': collections.OrderedDict([
-            ('name', 'Name of the FlatCAM object to be set as active (selected). Required.'),
-        ]),
-        'examples': ['set_active object_name']
+        "main": "Sets a FlatCAM object as active (selected).",
+        "args": collections.OrderedDict(
+            [
+                ("name", "Name of the FlatCAM object to be set as active (selected). Required."),
+            ]
+        ),
+        "examples": ["set_active object_name"],
     }
 
     def execute(self, args, unnamed_args):
@@ -46,7 +48,7 @@ class TclCommandSetActive(TclCommand):
         :return:
         """
 
-        obj_name = args['name']
+        obj_name = args["name"]
 
         try:
             self.app.collection.set_active(str(obj_name))

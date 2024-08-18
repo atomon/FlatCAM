@@ -9,9 +9,9 @@ class TclCommandNew(TclCommand):
     """
 
     # array of all command aliases, to be able use  old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['new']
+    aliases = ["new"]
 
-    description = '%s %s' % ("--", "Starts a new project. Clears objects from memory.")
+    description = "%s %s" % ("--", "Starts a new project. Clears objects from memory.")
 
     # dictionary of types from Tcl command, needs to be ordered
     arg_names = collections.OrderedDict()
@@ -24,9 +24,9 @@ class TclCommandNew(TclCommand):
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Starts a new project. Clears objects from memory.",
-        'args': collections.OrderedDict(),
-        'examples': ['new']
+        "main": "Starts a new project. Clears objects from memory.",
+        "args": collections.OrderedDict(),
+        "examples": ["new"],
     }
 
     def execute(self, args, unnamed_args):

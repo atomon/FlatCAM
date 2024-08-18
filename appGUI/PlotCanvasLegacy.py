@@ -27,18 +27,20 @@ import builtins
 
 # Prevent conflict with Qt5 and above.
 from matplotlib import use as mpl_use
+
 mpl_use("Qt5Agg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.lines import Line2D
 from matplotlib.offsetbox import AnchoredText
+
 # from matplotlib.widgets import Cursor
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class CanvasCache(QtCore.QObject):
@@ -78,10 +80,10 @@ class CanvasCache(QtCore.QObject):
         self.axes.set_xticks([])
         self.axes.set_yticks([])
 
-        if self.app.defaults['global_theme'] == 'white':
-            self.axes.set_facecolor('#FFFFFF')
+        if self.app.defaults["global_theme"] == "white":
+            self.axes.set_facecolor("#FFFFFF")
         else:
-            self.axes.set_facecolor('#000000')
+            self.axes.set_facecolor("#000000")
 
         self.canvas = FigureCanvas(self.figure)
 
@@ -146,16 +148,16 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         self.app = app
 
-        if self.app.defaults['global_theme'] == 'white':
-            theme_color = '#FFFFFF'
-            tick_color = '#000000'
-            self.rect_hud_color = '#0000FF10'
-            self.text_hud_color = '#000000'
+        if self.app.defaults["global_theme"] == "white":
+            theme_color = "#FFFFFF"
+            tick_color = "#000000"
+            self.rect_hud_color = "#0000FF10"
+            self.text_hud_color = "#000000"
         else:
-            theme_color = '#000000'
-            tick_color = '#FFFFFF'
-            self.rect_hud_color = '#80808040'
-            self.text_hud_color = '#FFFFFF'
+            theme_color = "#000000"
+            tick_color = "#FFFFFF"
+            self.rect_hud_color = "#80808040"
+            self.text_hud_color = "#FFFFFF"
 
         # workspace lines; I didn't use the rectangle because I didn't want to add another VisPy Node,
         # which might decrease performance
@@ -165,53 +167,49 @@ class PlotCanvasLegacy(QtCore.QObject):
         self.pagesize_dict = {}
         self.pagesize_dict.update(
             {
-                'A0': (841, 1189),
-                'A1': (594, 841),
-                'A2': (420, 594),
-                'A3': (297, 420),
-                'A4': (210, 297),
-                'A5': (148, 210),
-                'A6': (105, 148),
-                'A7': (74, 105),
-                'A8': (52, 74),
-                'A9': (37, 52),
-                'A10': (26, 37),
-
-                'B0': (1000, 1414),
-                'B1': (707, 1000),
-                'B2': (500, 707),
-                'B3': (353, 500),
-                'B4': (250, 353),
-                'B5': (176, 250),
-                'B6': (125, 176),
-                'B7': (88, 125),
-                'B8': (62, 88),
-                'B9': (44, 62),
-                'B10': (31, 44),
-
-                'C0': (917, 1297),
-                'C1': (648, 917),
-                'C2': (458, 648),
-                'C3': (324, 458),
-                'C4': (229, 324),
-                'C5': (162, 229),
-                'C6': (114, 162),
-                'C7': (81, 114),
-                'C8': (57, 81),
-                'C9': (40, 57),
-                'C10': (28, 40),
-
+                "A0": (841, 1189),
+                "A1": (594, 841),
+                "A2": (420, 594),
+                "A3": (297, 420),
+                "A4": (210, 297),
+                "A5": (148, 210),
+                "A6": (105, 148),
+                "A7": (74, 105),
+                "A8": (52, 74),
+                "A9": (37, 52),
+                "A10": (26, 37),
+                "B0": (1000, 1414),
+                "B1": (707, 1000),
+                "B2": (500, 707),
+                "B3": (353, 500),
+                "B4": (250, 353),
+                "B5": (176, 250),
+                "B6": (125, 176),
+                "B7": (88, 125),
+                "B8": (62, 88),
+                "B9": (44, 62),
+                "B10": (31, 44),
+                "C0": (917, 1297),
+                "C1": (648, 917),
+                "C2": (458, 648),
+                "C3": (324, 458),
+                "C4": (229, 324),
+                "C5": (162, 229),
+                "C6": (114, 162),
+                "C7": (81, 114),
+                "C8": (57, 81),
+                "C9": (40, 57),
+                "C10": (28, 40),
                 # American paper sizes
-                'LETTER': (8.5*25.4, 11*25.4),
-                'LEGAL': (8.5*25.4, 14*25.4),
-                'ELEVENSEVENTEEN': (11*25.4, 17*25.4),
-
+                "LETTER": (8.5 * 25.4, 11 * 25.4),
+                "LEGAL": (8.5 * 25.4, 14 * 25.4),
+                "ELEVENSEVENTEEN": (11 * 25.4, 17 * 25.4),
                 # From https://en.wikipedia.org/wiki/Paper_size
-                'JUNIOR_LEGAL': (5*25.4, 8*25.4),
-                'HALF_LETTER': (5.5*25.4, 8*25.4),
-                'GOV_LETTER': (8*25.4, 10.5*25.4),
-                'GOV_LEGAL': (8.5*25.4, 13*25.4),
-                'LEDGER': (17*25.4, 11*25.4),
+                "JUNIOR_LEGAL": (5 * 25.4, 8 * 25.4),
+                "HALF_LETTER": (5.5 * 25.4, 8 * 25.4),
+                "GOV_LETTER": (8 * 25.4, 10.5 * 25.4),
+                "GOV_LEGAL": (8.5 * 25.4, 13 * 25.4),
+                "LEDGER": (17 * 25.4, 11 * 25.4),
             }
         )
 
@@ -231,16 +229,16 @@ class PlotCanvasLegacy(QtCore.QObject):
         # New axes must have a label, otherwise mpl returns an existing one.
         self.axes = self.figure.add_axes([0.05, 0.05, 0.9, 0.9], label="base", alpha=0.0)
         self.axes.set_aspect(1)
-        self.axes.grid(True, color='gray')
+        self.axes.grid(True, color="gray")
         self.h_line = self.axes.axhline(color=(0.70, 0.3, 0.3), linewidth=2)
         self.v_line = self.axes.axvline(color=(0.70, 0.3, 0.3), linewidth=2)
 
-        self.axes.tick_params(axis='x', color=tick_color, labelcolor=tick_color)
-        self.axes.tick_params(axis='y', color=tick_color, labelcolor=tick_color)
-        self.axes.spines['bottom'].set_color(tick_color)
-        self.axes.spines['top'].set_color(tick_color)
-        self.axes.spines['right'].set_color(tick_color)
-        self.axes.spines['left'].set_color(tick_color)
+        self.axes.tick_params(axis="x", color=tick_color, labelcolor=tick_color)
+        self.axes.tick_params(axis="y", color=tick_color, labelcolor=tick_color)
+        self.axes.spines["bottom"].set_color(tick_color)
+        self.axes.spines["top"].set_color(tick_color)
+        self.axes.spines["right"].set_color(tick_color)
+        self.axes.spines["left"].set_color(tick_color)
 
         self.axes.set_facecolor(theme_color)
 
@@ -278,17 +276,17 @@ class PlotCanvasLegacy(QtCore.QObject):
         # ##############################################################################
 
         # Events
-        self.mp = self.graph_event_connect('button_press_event', self.on_mouse_press)
-        self.mr = self.graph_event_connect('button_release_event', self.on_mouse_release)
-        self.mm = self.graph_event_connect('motion_notify_event', self.on_mouse_move)
+        self.mp = self.graph_event_connect("button_press_event", self.on_mouse_press)
+        self.mr = self.graph_event_connect("button_release_event", self.on_mouse_release)
+        self.mm = self.graph_event_connect("motion_notify_event", self.on_mouse_move)
         # self.canvas.connect('configure-event', self.auto_adjust_axes)
-        self.aaa = self.graph_event_connect('resize_event', self.auto_adjust_axes)
+        self.aaa = self.graph_event_connect("resize_event", self.auto_adjust_axes)
         # self.canvas.add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
         # self.canvas.connect("scroll-event", self.on_scroll)
-        self.osc = self.graph_event_connect('scroll_event', self.on_scroll)
+        self.osc = self.graph_event_connect("scroll_event", self.on_scroll)
         # self.graph_event_connect('key_press_event', self.on_key_down)
         # self.graph_event_connect('key_release_event', self.on_key_up)
-        self.odr = self.graph_event_connect('draw_event', self.on_draw)
+        self.odr = self.graph_event_connect("draw_event", self.on_draw)
 
         self.key = None
 
@@ -310,7 +308,7 @@ class PlotCanvasLegacy(QtCore.QObject):
         self.hud_enabled = False
         self.text_hud = self.Thud(plotcanvas=self)
 
-        if self.app.defaults['global_hud'] is True:
+        if self.app.defaults["global_hud"] is True:
             self.on_toggle_hud(state=True, silent=None)
 
         # enable Grid lines
@@ -318,7 +316,7 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         # draw a rectangle made out of 4 lines on the canvas to serve as a hint for the work area
         # all CNC have a limited workspace
-        if self.app.defaults['global_workspace'] is True:
+        if self.app.defaults["global_workspace"] is True:
             self.draw_workspace(workspace_size=self.app.defaults["global_workspaceT"])
 
         # Axis Display
@@ -326,13 +324,15 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         # enable Axis
         self.on_toggle_axis(state=True, silent=True)
-        self.app.ui.axis_status_label.setStyleSheet("""
+        self.app.ui.axis_status_label.setStyleSheet(
+            """
                                                     QLabel
                                                     {
                                                         color: black;
                                                         background-color: orange;
                                                     }
-                                                    """)
+                                                    """
+        )
 
     def on_toggle_axis(self, signal=None, state=None, silent=None):
         if not state:
@@ -340,22 +340,24 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         if state:
             self.axis_enabled = True
-            self.app.defaults['global_axis'] = True
+            self.app.defaults["global_axis"] = True
             if self.h_line not in self.axes.lines and self.v_line not in self.axes.lines:
                 self.h_line = self.axes.axhline(color=(0.70, 0.3, 0.3), linewidth=2)
                 self.v_line = self.axes.axvline(color=(0.70, 0.3, 0.3), linewidth=2)
-                self.app.ui.axis_status_label.setStyleSheet("""
+                self.app.ui.axis_status_label.setStyleSheet(
+                    """
                                                             QLabel
                                                             {
                                                                 color: black;
                                                                 background-color: orange;
                                                             }
-                                                            """)
+                                                            """
+                )
                 if silent is None:
                     self.app.inform[str, bool].emit(_("Axis enabled."), False)
         else:
             self.axis_enabled = False
-            self.app.defaults['global_axis'] = False
+            self.app.defaults["global_axis"] = False
             if self.h_line in self.axes.lines and self.v_line in self.axes.lines:
                 self.axes.lines.remove(self.h_line)
                 self.axes.lines.remove(self.v_line)
@@ -372,21 +374,23 @@ class PlotCanvasLegacy(QtCore.QObject):
         if state:
             self.hud_enabled = True
             self.text_hud.add_artist()
-            self.app.defaults['global_hud'] = True
+            self.app.defaults["global_hud"] = True
 
-            self.app.ui.hud_label.setStyleSheet("""
+            self.app.ui.hud_label.setStyleSheet(
+                """
                                                 QLabel
                                                 {
                                                     color: black;
                                                     background-color: mediumpurple;
                                                 }
-                                                """)
+                                                """
+            )
             if silent is None:
                 self.app.inform[str, bool].emit(_("HUD enabled."), False)
         else:
             self.hud_enabled = False
             self.text_hud.remove_artist()
-            self.app.defaults['global_hud'] = False
+            self.app.defaults["global_hud"] = False
             self.app.ui.hud_label.setStyleSheet("")
             if silent is None:
                 self.app.inform[str, bool].emit(_("HUD disabled."), False)
@@ -400,20 +404,30 @@ class PlotCanvasLegacy(QtCore.QObject):
             super().__init__()
 
             self.p = plotcanvas
-            units = self.p.app.defaults['units']
-            self._text = 'Dx:    %s [%s]\nDy:    %s [%s]\n\nX:      %s [%s]\nY:      %s [%s]' % \
-                         ('0.0000', units, '0.0000', units, '0.0000', units, '0.0000', units)
+            units = self.p.app.defaults["units"]
+            self._text = "Dx:    %s [%s]\nDy:    %s [%s]\n\nX:      %s [%s]\nY:      %s [%s]" % (
+                "0.0000",
+                units,
+                "0.0000",
+                units,
+                "0.0000",
+                units,
+                "0.0000",
+                units,
+            )
 
             # set font size
             qsettings = QtCore.QSettings("Open Source", "FlatCAM")
             if qsettings.contains("hud_font_size"):
                 # I multiply with 2.5 because this seems to be the difference between the value taken by the VisPy (3D)
                 # and Matplotlib (Legacy2D FlatCAM graphic engine)
-                fsize = int(qsettings.value('hud_font_size', type=int) * 2.5)
+                fsize = int(qsettings.value("hud_font_size", type=int) * 2.5)
             else:
                 fsize = 20
 
-            self.hud_holder = AnchoredText(self._text, prop=dict(size=fsize), frameon=True, loc='upper left')
+            self.hud_holder = AnchoredText(
+                self._text, prop=dict(size=fsize), frameon=True, loc="upper left"
+            )
             self.hud_holder.patch.set_boxstyle("round,pad=0.,rounding_size=0.2")
 
             fc_color = self.p.rect_hud_color[:-2]
@@ -424,7 +438,7 @@ class PlotCanvasLegacy(QtCore.QObject):
             self.hud_holder.patch.set_alpha(fc_alpha)
             self.hud_holder.patch.set_edgecolor((0, 0, 0, 0))
 
-            self. hud_holder.txt._text.set_color(color=text_color)
+            self.hud_holder.txt._text.set_color(color=text_color)
             self.text_changed.connect(self.on_text_changed)
 
         @property
@@ -438,7 +452,7 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         def on_text_changed(self, txt):
             try:
-                txt = txt.replace('\t', '    ')
+                txt = txt.replace("\t", "    ")
                 self.hud_holder.txt.set_text(txt)
                 self.p.canvas.draw()
             except Exception:
@@ -456,7 +470,7 @@ class PlotCanvasLegacy(QtCore.QObject):
         state = not self.grid_lines_enabled
 
         if state:
-            self.app.defaults['global_grid_lines'] = True
+            self.app.defaults["global_grid_lines"] = True
             self.grid_lines_enabled = True
             self.axes.grid(True)
             try:
@@ -466,7 +480,7 @@ class PlotCanvasLegacy(QtCore.QObject):
             if silent is None:
                 self.app.inform[str, bool].emit(_("Grid enabled."), False)
         else:
-            self.app.defaults['global_grid_lines'] = False
+            self.app.defaults["global_grid_lines"] = False
             self.grid_lines_enabled = False
             self.axes.grid(False)
             try:
@@ -483,34 +497,41 @@ class PlotCanvasLegacy(QtCore.QObject):
         :return:
         """
         try:
-            if self.app.defaults['units'].upper() == 'MM':
+            if self.app.defaults["units"].upper() == "MM":
                 dims = self.pagesize_dict[workspace_size]
             else:
-                dims = (self.pagesize_dict[workspace_size][0]/25.4, self.pagesize_dict[workspace_size][1]/25.4)
+                dims = (
+                    self.pagesize_dict[workspace_size][0] / 25.4,
+                    self.pagesize_dict[workspace_size][1] / 25.4,
+                )
         except Exception as e:
             log.debug("PlotCanvasLegacy.draw_workspace() --> %s" % str(e))
             return
 
-        if self.app.defaults['global_workspace_orientation'] == 'l':
+        if self.app.defaults["global_workspace_orientation"] == "l":
             dims = (dims[1], dims[0])
 
         xdata = [0, dims[0], dims[0], 0, 0]
         ydata = [0, 0, dims[1], dims[1], 0]
 
         if self.workspace_line not in self.axes.lines:
-            self.workspace_line = Line2D(xdata=xdata, ydata=ydata, linewidth=2, antialiased=True, color='#b34d4d')
+            self.workspace_line = Line2D(
+                xdata=xdata, ydata=ydata, linewidth=2, antialiased=True, color="#b34d4d"
+            )
             self.axes.add_line(self.workspace_line)
             self.canvas.draw()
 
         self.app.ui.wplace_label.set_value(workspace_size[:3])
         self.app.ui.wplace_label.setToolTip(workspace_size)
-        self.fcapp.ui.wplace_label.setStyleSheet("""
+        self.fcapp.ui.wplace_label.setStyleSheet(
+            """
                         QLabel
                         {
                             color: black;
                             background-color: olivedrab;
                         }
-                        """)
+                        """
+        )
 
     def delete_workspace(self):
         try:
@@ -531,17 +552,17 @@ class PlotCanvasLegacy(QtCore.QObject):
         :return: Connection id
         :rtype: int
         """
-        if event_name == 'mouse_move':
-            event_name = 'motion_notify_event'
-        if event_name == 'mouse_press':
-            event_name = 'button_press_event'
-        if event_name == 'mouse_release':
-            event_name = 'button_release_event'
-        if event_name == 'mouse_double_click':
+        if event_name == "mouse_move":
+            event_name = "motion_notify_event"
+        if event_name == "mouse_press":
+            event_name = "button_press_event"
+        if event_name == "mouse_release":
+            event_name = "button_release_event"
+        if event_name == "mouse_double_click":
             return self.double_click.connect(callback)
 
-        if event_name == 'key_press':
-            event_name = 'key_press_event'
+        if event_name == "key_press":
+            event_name = "key_press_event"
 
         return self.canvas.mpl_connect(event_name, callback)
 
@@ -567,15 +588,19 @@ class PlotCanvasLegacy(QtCore.QObject):
         if self.app.defaults["global_cursor_color_enabled"]:
             color = self.app.defaults["global_cursor_color"]
         else:
-            if self.app.defaults['global_theme'] == 'white':
-                color = '#000000'
+            if self.app.defaults["global_theme"] == "white":
+                color = "#000000"
             else:
-                color = '#FFFFFF'
+                color = "#FFFFFF"
 
         if big is True:
             self.big_cursor = True
-            self.ch_line = self.axes.axhline(color=color, linewidth=self.app.defaults["global_cursor_width"])
-            self.cv_line = self.axes.axvline(color=color, linewidth=self.app.defaults["global_cursor_width"])
+            self.ch_line = self.axes.axhline(
+                color=color, linewidth=self.app.defaults["global_cursor_width"]
+            )
+            self.cv_line = self.axes.axvline(
+                color=color, linewidth=self.app.defaults["global_cursor_width"]
+            )
             self.big_cursor_isdisabled = False
         else:
             self.big_cursor = False
@@ -600,10 +625,10 @@ class PlotCanvasLegacy(QtCore.QObject):
             if color:
                 color = color
             else:
-                if self.app.defaults['global_theme'] == 'white':
-                    color = '#000000'
+                if self.app.defaults["global_theme"] == "white":
+                    color = "#000000"
                 else:
-                    color = '#FFFFFF'
+                    color = "#FFFFFF"
 
             if self.big_cursor is False:
                 try:
@@ -613,8 +638,15 @@ class PlotCanvasLegacy(QtCore.QObject):
                     # The size of the cursor is multiplied by 1.65 because that value made the cursor similar with the
                     # one in the OpenGL(3D) graphic engine
                     pointer_size = int(float(self.app.defaults["global_cursor_size"]) * 1.65)
-                    elements = self.axes.plot(x, y, '+', color=color, ms=pointer_size,
-                                              mew=self.app.defaults["global_cursor_width"], animated=True)
+                    elements = self.axes.plot(
+                        x,
+                        y,
+                        "+",
+                        color=color,
+                        ms=pointer_size,
+                        mew=self.app.defaults["global_cursor_width"],
+                        animated=True,
+                    )
                     for el in elements:
                         self.axes.draw_artist(el)
                 except Exception as e:
@@ -648,16 +680,22 @@ class PlotCanvasLegacy(QtCore.QObject):
                 if self.app.defaults["global_cursor_color_enabled"]:
                     color = self.app.defaults["global_cursor_color"]
                 else:
-                    if self.app.defaults['global_theme'] == 'white':
-                        color = '#000000'
+                    if self.app.defaults["global_theme"] == "white":
+                        color = "#000000"
                     else:
-                        color = '#FFFFFF'
+                        color = "#FFFFFF"
 
-                self.ch_line = self.axes.axhline(color=color, linewidth=self.app.defaults["global_cursor_width"])
-                self.cv_line = self.axes.axvline(color=color, linewidth=self.app.defaults["global_cursor_width"])
+                self.ch_line = self.axes.axhline(
+                    color=color, linewidth=self.app.defaults["global_cursor_width"]
+                )
+                self.cv_line = self.axes.axvline(
+                    color=color, linewidth=self.app.defaults["global_cursor_width"]
+                )
                 self.big_cursor_isdisabled = False
             if self.app.defaults["global_cursor_color_enabled"] is True:
-                self.draw_cursor(x_pos=self.mouse[0], y_pos=self.mouse[1], color=self.app.cursor_color_3D)
+                self.draw_cursor(
+                    x_pos=self.mouse[0], y_pos=self.mouse[1], color=self.app.cursor_color_3D
+                )
             else:
                 self.draw_cursor(x_pos=self.mouse[0], y_pos=self.mouse[1])
         else:
@@ -678,7 +716,7 @@ class PlotCanvasLegacy(QtCore.QObject):
         :param event:
         :return:
         """
-        log.debug('on_key_down(): ' + str(event.key))
+        log.debug("on_key_down(): " + str(event.key))
         self.key = event.key
 
     def on_key_up(self, event):
@@ -784,7 +822,7 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         # Adjust axes
         for ax in self.figure.get_axes():
-            if ax._label != 'base':
+            if ax._label != "base":
                 ax.set_frame_on(False)  # No frame
                 ax.set_xticks([])  # No tick
                 ax.set_yticks([])  # No ticks
@@ -940,23 +978,23 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         if self.key is None:
 
-            if event.button == 'up':
+            if event.button == "up":
                 self.zoom(1 / 1.5, self.mouse)
             else:
                 self.zoom(1.5, self.mouse)
             return
 
-        if self.key == 'shift':
+        if self.key == "shift":
 
-            if event.button == 'up':
+            if event.button == "up":
                 self.pan(0.3, 0)
             else:
                 self.pan(-0.3, 0)
             return
 
-        if self.key == 'control':
+        if self.key == "control":
 
-            if event.button == 'up':
+            if event.button == "up":
                 self.pan(0, 0.3)
             else:
                 self.pan(0, -0.3)
@@ -968,7 +1006,7 @@ class PlotCanvasLegacy(QtCore.QObject):
         self.mouse_press_pos = (event.x, event.y)
 
         # Check for middle mouse button press
-        if self.app.defaults["global_pan_button"] == '2':
+        if self.app.defaults["global_pan_button"] == "2":
             pan_button = 3  # right button for Matplotlib
         else:
             pan_button = 2  # middle button for Matplotlib
@@ -977,8 +1015,13 @@ class PlotCanvasLegacy(QtCore.QObject):
             # Prepare axes for pan (using 'matplotlib' pan function)
             self.pan_axes = []
             for a in self.figure.get_axes():
-                if (event.x is not None and event.y is not None and a.in_axes(event) and
-                        a.get_navigate() and a.can_pan()):
+                if (
+                    event.x is not None
+                    and event.y is not None
+                    and a.in_axes(event)
+                    and a.get_navigate()
+                    and a.can_pan()
+                ):
                     a.start_pan(event.x, event.y, 1)
                     self.pan_axes.append(a)
 
@@ -999,7 +1042,7 @@ class PlotCanvasLegacy(QtCore.QObject):
 
         # Check for middle mouse button release to complete pan procedure
         # Check for middle mouse button press
-        if self.app.defaults["global_pan_button"] == '2':
+        if self.app.defaults["global_pan_button"] == "2":
             pan_button = 3  # right button for Matplotlib
         else:
             pan_button = 2  # middle button for Matplotlib
@@ -1013,7 +1056,9 @@ class PlotCanvasLegacy(QtCore.QObject):
 
             # And update the cursor
             if self.app.defaults["global_cursor_color_enabled"] is True:
-                self.draw_cursor(x_pos=self.mouse[0], y_pos=self.mouse[1], color=self.app.cursor_color_3D)
+                self.draw_cursor(
+                    x_pos=self.mouse[0], y_pos=self.mouse[1], color=self.app.cursor_color_3D
+                )
             else:
                 self.draw_cursor(x_pos=self.mouse[0], y_pos=self.mouse[1])
 
@@ -1115,8 +1160,9 @@ class PlotCanvasLegacy(QtCore.QObject):
         if self.app.grid_status():
             if self.app.defaults["global_gridx"] != 0:
                 try:
-                    snap_x_ = round(x / float(self.app.defaults["global_gridx"])) * \
-                              float(self.app.defaults["global_gridx"])
+                    snap_x_ = round(x / float(self.app.defaults["global_gridx"])) * float(
+                        self.app.defaults["global_gridx"]
+                    )
                 except TypeError:
                     snap_x_ = x
             else:
@@ -1127,8 +1173,9 @@ class PlotCanvasLegacy(QtCore.QObject):
             if self.app.ui.grid_gap_link_cb.isChecked():
                 if self.app.defaults["global_gridx"] != 0:
                     try:
-                        snap_y_ = round(y / float(self.app.defaults["global_gridx"])) * \
-                                  float(self.app.defaults["global_gridx"])
+                        snap_y_ = round(y / float(self.app.defaults["global_gridx"])) * float(
+                            self.app.defaults["global_gridx"]
+                        )
                     except TypeError:
                         snap_y_ = y
                 else:
@@ -1136,8 +1183,9 @@ class PlotCanvasLegacy(QtCore.QObject):
             else:
                 if self.app.defaults["global_gridy"] != 0:
                     try:
-                        snap_y_ = round(y / float(self.app.defaults["global_gridy"])) * \
-                                  float(self.app.defaults["global_gridy"])
+                        snap_y_ = round(y / float(self.app.defaults["global_gridy"])) * float(
+                            self.app.defaults["global_gridy"]
+                        )
                     except TypeError:
                         snap_y_ = y
                 else:
@@ -1186,6 +1234,7 @@ class ShapeCollectionLegacy:
     hold the collection of shapes into a dict self._shapes.
     This handles the shapes redraw on canvas.
     """
+
     def __init__(self, obj, app, name=None, annotation_job=None, linewidth=1):
         """
 
@@ -1219,7 +1268,7 @@ class ShapeCollectionLegacy:
         self._linewidth = linewidth
 
         if name is None:
-            axes_name = self.obj.options['name']
+            axes_name = self.obj.options["name"]
         else:
             axes_name = name
 
@@ -1227,9 +1276,22 @@ class ShapeCollectionLegacy:
         if axes_name not in self.app.plotcanvas.figure.axes:
             self.axes = self.app.plotcanvas.new_axes(axes_name)
 
-    def add(self, shape=None, color=None, face_color=None, alpha=None, visible=True,
-            update=False, layer=1, tolerance=0.01, obj=None, gcode_parsed=None, tool_tolerance=None, tooldia=None,
-            linewidth=None):
+    def add(
+        self,
+        shape=None,
+        color=None,
+        face_color=None,
+        alpha=None,
+        visible=True,
+        update=False,
+        layer=1,
+        tolerance=0.01,
+        obj=None,
+        gcode_parsed=None,
+        tool_tolerance=None,
+        tooldia=None,
+        linewidth=None,
+    ):
         """
         This function will add shapes to the shape collection
 
@@ -1285,32 +1347,32 @@ class ShapeCollectionLegacy:
         try:
             for sh in shape:
                 self.shape_id += 1
-                self.shape_dict.update({
-                    'color': self._color,
-                    'face_color': self._face_color,
-                    'linewidth': line_width,
-                    'alpha': self._alpha,
-                    'visible': self._visible,
-                    'shape': sh
-                })
+                self.shape_dict.update(
+                    {
+                        "color": self._color,
+                        "face_color": self._face_color,
+                        "linewidth": line_width,
+                        "alpha": self._alpha,
+                        "visible": self._visible,
+                        "shape": sh,
+                    }
+                )
 
-                self._shapes.update({
-                    self.shape_id: deepcopy(self.shape_dict)
-                })
+                self._shapes.update({self.shape_id: deepcopy(self.shape_dict)})
         except TypeError:
             self.shape_id += 1
-            self.shape_dict.update({
-                'color': self._color,
-                'face_color': self._face_color,
-                'linewidth': line_width,
-                'alpha': self._alpha,
-                'visible': self._visible,
-                'shape': shape
-            })
+            self.shape_dict.update(
+                {
+                    "color": self._color,
+                    "face_color": self._face_color,
+                    "linewidth": line_width,
+                    "alpha": self._alpha,
+                    "visible": self._visible,
+                    "shape": shape,
+                }
+            )
 
-            self._shapes.update({
-                self.shape_id: deepcopy(self.shape_dict)
-            })
+            self._shapes.update({self.shape_id: deepcopy(self.shape_dict)})
 
         return self.shape_id
 
@@ -1354,7 +1416,7 @@ class ShapeCollectionLegacy:
         try:
             obj_type = self.obj.kind
         except AttributeError:
-            obj_type = 'utility'
+            obj_type = "utility"
 
         # if we don't use this then when adding each new shape, the old ones will be added again, too
         # if obj_type == 'utility':
@@ -1362,168 +1424,253 @@ class ShapeCollectionLegacy:
         self.axes.patches.clear()
 
         for element in local_shapes:
-            if local_shapes[element]['visible'] is True:
-                if obj_type == 'excellon':
+            if local_shapes[element]["visible"] is True:
+                if obj_type == "excellon":
                     # Plot excellon (All polygons?)
-                    if self.obj.options["solid"] and isinstance(local_shapes[element]['shape'], Polygon):
+                    if self.obj.options["solid"] and isinstance(
+                        local_shapes[element]["shape"], Polygon
+                    ):
                         try:
-                            patch = PolygonPatch(local_shapes[element]['shape'],
-                                                 facecolor=local_shapes[element]['face_color'],
-                                                 edgecolor=local_shapes[element]['color'],
-                                                 alpha=local_shapes[element]['alpha'],
-                                                 zorder=3,
-                                                 linewidth=local_shapes[element]['linewidth']
-                                                 )
+                            patch = PolygonPatch(
+                                local_shapes[element]["shape"],
+                                facecolor=local_shapes[element]["face_color"],
+                                edgecolor=local_shapes[element]["color"],
+                                alpha=local_shapes[element]["alpha"],
+                                zorder=3,
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
                             self.axes.add_patch(patch)
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() excellon poly --> %s" % str(e))
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() excellon poly --> %s" % str(e)
+                            )
                     else:
                         try:
-                            if isinstance(local_shapes[element]['shape'], Polygon):
-                                x, y = local_shapes[element]['shape'].exterior.coords.xy
-                                self.axes.plot(x, y, 'r-', linewidth=local_shapes[element]['linewidth'])
-                                for ints in local_shapes[element]['shape'].interiors:
+                            if isinstance(local_shapes[element]["shape"], Polygon):
+                                x, y = local_shapes[element]["shape"].exterior.coords.xy
+                                self.axes.plot(
+                                    x, y, "r-", linewidth=local_shapes[element]["linewidth"]
+                                )
+                                for ints in local_shapes[element]["shape"].interiors:
                                     x, y = ints.coords.xy
-                                    self.axes.plot(x, y, 'o-', linewidth=local_shapes[element]['linewidth'])
-                            elif isinstance(local_shapes[element]['shape'], LinearRing):
-                                x, y = local_shapes[element]['shape'].coords.xy
-                                self.axes.plot(x, y, 'r-', linewidth=local_shapes[element]['linewidth'])
+                                    self.axes.plot(
+                                        x, y, "o-", linewidth=local_shapes[element]["linewidth"]
+                                    )
+                            elif isinstance(local_shapes[element]["shape"], LinearRing):
+                                x, y = local_shapes[element]["shape"].coords.xy
+                                self.axes.plot(
+                                    x, y, "r-", linewidth=local_shapes[element]["linewidth"]
+                                )
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() excellon no poly --> %s" % str(e))
-                elif obj_type == 'geometry':
-                    if type(local_shapes[element]['shape']) == Polygon:
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() excellon no poly --> %s" % str(e)
+                            )
+                elif obj_type == "geometry":
+                    if type(local_shapes[element]["shape"]) == Polygon:
                         try:
-                            x, y = local_shapes[element]['shape'].exterior.coords.xy
-                            self.axes.plot(x, y, local_shapes[element]['color'],
-                                           linestyle='-',
-                                           linewidth=local_shapes[element]['linewidth'])
-                            for ints in local_shapes[element]['shape'].interiors:
+                            x, y = local_shapes[element]["shape"].exterior.coords.xy
+                            self.axes.plot(
+                                x,
+                                y,
+                                local_shapes[element]["color"],
+                                linestyle="-",
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
+                            for ints in local_shapes[element]["shape"].interiors:
                                 x, y = ints.coords.xy
-                                self.axes.plot(x, y, local_shapes[element]['color'],
-                                               linestyle='-',
-                                               linewidth=local_shapes[element]['linewidth'])
+                                self.axes.plot(
+                                    x,
+                                    y,
+                                    local_shapes[element]["color"],
+                                    linestyle="-",
+                                    linewidth=local_shapes[element]["linewidth"],
+                                )
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() geometry poly --> %s" % str(e))
-                    elif type(local_shapes[element]['shape']) == LineString or \
-                            type(local_shapes[element]['shape']) == LinearRing:
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() geometry poly --> %s" % str(e)
+                            )
+                    elif (
+                        type(local_shapes[element]["shape"]) == LineString
+                        or type(local_shapes[element]["shape"]) == LinearRing
+                    ):
 
                         try:
-                            x, y = local_shapes[element]['shape'].coords.xy
-                            self.axes.plot(x, y, local_shapes[element]['color'],
-                                           linestyle='-',
-                                           linewidth=local_shapes[element]['linewidth'])
+                            x, y = local_shapes[element]["shape"].coords.xy
+                            self.axes.plot(
+                                x,
+                                y,
+                                local_shapes[element]["color"],
+                                linestyle="-",
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() geometry no poly --> %s" % str(e))
-                elif obj_type == 'gerber':
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() geometry no poly --> %s" % str(e)
+                            )
+                elif obj_type == "gerber":
                     if self.obj.options["multicolored"]:
-                        linespec = '-'
+                        linespec = "-"
                     else:
-                        linespec = 'k-'
+                        linespec = "k-"
 
                     if self.obj.options["solid"]:
                         if update_colors:
                             gerber_fill_color = update_colors[0]
                             gerber_outline_color = update_colors[1]
                         else:
-                            gerber_fill_color = local_shapes[element]['face_color']
-                            gerber_outline_color = local_shapes[element]['color']
+                            gerber_fill_color = local_shapes[element]["face_color"]
+                            gerber_outline_color = local_shapes[element]["color"]
 
                         try:
-                            patch = PolygonPatch(local_shapes[element]['shape'],
-                                                 facecolor=gerber_fill_color,
-                                                 edgecolor=gerber_outline_color,
-                                                 alpha=local_shapes[element]['alpha'],
-                                                 zorder=2,
-                                                 linewidth=local_shapes[element]['linewidth'])
+                            patch = PolygonPatch(
+                                local_shapes[element]["shape"],
+                                facecolor=gerber_fill_color,
+                                edgecolor=gerber_outline_color,
+                                alpha=local_shapes[element]["alpha"],
+                                zorder=2,
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
                             self.axes.add_patch(patch)
                         except AssertionError:
                             log.warning("A geometry component was not a polygon:")
                             log.warning(str(element))
                         except Exception as e:
                             log.debug(
-                                "PlotCanvasLegacy.ShepeCollectionLegacy.redraw() gerber 'solid' --> %s" % str(e))
+                                "PlotCanvasLegacy.ShepeCollectionLegacy.redraw() gerber 'solid' --> %s"
+                                % str(e)
+                            )
                     else:
                         try:
-                            x, y = local_shapes[element]['shape'].exterior.xy
-                            self.axes.plot(x, y, linespec, linewidth=local_shapes[element]['linewidth'])
-                            for ints in local_shapes[element]['shape'].interiors:
+                            x, y = local_shapes[element]["shape"].exterior.xy
+                            self.axes.plot(
+                                x, y, linespec, linewidth=local_shapes[element]["linewidth"]
+                            )
+                            for ints in local_shapes[element]["shape"].interiors:
                                 x, y = ints.coords.xy
-                                self.axes.plot(x, y, linespec, linewidth=local_shapes[element]['linewidth'])
+                                self.axes.plot(
+                                    x, y, linespec, linewidth=local_shapes[element]["linewidth"]
+                                )
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() gerber no 'solid' --> %s" % str(e))
-                elif obj_type == 'cncjob':
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() gerber no 'solid' --> %s" % str(e)
+                            )
+                elif obj_type == "cncjob":
 
-                    if local_shapes[element]['face_color'] is None:
+                    if local_shapes[element]["face_color"] is None:
                         try:
-                            linespec = '--'
-                            linecolor = local_shapes[element]['color']
+                            linespec = "--"
+                            linecolor = local_shapes[element]["color"]
                             # if geo['kind'][0] == 'C':
                             #     linespec = 'k-'
-                            x, y = local_shapes[element]['shape'].coords.xy
-                            self.axes.plot(x, y, linespec, color=linecolor,
-                                           linewidth=local_shapes[element]['linewidth'])
+                            x, y = local_shapes[element]["shape"].coords.xy
+                            self.axes.plot(
+                                x,
+                                y,
+                                linespec,
+                                color=linecolor,
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() cncjob with face_color --> %s" % str(e))
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() cncjob with face_color --> %s"
+                                % str(e)
+                            )
                     else:
                         try:
                             path_num += 1
                             if self.obj.ui.annotation_cb.get_value():
-                                if isinstance(local_shapes[element]['shape'], Polygon):
+                                if isinstance(local_shapes[element]["shape"], Polygon):
                                     self.axes.annotate(
                                         str(path_num),
-                                        xy=local_shapes[element]['shape'].exterior.coords[0],
-                                        xycoords='data', fontsize=20)
+                                        xy=local_shapes[element]["shape"].exterior.coords[0],
+                                        xycoords="data",
+                                        fontsize=20,
+                                    )
                                 else:
                                     self.axes.annotate(
                                         str(path_num),
-                                        xy=local_shapes[element]['shape'].coords[0],
-                                        xycoords='data', fontsize=20)
+                                        xy=local_shapes[element]["shape"].coords[0],
+                                        xycoords="data",
+                                        fontsize=20,
+                                    )
 
-                            patch = PolygonPatch(local_shapes[element]['shape'],
-                                                 facecolor=local_shapes[element]['face_color'],
-                                                 edgecolor=local_shapes[element]['color'],
-                                                 alpha=local_shapes[element]['alpha'], zorder=2,
-                                                 linewidth=local_shapes[element]['linewidth'])
+                            patch = PolygonPatch(
+                                local_shapes[element]["shape"],
+                                facecolor=local_shapes[element]["face_color"],
+                                edgecolor=local_shapes[element]["color"],
+                                alpha=local_shapes[element]["alpha"],
+                                zorder=2,
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
                             self.axes.add_patch(patch)
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() cncjob no face_color --> %s" % str(e))
-                elif obj_type == 'utility':
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() cncjob no face_color --> %s"
+                                % str(e)
+                            )
+                elif obj_type == "utility":
                     # not a FlatCAM object, must be utility
-                    if local_shapes[element]['face_color']:
+                    if local_shapes[element]["face_color"]:
                         try:
-                            patch = PolygonPatch(local_shapes[element]['shape'],
-                                                 facecolor=local_shapes[element]['face_color'],
-                                                 edgecolor=local_shapes[element]['color'],
-                                                 alpha=local_shapes[element]['alpha'],
-                                                 zorder=2,
-                                                 linewidth=local_shapes[element]['linewidth'])
+                            patch = PolygonPatch(
+                                local_shapes[element]["shape"],
+                                facecolor=local_shapes[element]["face_color"],
+                                edgecolor=local_shapes[element]["color"],
+                                alpha=local_shapes[element]["alpha"],
+                                zorder=2,
+                                linewidth=local_shapes[element]["linewidth"],
+                            )
 
                             self.axes.add_patch(patch)
                         except Exception as e:
-                            log.debug("ShapeCollectionLegacy.redraw() utility poly with face_color --> %s" % str(e))
+                            log.debug(
+                                "ShapeCollectionLegacy.redraw() utility poly with face_color --> %s"
+                                % str(e)
+                            )
                     else:
-                        if isinstance(local_shapes[element]['shape'], Polygon):
+                        if isinstance(local_shapes[element]["shape"], Polygon):
                             try:
-                                ext_shape = local_shapes[element]['shape'].exterior
+                                ext_shape = local_shapes[element]["shape"].exterior
                                 if ext_shape is not None:
                                     x, y = ext_shape.xy
-                                    self.axes.plot(x, y, local_shapes[element]['color'], linestyle='-',
-                                                   linewidth=local_shapes[element]['linewidth'])
-                                for ints in local_shapes[element]['shape'].interiors:
+                                    self.axes.plot(
+                                        x,
+                                        y,
+                                        local_shapes[element]["color"],
+                                        linestyle="-",
+                                        linewidth=local_shapes[element]["linewidth"],
+                                    )
+                                for ints in local_shapes[element]["shape"].interiors:
                                     if ints is not None:
                                         x, y = ints.coords.xy
-                                        self.axes.plot(x, y, local_shapes[element]['color'], linestyle='-',
-                                                       linewidth=local_shapes[element]['linewidth'])
+                                        self.axes.plot(
+                                            x,
+                                            y,
+                                            local_shapes[element]["color"],
+                                            linestyle="-",
+                                            linewidth=local_shapes[element]["linewidth"],
+                                        )
                             except Exception as e:
-                                log.debug("ShapeCollectionLegacy.redraw() utility poly no face_color --> %s" % str(e))
+                                log.debug(
+                                    "ShapeCollectionLegacy.redraw() utility poly no face_color --> %s"
+                                    % str(e)
+                                )
                         else:
                             try:
-                                if local_shapes[element]['shape'] is not None:
-                                    x, y = local_shapes[element]['shape'].coords.xy
-                                    self.axes.plot(x, y, local_shapes[element]['color'], linestyle='-',
-                                                   linewidth=local_shapes[element]['linewidth'])
+                                if local_shapes[element]["shape"] is not None:
+                                    x, y = local_shapes[element]["shape"].coords.xy
+                                    self.axes.plot(
+                                        x,
+                                        y,
+                                        local_shapes[element]["color"],
+                                        linestyle="-",
+                                        linewidth=local_shapes[element]["linewidth"],
+                                    )
                             except Exception as e:
-                                log.debug("ShapeCollectionLegacy.redraw() utility lines no face_color --> %s" % str(e))
+                                log.debug(
+                                    "ShapeCollectionLegacy.redraw() utility lines no face_color --> %s"
+                                    % str(e)
+                                )
         self.app.plotcanvas.auto_adjust_axes()
 
     def set(self, text, pos, visible=True, font_size=16, color=None):
@@ -1545,13 +1692,20 @@ class ShapeCollectionLegacy:
             return
 
         if len(text) != len(pos):
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Could not annotate due of a difference between the number "
-                                                        "of text elements and the number of text positions."))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s"
+                % _(
+                    "Could not annotate due of a difference between the number "
+                    "of text elements and the number of text positions."
+                )
+            )
             return
 
         for idx in range(len(text)):
             try:
-                self.axes.annotate(text[idx], xy=pos[idx], xycoords='data', fontsize=font_size, color=color)
+                self.axes.annotate(
+                    text[idx], xy=pos[idx], xycoords="data", fontsize=font_size, color=color
+                )
             except Exception as e:
                 log.debug("ShapeCollectionLegacy.set() --> %s" % str(e))
 
@@ -1575,10 +1729,10 @@ class ShapeCollectionLegacy:
         if indexes:
             for i in indexes:
                 if i in self._shapes:
-                    self._shapes[i]['visible'] = state
+                    self._shapes[i]["visible"] = state
         else:
             for i in self._shapes:
-                self._shapes[i]['visible'] = state
+                self._shapes[i]["visible"] = state
 
         self.redraw()
 
@@ -1595,6 +1749,7 @@ class ShapeCollectionLegacy:
             if self._visible is False:
                 self.redraw()
         self._visible = value
+
 
 # class MplCursor(Cursor):
 #     """

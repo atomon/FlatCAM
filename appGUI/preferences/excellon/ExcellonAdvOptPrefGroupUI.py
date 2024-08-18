@@ -1,19 +1,25 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QSettings
 
-from appGUI.GUIElements import FCDoubleSpinner, RadioSet, FCCheckBox, NumericalEvalTupleEntry, NumericalEvalEntry
+from appGUI.GUIElements import (
+    FCDoubleSpinner,
+    RadioSet,
+    FCCheckBox,
+    NumericalEvalTupleEntry,
+    NumericalEvalEntry,
+)
 from appGUI.preferences.OptionsGroupUI import OptionsGroupUI
 import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 settings = QSettings("Open Source", "FlatCAM")
 if settings.contains("machinist"):
-    machinist_setting = settings.value('machinist', type=int)
+    machinist_setting = settings.value("machinist", type=int)
 else:
     machinist_setting = 0
 
@@ -31,11 +37,13 @@ class ExcellonAdvOptPrefGroupUI(OptionsGroupUI):
         # ## ADVANCED OPTIONS ###
         # #######################
 
-        self.exc_label = QtWidgets.QLabel('<b>%s:</b>' % _('Advanced Options'))
+        self.exc_label = QtWidgets.QLabel("<b>%s:</b>" % _("Advanced Options"))
         self.exc_label.setToolTip(
-            _("A list of advanced parameters.\n"
-              "Those parameters are available only for\n"
-              "Advanced App. Level.")
+            _(
+                "A list of advanced parameters.\n"
+                "Those parameters are available only for\n"
+                "Advanced App. Level."
+            )
         )
         self.layout.addWidget(self.exc_label)
 
@@ -45,17 +53,17 @@ class ExcellonAdvOptPrefGroupUI(OptionsGroupUI):
         self.layout.addLayout(grid0)
 
         # Table Visibility CB
-        self.table_visibility_cb = FCCheckBox(label=_('Table Show/Hide'))
-        self.table_visibility_cb.setToolTip(
-            _("Toggle the display of the Tools Table.")
-        )
+        self.table_visibility_cb = FCCheckBox(label=_("Table Show/Hide"))
+        self.table_visibility_cb.setToolTip(_("Toggle the display of the Tools Table."))
         grid0.addWidget(self.table_visibility_cb, 0, 0, 1, 2)
 
         # Auto Load Tools from DB
-        self.autoload_db_cb = FCCheckBox('%s' % _("Auto load from DB"))
+        self.autoload_db_cb = FCCheckBox("%s" % _("Auto load from DB"))
         self.autoload_db_cb.setToolTip(
-            _("Automatic replacement of the tools from related application tools\n"
-              "with tools from DB that have a close diameter value.")
+            _(
+                "Automatic replacement of the tools from related application tools\n"
+                "with tools from DB that have a close diameter value."
+            )
         )
         grid0.addWidget(self.autoload_db_cb, 1, 0, 1, 2)
 

@@ -14,8 +14,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -49,15 +49,15 @@ class AppTool(QtWidgets.QWidget):
         # 'pos' is the menu where the Action has to be installed
         # if no 'pos' kwarg is provided then by default our Action will be installed in the menutool
         # as it previously was
-        if 'pos' in kwargs:
-            pos = kwargs['pos']
+        if "pos" in kwargs:
+            pos = kwargs["pos"]
         else:
             pos = self.app.ui.menutool
 
         # 'before' is the Action in the menu stated by 'pos' kwarg, before which we want our Action to be installed
         # if 'before' kwarg is not provided, by default our Action will be added in the last place.
-        if 'before' in kwargs:
-            before = (kwargs['before'])
+        if "before" in kwargs:
+            before = kwargs["before"]
 
         # create the new Action
         self.menuAction = QtWidgets.QAction(self)
@@ -69,7 +69,7 @@ class AppTool(QtWidgets.QWidget):
         if shortcut is None:
             self.menuAction.setText(self.toolName)
         else:
-            self.menuAction.setText(self.toolName + '\t%s' % shortcut)
+            self.menuAction.setText(self.toolName + "\t%s" % shortcut)
 
         # add a ToolTip to the new Action
         # self.menuAction.setToolTip(self.toolTip) # currently not available
@@ -110,23 +110,23 @@ class AppTool(QtWidgets.QWidget):
         :return:
         """
 
-        if 'shapes_storage' in kwargs:
-            s_storage = kwargs['shapes_storage']
+        if "shapes_storage" in kwargs:
+            s_storage = kwargs["shapes_storage"]
         else:
             s_storage = self.app.tool_shapes
 
-        if 'color' in kwargs:
-            color = kwargs['color']
+        if "color" in kwargs:
+            color = kwargs["color"]
         else:
-            color = self.app.defaults['global_sel_line']
+            color = self.app.defaults["global_sel_line"]
 
-        if 'face_color' in kwargs:
-            face_color = kwargs['face_color']
+        if "face_color" in kwargs:
+            face_color = kwargs["face_color"]
         else:
-            face_color = self.app.defaults['global_sel_fill']
+            face_color = self.app.defaults["global_sel_fill"]
 
-        if 'face_alpha' in kwargs:
-            face_alpha = kwargs['face_alpha']
+        if "face_alpha" in kwargs:
+            face_alpha = kwargs["face_alpha"]
         else:
             face_alpha = 0.3
 
@@ -144,7 +144,9 @@ class AppTool(QtWidgets.QWidget):
 
         color_t = face_color[:-2] + str(hex(int(face_alpha * 255)))[2:]
 
-        s_storage.add(sel_rect, color=color, face_color=color_t, update=True, layer=0, tolerance=None)
+        s_storage.add(
+            sel_rect, color=color, face_color=color_t, update=True, layer=0, tolerance=None
+        )
         if self.app.is_legacy is True:
             s_storage.redraw()
 
@@ -156,23 +158,23 @@ class AppTool(QtWidgets.QWidget):
         :return:
         """
 
-        if 'shapes_storage' in kwargs:
-            s_storage = kwargs['shapes_storage']
+        if "shapes_storage" in kwargs:
+            s_storage = kwargs["shapes_storage"]
         else:
             s_storage = self.app.tool_shapes
 
-        if 'color' in kwargs:
-            color = kwargs['color']
+        if "color" in kwargs:
+            color = kwargs["color"]
         else:
-            color = self.app.defaults['global_sel_line']
+            color = self.app.defaults["global_sel_line"]
 
-        if 'face_color' in kwargs:
-            face_color = kwargs['face_color']
+        if "face_color" in kwargs:
+            face_color = kwargs["face_color"]
         else:
-            face_color = self.app.defaults['global_sel_fill']
+            face_color = self.app.defaults["global_sel_fill"]
 
-        if 'face_alpha' in kwargs:
-            face_alpha = kwargs['face_alpha']
+        if "face_alpha" in kwargs:
+            face_alpha = kwargs["face_alpha"]
         else:
             face_alpha = 0.3
 
@@ -186,7 +188,9 @@ class AppTool(QtWidgets.QWidget):
 
         color_t = face_color[:-2] + str(hex(int(face_alpha * 255)))[2:]
 
-        s_storage.add(sel_rect, color=color, face_color=color_t, update=True, layer=0, tolerance=None)
+        s_storage.add(
+            sel_rect, color=color, face_color=color_t, update=True, layer=0, tolerance=None
+        )
         if self.app.is_legacy is True:
             s_storage.redraw()
 
@@ -197,8 +201,8 @@ class AppTool(QtWidgets.QWidget):
         :return:
         """
 
-        if 'shapes_storage' in kwargs:
-            s_storage = kwargs['shapes_storage']
+        if "shapes_storage" in kwargs:
+            s_storage = kwargs["shapes_storage"]
         else:
             s_storage = self.app.tool_shapes
 
@@ -214,23 +218,23 @@ class AppTool(QtWidgets.QWidget):
         :return:
         """
 
-        if 'shapes_storage' in kwargs:
-            s_storage = kwargs['shapes_storage']
+        if "shapes_storage" in kwargs:
+            s_storage = kwargs["shapes_storage"]
         else:
             s_storage = self.app.move_tool.sel_shapes
 
-        if 'color' in kwargs:
-            color = kwargs['color']
+        if "color" in kwargs:
+            color = kwargs["color"]
         else:
-            color = self.app.defaults['global_sel_line']
+            color = self.app.defaults["global_sel_line"]
 
-        if 'face_color' in kwargs:
-            face_color = kwargs['face_color']
+        if "face_color" in kwargs:
+            face_color = kwargs["face_color"]
         else:
-            face_color = self.app.defaults['global_sel_fill']
+            face_color = self.app.defaults["global_sel_fill"]
 
-        if 'face_alpha' in kwargs:
-            face_alpha = kwargs['face_alpha']
+        if "face_alpha" in kwargs:
+            face_alpha = kwargs["face_alpha"]
         else:
             face_alpha = 0.3
 
@@ -253,9 +257,13 @@ class AppTool(QtWidgets.QWidget):
         color_t_error = "#00000000"
 
         if geo.is_valid and not geo.is_empty:
-            s_storage.add(geo, color=color, face_color=color_t, update=True, layer=0, tolerance=None)
+            s_storage.add(
+                geo, color=color, face_color=color_t, update=True, layer=0, tolerance=None
+            )
         elif not geo.is_valid:
-            s_storage.add(geo, color="red", face_color=color_t_error, update=True, layer=0, tolerance=None)
+            s_storage.add(
+                geo, color="red", face_color=color_t_error, update=True, layer=0, tolerance=None
+            )
 
         if self.app.is_legacy is True:
             s_storage.redraw()
@@ -267,8 +275,8 @@ class AppTool(QtWidgets.QWidget):
         :return:
         """
 
-        if 'shapes_storage' in kwargs:
-            s_storage = kwargs['shapes_storage']
+        if "shapes_storage" in kwargs:
+            s_storage = kwargs["shapes_storage"]
         else:
             s_storage = self.app.move_tool.sel_shapes
 
@@ -277,20 +285,27 @@ class AppTool(QtWidgets.QWidget):
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def sizeHint(self):
         """

@@ -7,15 +7,22 @@
 
 from PyQt5 import QtWidgets, QtGui
 from appTool import AppTool
-from appGUI.GUIElements import FCSpinner, FCDoubleSpinner, NumericalEvalEntry, FCLabel, RadioSet, FCButton
+from appGUI.GUIElements import (
+    FCSpinner,
+    FCDoubleSpinner,
+    NumericalEvalEntry,
+    FCLabel,
+    RadioSet,
+    FCButton,
+)
 import math
 
 import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -33,7 +40,7 @@ class ToolCalculator(AppTool):
         self.ui = CalcUI(layout=self.layout, app=self.app)
         self.toolName = self.ui.toolName
 
-        self.units = ''
+        self.units = ""
 
         # ## Signals
         self.ui.cutDepth_entry.valueChanged.connect(self.on_calculate_tool_dia)
@@ -79,14 +86,14 @@ class ToolCalculator(AppTool):
         self.app.ui.notebook.setTabText(2, _("Calc. Tool"))
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+C', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+C", **kwargs)
 
     def set_tool_ui(self):
-        self.units = self.app.defaults['units'].lower()
+        self.units = self.app.defaults["units"].lower()
 
         # ## Initialize form
-        self.ui.mm_entry.set_value('%.*f' % (self.decimals, 0))
-        self.ui.inch_entry.set_value('%.*f' % (self.decimals, 0))
+        self.ui.mm_entry.set_value("%.*f" % (self.decimals, 0))
+        self.ui.inch_entry.set_value("%.*f" % (self.decimals, 0))
 
         length = self.app.defaults["tools_calc_electro_length"]
         width = self.app.defaults["tools_calc_electro_width"]
@@ -108,13 +115,13 @@ class ToolCalculator(AppTool):
         self.ui.tipDia_entry.set_value(tip_dia)
         self.ui.tipAngle_entry.set_value(tip_angle)
         self.ui.cutDepth_entry.set_value(cut_z)
-        self.ui.effectiveToolDia_entry.set_value('0.0000')
+        self.ui.effectiveToolDia_entry.set_value("0.0000")
 
-        self.ui.area_sel_radio.set_value('d')
-        self.on_area_calculation_radio(val='d')
+        self.ui.area_sel_radio.set_value("d")
+        self.on_area_calculation_radio(val="d")
 
     def on_area_calculation_radio(self, val):
-        if val == 'a':
+        if val == "a":
             self.ui.pcbwidthlabel.hide()
             self.ui.pcbwidth_entry.hide()
             self.ui.width_unit.hide()
@@ -160,11 +167,11 @@ class ToolCalculator(AppTool):
 
     def on_calculate_inch_units(self):
         mm_val = float(self.ui.mm_entry.get_value())
-        self.ui.inch_entry.set_value('%.*f' % (self.decimals, (mm_val / 25.4)))
+        self.ui.inch_entry.set_value("%.*f" % (self.decimals, (mm_val / 25.4)))
 
     def on_calculate_mm_units(self):
         inch_val = float(self.ui.inch_entry.get_value())
-        self.ui.mm_entry.set_value('%.*f' % (self.decimals, (inch_val * 25.4)))
+        self.ui.mm_entry.set_value("%.*f" % (self.decimals, (inch_val * 25.4)))
 
     def on_calculate_eplate(self):
         area_calc_sel = self.ui.area_sel_radio.get_value()
@@ -175,14 +182,14 @@ class ToolCalculator(AppTool):
         density = self.ui.cdensity_entry.get_value()
         copper = self.ui.growth_entry.get_value()
 
-        if area_calc_sel == 'd':
+        if area_calc_sel == "d":
             calculated_current = (length * width * density) * 0.0021527820833419
         else:
             calculated_current = (area * density) * 0.0021527820833419
         calculated_time = copper * 2.142857142857143 * float(20 / density)
 
-        self.ui.cvalue_entry.set_value('%.2f' % calculated_current)
-        self.ui.time_entry.set_value('%.1f' % calculated_time)
+        self.ui.cvalue_entry.set_value("%.2f" % calculated_current)
+        self.ui.time_entry.set_value("%.1f" % calculated_time)
 
 
 class CalcUI:
@@ -196,17 +203,19 @@ class CalcUI:
         self.app = app
         self.decimals = self.app.decimals
         self.layout = layout
-        self.units = self.app.defaults['units'].lower()
+        self.units = self.app.defaults["units"].lower()
 
         # ## Title
         title_label = FCLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
 
         # #####################
@@ -229,13 +238,13 @@ class CalcUI:
         grid_units_layout.addWidget(mm_label, 0, 0)
         grid_units_layout.addWidget(inch_label, 0, 1)
 
-        self.inch_entry = NumericalEvalEntry(border_color='#0069A9')
+        self.inch_entry = NumericalEvalEntry(border_color="#0069A9")
 
         # self.inch_entry.setFixedWidth(70)
         # self.inch_entry.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         self.inch_entry.setToolTip(_("Here you enter the value to be converted from INCH to MM"))
 
-        self.mm_entry = NumericalEvalEntry(border_color='#0069A9')
+        self.mm_entry = NumericalEvalEntry(border_color="#0069A9")
         # self.mm_entry.setFixedWidth(130)
         # self.mm_entry.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         self.mm_entry.setToolTip(_("Here you enter the value to be converted from MM to INCH"))
@@ -257,7 +266,7 @@ class CalcUI:
         form_layout = QtWidgets.QFormLayout()
         self.layout.addLayout(form_layout)
 
-        self.tipDia_label = FCLabel('%s:' % _("Tip Diameter"))
+        self.tipDia_label = FCLabel("%s:" % _("Tip Diameter"))
         self.tipDia_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.tipDia_entry.set_precision(self.decimals)
         self.tipDia_entry.set_range(0.0, 10000.0000)
@@ -265,35 +274,43 @@ class CalcUI:
 
         # self.tipDia_entry.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         self.tipDia_label.setToolTip(
-            _("This is the tool tip diameter.\n"
-              "It is specified by manufacturer.")
+            _("This is the tool tip diameter.\n" "It is specified by manufacturer.")
         )
-        self.tipAngle_label = FCLabel('%s:' % _("Tip Angle"))
+        self.tipAngle_label = FCLabel("%s:" % _("Tip Angle"))
         self.tipAngle_entry = FCSpinner(callback=self.confirmation_message_int)
         self.tipAngle_entry.set_range(0, 180)
         self.tipAngle_entry.set_step(5)
 
         # self.tipAngle_entry.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.tipAngle_label.setToolTip(_("This is the angle of the tip of the tool.\n"
-                                         "It is specified by manufacturer."))
+        self.tipAngle_label.setToolTip(
+            _("This is the angle of the tip of the tool.\n" "It is specified by manufacturer.")
+        )
 
-        self.cutDepth_label = FCLabel('%s:' % _("Cut Z"))
+        self.cutDepth_label = FCLabel("%s:" % _("Cut Z"))
         self.cutDepth_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.cutDepth_entry.set_range(-10000.0000, 10000.0000)
         self.cutDepth_entry.set_precision(self.decimals)
 
         # self.cutDepth_entry.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.cutDepth_label.setToolTip(_("This is the depth to cut into the material.\n"
-                                         "In the CNCJob is the CutZ parameter."))
+        self.cutDepth_label.setToolTip(
+            _(
+                "This is the depth to cut into the material.\n"
+                "In the CNCJob is the CutZ parameter."
+            )
+        )
 
-        self.effectiveToolDia_label = FCLabel('%s:' % _("Tool Diameter"))
+        self.effectiveToolDia_label = FCLabel("%s:" % _("Tool Diameter"))
         self.effectiveToolDia_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.effectiveToolDia_entry.set_precision(self.decimals)
 
         # self.effectiveToolDia_entry.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
-        self.effectiveToolDia_label.setToolTip(_("This is the tool diameter to be entered into\n"
-                                                 "FlatCAM Gerber section.\n"
-                                                 "In the CNCJob section it is called >Tool dia<."))
+        self.effectiveToolDia_label.setToolTip(
+            _(
+                "This is the tool diameter to be entered into\n"
+                "FlatCAM Gerber section.\n"
+                "In the CNCJob section it is called >Tool dia<."
+            )
+        )
         # self.effectiveToolDia_entry.setEnabled(False)
 
         form_layout.addRow(self.tipDia_label, self.tipDia_entry)
@@ -303,11 +320,15 @@ class CalcUI:
 
         # ## Buttons
         self.calculate_vshape_button = FCButton(_("Calculate"))
-        self.calculate_vshape_button.setIcon(QtGui.QIcon(self.app.resource_location + '/calculator16.png'))
+        self.calculate_vshape_button.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/calculator16.png")
+        )
 
         self.calculate_vshape_button.setToolTip(
-            _("Calculate either the Cut Z or the effective tool diameter,\n  "
-              "depending on which is desired and which is known. ")
+            _(
+                "Calculate either the Cut Z or the effective tool diameter,\n  "
+                "depending on which is desired and which is known. "
+            )
         )
 
         self.layout.addWidget(self.calculate_vshape_button)
@@ -321,8 +342,10 @@ class CalcUI:
         # ## Title of the ElectroPlating Tools Calculator
         plate_title_label = FCLabel("<font size=3><b>%s</b></font>" % self.eplateName)
         plate_title_label.setToolTip(
-            _("This calculator is useful for those who plate the via/pad/drill holes,\n"
-              "using a method like graphite ink or calcium hypophosphite ink or palladium chloride.")
+            _(
+                "This calculator is useful for those who plate the via/pad/drill holes,\n"
+                "using a method like graphite ink or calcium hypophosphite ink or palladium chloride."
+            )
         )
         self.layout.addWidget(plate_title_label)
 
@@ -333,27 +356,27 @@ class CalcUI:
         self.layout.addLayout(grid2)
 
         # Area Calculation
-        self.area_sel_label = FCLabel('%s:' % _("Area Calculation"))
-        self.area_sel_label.setToolTip(
-            _("Choose how to calculate the board area.")
+        self.area_sel_label = FCLabel("%s:" % _("Area Calculation"))
+        self.area_sel_label.setToolTip(_("Choose how to calculate the board area."))
+        self.area_sel_radio = RadioSet(
+            [{"label": _("Dimensions"), "value": "d"}, {"label": _("Area"), "value": "a"}],
+            stretch=False,
         )
-        self.area_sel_radio = RadioSet([
-            {'label': _('Dimensions'), 'value': 'd'},
-            {"label": _("Area"), "value": "a"}
-        ], stretch=False)
 
         grid2.addWidget(self.area_sel_label, 0, 0)
         grid2.addWidget(self.area_sel_radio, 1, 0, 1, 2)
 
         # BOARD LENGTH
-        self.pcblengthlabel = FCLabel('%s:' % _("Board Length"))
-        self.pcblengthlabel.setToolTip(_('This is the board length. In centimeters.'))
+        self.pcblengthlabel = FCLabel("%s:" % _("Board Length"))
+        self.pcblengthlabel.setToolTip(_("This is the board length. In centimeters."))
         self.pcblength_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.pcblength_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.pcblength_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.pcblength_entry.set_precision(self.decimals)
         self.pcblength_entry.set_range(0.0, 10000.0000)
 
-        self.length_unit = FCLabel('%s' % _("cm"))
+        self.length_unit = FCLabel("%s" % _("cm"))
         self.length_unit.setMinimumWidth(25)
 
         l_hlay = QtWidgets.QHBoxLayout()
@@ -364,14 +387,16 @@ class CalcUI:
         grid2.addLayout(l_hlay, 2, 1)
 
         # BOARD WIDTH
-        self.pcbwidthlabel = FCLabel('%s:' % _("Board Width"))
-        self.pcbwidthlabel.setToolTip(_('This is the board width.In centimeters.'))
+        self.pcbwidthlabel = FCLabel("%s:" % _("Board Width"))
+        self.pcbwidthlabel.setToolTip(_("This is the board width.In centimeters."))
         self.pcbwidth_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.pcbwidth_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.pcbwidth_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.pcbwidth_entry.set_precision(self.decimals)
         self.pcbwidth_entry.set_range(0.0, 10000.0000)
 
-        self.width_unit = FCLabel('%s' % _("cm"))
+        self.width_unit = FCLabel("%s" % _("cm"))
         self.width_unit.setMinimumWidth(25)
 
         w_hlay = QtWidgets.QHBoxLayout()
@@ -382,14 +407,16 @@ class CalcUI:
         grid2.addLayout(w_hlay, 4, 1)
 
         # AREA
-        self.area_label = FCLabel('%s:' % _("Area"))
-        self.area_label.setToolTip(_('This is the board area.'))
+        self.area_label = FCLabel("%s:" % _("Area"))
+        self.area_label.setToolTip(_("This is the board area."))
         self.area_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.area_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.area_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.area_entry.set_precision(self.decimals)
         self.area_entry.set_range(0.0, 10000.0000)
 
-        self.area_unit = FCLabel('%s<sup>2</sup>' % _("cm"))
+        self.area_unit = FCLabel("%s<sup>2</sup>" % _("cm"))
         self.area_unit.setMinimumWidth(25)
 
         a_hlay = QtWidgets.QHBoxLayout()
@@ -405,16 +432,19 @@ class CalcUI:
         grid2.addWidget(separator_line, 7, 0, 1, 2)
 
         # DENSITY
-        self.cdensity_label = FCLabel('%s:' % _("Current Density"))
-        self.cdensity_label.setToolTip(_("Current density to pass through the board. \n"
-                                         "In Amps per Square Feet ASF."))
+        self.cdensity_label = FCLabel("%s:" % _("Current Density"))
+        self.cdensity_label.setToolTip(
+            _("Current density to pass through the board. \n" "In Amps per Square Feet ASF.")
+        )
         self.cdensity_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.cdensity_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.cdensity_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.cdensity_entry.set_precision(self.decimals)
         self.cdensity_entry.set_range(0.0, 10000.0000)
         self.cdensity_entry.setSingleStep(0.1)
 
-        density_unit = FCLabel('%s' % "ASF")
+        density_unit = FCLabel("%s" % "ASF")
         density_unit.setMinimumWidth(25)
 
         d_hlay = QtWidgets.QHBoxLayout()
@@ -425,16 +455,19 @@ class CalcUI:
         grid2.addLayout(d_hlay, 8, 1)
 
         # COPPER GROWTH
-        self.growth_label = FCLabel('%s:' % _("Copper Growth"))
-        self.growth_label.setToolTip(_("How thick the copper growth is intended to be.\n"
-                                       "In microns."))
+        self.growth_label = FCLabel("%s:" % _("Copper Growth"))
+        self.growth_label.setToolTip(
+            _("How thick the copper growth is intended to be.\n" "In microns.")
+        )
         self.growth_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.growth_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.growth_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.growth_entry.set_precision(self.decimals)
         self.growth_entry.set_range(0.0, 10000.0000)
         self.growth_entry.setSingleStep(0.01)
 
-        growth_unit = FCLabel('%s' % _("um"))
+        growth_unit = FCLabel("%s" % _("um"))
         growth_unit.setMinimumWidth(25)
 
         g_hlay = QtWidgets.QHBoxLayout()
@@ -445,16 +478,19 @@ class CalcUI:
         grid2.addLayout(g_hlay, 10, 1)
 
         # CURRENT
-        self.cvaluelabel = FCLabel('%s:' % _("Current Value"))
-        self.cvaluelabel.setToolTip(_('This is the current intensity value\n'
-                                      'to be set on the Power Supply. In Amps.'))
+        self.cvaluelabel = FCLabel("%s:" % _("Current Value"))
+        self.cvaluelabel.setToolTip(
+            _("This is the current intensity value\n" "to be set on the Power Supply. In Amps.")
+        )
         self.cvalue_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.cvalue_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.cvalue_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.cvalue_entry.set_precision(self.decimals)
         self.cvalue_entry.set_range(0.0, 10000.0000)
         self.cvalue_entry.setSingleStep(0.1)
 
-        current_unit = FCLabel('%s' % "A")
+        current_unit = FCLabel("%s" % "A")
         current_unit.setMinimumWidth(25)
         self.cvalue_entry.setReadOnly(True)
 
@@ -466,16 +502,19 @@ class CalcUI:
         grid2.addLayout(c_hlay, 12, 1)
 
         # TIME
-        self.timelabel = FCLabel('%s:' % _("Time"))
-        self.timelabel.setToolTip(_('This is the calculated time required for the procedure.\n'
-                                    'In minutes.'))
+        self.timelabel = FCLabel("%s:" % _("Time"))
+        self.timelabel.setToolTip(
+            _("This is the calculated time required for the procedure.\n" "In minutes.")
+        )
         self.time_entry = FCDoubleSpinner(callback=self.confirmation_message)
-        self.time_entry.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        self.time_entry.setSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.time_entry.set_precision(self.decimals)
         self.time_entry.set_range(0.0, 10000.0000)
         self.time_entry.setSingleStep(0.1)
 
-        time_unit = FCLabel('%s' % "min")
+        time_unit = FCLabel("%s" % "min")
         time_unit.setMinimumWidth(25)
         self.time_entry.setReadOnly(True)
 
@@ -488,10 +527,14 @@ class CalcUI:
 
         # ## Buttons
         self.calculate_plate_button = FCButton(_("Calculate"))
-        self.calculate_plate_button.setIcon(QtGui.QIcon(self.app.resource_location + '/calculator16.png'))
+        self.calculate_plate_button.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/calculator16.png")
+        )
         self.calculate_plate_button.setToolTip(
-            _("Calculate the current intensity value and the procedure time,\n"
-              "depending on the parameters above")
+            _(
+                "Calculate the current intensity value and the procedure time,\n"
+                "depending on the parameters above"
+            )
         )
         self.layout.addWidget(self.calculate_plate_button)
 
@@ -499,16 +542,16 @@ class CalcUI:
 
         # ## Reset Tool
         self.reset_button = FCButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(self.reset_button)
 
         # #################################### FINSIHED GUI ###########################
@@ -516,17 +559,24 @@ class CalcUI:
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

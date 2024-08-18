@@ -21,11 +21,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolSub(AppTool):
@@ -96,7 +96,7 @@ class ToolSub(AppTool):
         self.aperture_processing_finished.connect(self.new_gerber_object)
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+W', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+W", **kwargs)
 
     def run(self, toggle=True):
         self.app.defaults.report_usage("ToolSub()")
@@ -147,11 +147,11 @@ class ToolSub(AppTool):
         # Get TARGET name
         # --------------------------------
         self.target_grb_obj_name = self.ui.target_gerber_combo.currentText()
-        if self.target_grb_obj_name == '':
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("No Target object loaded."))
+        if self.target_grb_obj_name == "":
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("No Target object loaded."))
             return
 
-        self.app.inform.emit('%s' % _("Loading geometry from Gerber objects."))
+        self.app.inform.emit("%s" % _("Loading geometry from Gerber objects."))
 
         # --------------------------------
         # Get TARGET object.
@@ -160,15 +160,17 @@ class ToolSub(AppTool):
             self.target_grb_obj = self.app.collection.get_by_name(self.target_grb_obj_name)
         except Exception as e:
             log.debug("ToolSub.on_subtract_gerber_click() --> %s" % str(e))
-            self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), self.obj_name))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), self.obj_name)
+            )
             return "Could not retrieve object: %s" % self.target_grb_obj_name
 
         # --------------------------------
         # Get SUBTRACTOR name
         # --------------------------------
         self.sub_grb_obj_name = self.ui.sub_gerber_combo.currentText()
-        if self.sub_grb_obj_name == '':
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("No Subtractor object loaded."))
+        if self.sub_grb_obj_name == "":
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("No Subtractor object loaded."))
             return
 
         # --------------------------------
@@ -178,7 +180,9 @@ class ToolSub(AppTool):
             self.sub_grb_obj = self.app.collection.get_by_name(self.sub_grb_obj_name)
         except Exception as e:
             log.debug("ToolSub.on_subtract_gerber_click() --> %s" % str(e))
-            self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), self.obj_name))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), self.obj_name)
+            )
             return "Could not retrieve object: %s" % self.sub_grb_obj_name
 
         # --------------------------------
@@ -188,44 +192,50 @@ class ToolSub(AppTool):
         for apid in self.target_grb_obj.apertures:
             self.new_apertures[apid] = {}
             for key in self.target_grb_obj.apertures[apid]:
-                if key == 'geometry':
-                    self.new_apertures[apid]['geometry'] = []
+                if key == "geometry":
+                    self.new_apertures[apid]["geometry"] = []
                 else:
                     self.new_apertures[apid][key] = self.target_grb_obj.apertures[apid][key]
 
         def worker_job(app_obj):
-            with app_obj.app.proc_container.new('%s' % _("Working ...")):
+            with app_obj.app.proc_container.new("%s" % _("Working ...")):
                 # SUBTRACTOR geometry (always the same)
-                sub_geometry = {'solid': [], 'clear': []}
+                sub_geometry = {"solid": [], "clear": []}
                 # iterate over SUBTRACTOR geometry and load it in the sub_geometry dict
                 for s_apid in app_obj.sub_grb_obj.apertures:
-                    for s_el in app_obj.sub_grb_obj.apertures[s_apid]['geometry']:
+                    for s_el in app_obj.sub_grb_obj.apertures[s_apid]["geometry"]:
                         if "solid" in s_el:
-                            sub_geometry['solid'].append(s_el["solid"])
+                            sub_geometry["solid"].append(s_el["solid"])
                         if "clear" in s_el:
-                            sub_geometry['clear'].append(s_el["clear"])
+                            sub_geometry["clear"].append(s_el["clear"])
 
                 for ap_id in app_obj.target_grb_obj.apertures:
                     # TARGET geometry
-                    target_geo = [geo for geo in app_obj.target_grb_obj.apertures[ap_id]['geometry']]
+                    target_geo = [
+                        geo for geo in app_obj.target_grb_obj.apertures[ap_id]["geometry"]
+                    ]
 
                     # send the job to the multiprocessing JOB
                     app_obj.results.append(
-                        app_obj.pool.apply_async(app_obj.aperture_intersection, args=(ap_id, target_geo, sub_geometry))
+                        app_obj.pool.apply_async(
+                            app_obj.aperture_intersection, args=(ap_id, target_geo, sub_geometry)
+                        )
                     )
 
                 output = []
                 for p in app_obj.results:
                     res = p.get()
                     output.append(res)
-                    app_obj.app.inform.emit('%s: %s...' % (_("Finished parsing geometry for aperture"), str(res[0])))
+                    app_obj.app.inform.emit(
+                        "%s: %s..." % (_("Finished parsing geometry for aperture"), str(res[0]))
+                    )
 
                 app_obj.app.inform.emit("%s" % _("Subtraction aperture processing finished."))
 
-                outname = app_obj.ui.target_gerber_combo.currentText() + '_sub'
+                outname = app_obj.ui.target_gerber_combo.currentText() + "_sub"
                 app_obj.aperture_processing_finished.emit(outname, output)
 
-        self.app.worker_task.emit({'fcn': worker_job, 'params': [self]})
+        self.app.worker_task.emit({"fcn": worker_job, "params": [self]})
 
     @staticmethod
     def aperture_intersection(apid, target_geo, sub_geometry):
@@ -295,11 +305,11 @@ class ToolSub(AppTool):
 
             grb_obj.apertures = deepcopy(self.new_apertures)
 
-            if '0' not in grb_obj.apertures:
-                grb_obj.apertures['0'] = {}
-                grb_obj.apertures['0']['type'] = 'REG'
-                grb_obj.apertures['0']['size'] = 0.0
-                grb_obj.apertures['0']['geometry'] = []
+            if "0" not in grb_obj.apertures:
+                grb_obj.apertures["0"] = {}
+                grb_obj.apertures["0"]["type"] = "REG"
+                grb_obj.apertures["0"]["size"] = 0.0
+                grb_obj.apertures["0"]["geometry"] = []
 
             for apid in list(grb_obj.apertures.keys()):
                 # output is a tuple in the format (apid, surviving_geo, modified_geo)
@@ -311,28 +321,28 @@ class ToolSub(AppTool):
                         surving_geo = t[1]
                         modified_geo = t[2]
                         if surving_geo:
-                            grb_obj.apertures[apid]['geometry'] += deepcopy(surving_geo)
+                            grb_obj.apertures[apid]["geometry"] += deepcopy(surving_geo)
 
                         if modified_geo:
-                            grb_obj.apertures['0']['geometry'] += modified_geo
+                            grb_obj.apertures["0"]["geometry"] += modified_geo
 
                 # if the current aperture does not have geometry then get rid of it
-                if not grb_obj.apertures[apid]['geometry']:
+                if not grb_obj.apertures[apid]["geometry"]:
                     grb_obj.apertures.pop(apid, None)
 
             # delete the '0' aperture if it has no geometry
-            if not grb_obj.apertures['0']['geometry']:
-                grb_obj.apertures.pop('0', None)
+            if not grb_obj.apertures["0"]["geometry"]:
+                grb_obj.apertures.pop("0", None)
 
             poly_buff = []
             follow_buff = []
             for ap in grb_obj.apertures:
-                for elem in grb_obj.apertures[ap]['geometry']:
-                    if 'solid' in elem:
-                        solid_geo = elem['solid']
+                for elem in grb_obj.apertures[ap]["geometry"]:
+                    if "solid" in elem:
+                        solid_geo = elem["solid"]
                         poly_buff.append(solid_geo)
-                    if 'follow' in elem:
-                        follow_buff.append(elem['follow'])
+                    if "follow" in elem:
+                        follow_buff.append(elem["follow"])
 
             work_poly_buff = MultiPolygon(poly_buff)
             try:
@@ -347,17 +357,18 @@ class ToolSub(AppTool):
 
             grb_obj.solid_geometry = deepcopy(poly_buff)
             grb_obj.follow_geometry = deepcopy(follow_buff)
-            grb_obj.source_file = app_obj.f_handlers.export_gerber(obj_name=outname, filename=None,
-                                                                   local_use=grb_obj, use_thread=False)
+            grb_obj.source_file = app_obj.f_handlers.export_gerber(
+                obj_name=outname, filename=None, local_use=grb_obj, use_thread=False
+            )
 
         with self.app.proc_container.new(_("New object ...")):
-            ret = self.app.app_obj.new_object('gerber', outname, obj_init, autoselected=False)
-            if ret == 'fail':
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _('Generating new object failed.'))
+            ret = self.app.app_obj.new_object("gerber", outname, obj_init, autoselected=False)
+            if ret == "fail":
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Generating new object failed."))
                 return
 
             # GUI feedback
-            self.app.inform.emit('[success] %s: %s' % (_("Created"), outname))
+            self.app.inform.emit("[success] %s: %s" % (_("Created"), outname))
 
             # Delete source objects if it was selected
             if self.ui.delete_sources_cb.get_value():
@@ -379,8 +390,8 @@ class ToolSub(AppTool):
         self.sub_type = "geo"
 
         self.target_geo_obj_name = self.ui.target_geo_combo.currentText()
-        if self.target_geo_obj_name == '':
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("No Target object loaded."))
+        if self.target_geo_obj_name == "":
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("No Target object loaded."))
             return
 
         # Get target object.
@@ -388,12 +399,14 @@ class ToolSub(AppTool):
             self.target_geo_obj = self.app.collection.get_by_name(self.target_geo_obj_name)
         except Exception as e:
             log.debug("ToolSub.on_subtract_geo_click() --> %s" % str(e))
-            self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), self.target_geo_obj_name))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), self.target_geo_obj_name)
+            )
             return "Could not retrieve object: %s" % self.target_grb_obj_name
 
         self.sub_geo_obj_name = self.ui.sub_geo_combo.currentText()
-        if self.sub_geo_obj_name == '':
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("No Subtractor object loaded."))
+        if self.sub_geo_obj_name == "":
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("No Subtractor object loaded."))
             return
 
         # Get substractor object.
@@ -401,12 +414,16 @@ class ToolSub(AppTool):
             self.sub_geo_obj = self.app.collection.get_by_name(self.sub_geo_obj_name)
         except Exception as e:
             log.debug("ToolSub.on_subtract_geo_click() --> %s" % str(e))
-            self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), self.sub_geo_obj_name))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), self.sub_geo_obj_name)
+            )
             return "Could not retrieve object: %s" % self.sub_geo_obj_name
 
         if self.sub_geo_obj.multigeo:
-            self.app.inform.emit('[ERROR_NOTCL] %s' %
-                                 _("Currently, the Subtractor geometry cannot be of type Multigeo."))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s"
+                % _("Currently, the Subtractor geometry cannot be of type Multigeo.")
+            )
             return
 
         # create the target_options obj
@@ -419,7 +436,7 @@ class ToolSub(AppTool):
         for tool in self.target_geo_obj.tools:
             self.new_tools[tool] = {}
             for key, v in self.target_geo_obj.tools[tool]:
-                self.new_tools[tool][key] = [] if key == 'solid_geometry' else deepcopy(v)
+                self.new_tools[tool][key] = [] if key == "solid_geometry" else deepcopy(v)
 
         # add the promises
         if self.target_geo_obj.multigeo:
@@ -435,11 +452,11 @@ class ToolSub(AppTool):
 
         if self.target_geo_obj.multigeo:
             for tool in self.target_geo_obj.tools:
-                geo = self.target_geo_obj.tools[tool]['solid_geometry']
-                self.app.worker_task.emit({'fcn': self.toolgeo_intersection, 'params': [tool, geo]})
+                geo = self.target_geo_obj.tools[tool]["solid_geometry"]
+                self.app.worker_task.emit({"fcn": self.toolgeo_intersection, "params": [tool, geo]})
         else:
             geo = self.target_geo_obj.solid_geometry
-            self.app.worker_task.emit({'fcn': self.toolgeo_intersection, 'params': ["single", geo]})
+            self.app.worker_task.emit({"fcn": self.toolgeo_intersection, "params": ["single", geo]})
 
     def toolgeo_intersection(self, tool, geo):
         new_geometry = []
@@ -448,7 +465,7 @@ class ToolSub(AppTool):
         if tool == "single":
             text = _("Parsing solid_geometry ...")
         else:
-            text = '%s: %s...' % (_("Parsing solid_geometry for tool"), str(tool))
+            text = "%s: %s..." % (_("Parsing solid_geometry for tool"), str(tool))
 
         with self.app.proc_container.new(text):
             # resulting paths are closed resulting into Polygons
@@ -505,8 +522,8 @@ class ToolSub(AppTool):
                     self.new_solid_geometry = deepcopy(new_geometry)
                     time.sleep(0.5)
             else:
-                while not self.new_tools[tool]['solid_geometry']:
-                    self.new_tools[tool]['solid_geometry'] = deepcopy(new_geometry)
+                while not self.new_tools[tool]["solid_geometry"]:
+                    self.new_tools[tool]["solid_geometry"] = deepcopy(new_geometry)
                     time.sleep(0.5)
 
         while True:
@@ -521,13 +538,14 @@ class ToolSub(AppTool):
 
     def new_geo_object(self, outname):
         geo_name = outname
+
         def obj_init(geo_obj, app_obj):
 
             # geo_obj.options = self.target_options
             # create the target_options obj
             for k, v in self.target_geo_obj.options.items():
                 geo_obj.options[k] = v
-            geo_obj.options['name'] = geo_name
+            geo_obj.options["name"] = geo_name
 
             if self.target_geo_obj.multigeo:
                 geo_obj.tools = deepcopy(self.new_tools)
@@ -539,20 +557,20 @@ class ToolSub(AppTool):
                 try:
                     geo_obj.tools = deepcopy(self.new_tools)
                     for tool in geo_obj.tools:
-                        geo_obj.tools[tool]['solid_geometry'] = deepcopy(self.new_solid_geometry)
+                        geo_obj.tools[tool]["solid_geometry"] = deepcopy(self.new_solid_geometry)
                 except Exception as e:
                     app_obj.log.debug("ToolSub.new_geo_object() --> %s" % str(e))
                 geo_obj.multigeo = False
 
         with self.app.proc_container.new(_("New object ...")):
-            ret = self.app.app_obj.new_object('geometry', outname, obj_init, autoselected=False)
-            if ret == 'fail':
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _('Generating new object failed.'))
+            ret = self.app.app_obj.new_object("geometry", outname, obj_init, autoselected=False)
+            if ret == "fail":
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Generating new object failed."))
                 return
             # Register recent file
-            self.app.file_opened.emit('geometry', outname)
+            self.app.file_opened.emit("geometry", outname)
             # GUI feedback
-            self.app.inform.emit('[success] %s: %s' % (_("Created"), outname))
+            self.app.inform.emit("[success] %s: %s" % (_("Created"), outname))
 
             # Delete source objects if it was selected
             if self.ui.delete_sources_cb.get_value():
@@ -619,24 +637,32 @@ class ToolSub(AppTool):
         """
         if succcess is True:
             if self.sub_type == "gerber":
-                outname = self.ui.target_gerber_combo.currentText() + '_sub'
+                outname = self.ui.target_gerber_combo.currentText() + "_sub"
 
                 # intersection jobs finished, start the creation of solid_geometry
-                self.app.worker_task.emit({'fcn': self.new_gerber_object, 'params': [outname]})
+                self.app.worker_task.emit({"fcn": self.new_gerber_object, "params": [outname]})
             else:
-                outname = self.ui.target_geo_combo.currentText() + '_sub'
+                outname = self.ui.target_geo_combo.currentText() + "_sub"
 
                 # intersection jobs finished, start the creation of solid_geometry
-                self.app.worker_task.emit({'fcn': self.new_geo_object, 'params': [outname]})
+                self.app.worker_task.emit({"fcn": self.new_geo_object, "params": [outname]})
         else:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _('Generating new object failed.'))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Generating new object failed."))
 
     def reset_fields(self):
-        self.ui.target_gerber_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
-        self.ui.sub_gerber_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.ui.target_gerber_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
+        self.ui.sub_gerber_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
 
-        self.ui.target_geo_combo.setRootModelIndex(self.app.collection.index(2, 0, QtCore.QModelIndex()))
-        self.ui.sub_geo_combo.setRootModelIndex(self.app.collection.index(2, 0, QtCore.QModelIndex()))
+        self.ui.target_geo_combo.setRootModelIndex(
+            self.app.collection.index(2, 0, QtCore.QModelIndex())
+        )
+        self.ui.sub_geo_combo.setRootModelIndex(
+            self.app.collection.index(2, 0, QtCore.QModelIndex())
+        )
 
     @staticmethod
     def poly2rings(poly):
@@ -654,13 +680,15 @@ class SubUI:
 
         # ## Title
         title_label = QtWidgets.QLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
         self.layout.addWidget(QtWidgets.QLabel(""))
 
@@ -679,8 +707,7 @@ class SubUI:
 
         self.delete_sources_cb = FCCheckBox(_("Delete source"))
         self.delete_sources_cb.setToolTip(
-            _("When checked will delete the source objects\n"
-              "after a successful operation.")
+            _("When checked will delete the source objects\n" "after a successful operation.")
         )
         grid0.addWidget(self.delete_sources_cb, 0, 0, 1, 2)
 
@@ -689,7 +716,7 @@ class SubUI:
         separator_line.setFrameShadow(QtWidgets.QFrame.Sunken)
         grid0.addWidget(separator_line, 2, 0, 1, 3)
 
-        grid0.addWidget(QtWidgets.QLabel(''), 4, 0, 1, 2)
+        grid0.addWidget(QtWidgets.QLabel(""), 4, 0, 1, 2)
 
         self.gerber_title = QtWidgets.QLabel("<b>%s</b>" % _("GERBER"))
         grid0.addWidget(self.gerber_title, 6, 0, 1, 2)
@@ -697,15 +724,16 @@ class SubUI:
         # Target Gerber Object
         self.target_gerber_combo = FCComboBox()
         self.target_gerber_combo.setModel(self.app.collection)
-        self.target_gerber_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.target_gerber_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         # self.target_gerber_combo.setCurrentIndex(1)
         self.target_gerber_combo.is_last = True
         self.target_gerber_combo.obj_type = "Gerber"
 
-        self.target_gerber_label = QtWidgets.QLabel('%s:' % _("Target"))
+        self.target_gerber_label = QtWidgets.QLabel("%s:" % _("Target"))
         self.target_gerber_label.setToolTip(
-            _("Gerber object from which to subtract\n"
-              "the subtractor Gerber object.")
+            _("Gerber object from which to subtract\n" "the subtractor Gerber object.")
         )
 
         grid0.addWidget(self.target_gerber_label, 8, 0)
@@ -714,35 +742,40 @@ class SubUI:
         # Substractor Gerber Object
         self.sub_gerber_combo = FCComboBox()
         self.sub_gerber_combo.setModel(self.app.collection)
-        self.sub_gerber_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
+        self.sub_gerber_combo.setRootModelIndex(
+            self.app.collection.index(0, 0, QtCore.QModelIndex())
+        )
         self.sub_gerber_combo.is_last = True
         self.sub_gerber_combo.obj_type = "Gerber"
 
-        self.sub_gerber_label = QtWidgets.QLabel('%s:' % _("Subtractor"))
+        self.sub_gerber_label = QtWidgets.QLabel("%s:" % _("Subtractor"))
         self.sub_gerber_label.setToolTip(
-            _("Gerber object that will be subtracted\n"
-              "from the target Gerber object.")
+            _("Gerber object that will be subtracted\n" "from the target Gerber object.")
         )
 
         grid0.addWidget(self.sub_gerber_label, 10, 0)
         grid0.addWidget(self.sub_gerber_combo, 10, 1)
 
-        self.intersect_btn = FCButton(_('Subtract Gerber'))
-        self.intersect_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/subtract_btn32.png'))
+        self.intersect_btn = FCButton(_("Subtract Gerber"))
+        self.intersect_btn.setIcon(QtGui.QIcon(self.app.resource_location + "/subtract_btn32.png"))
         self.intersect_btn.setToolTip(
-            _("Will remove the area occupied by the subtractor\n"
-              "Gerber from the Target Gerber.\n"
-              "Can be used to remove the overlapping silkscreen\n"
-              "over the soldermask.")
+            _(
+                "Will remove the area occupied by the subtractor\n"
+                "Gerber from the Target Gerber.\n"
+                "Can be used to remove the overlapping silkscreen\n"
+                "over the soldermask."
+            )
         )
-        self.intersect_btn.setStyleSheet("""
+        self.intersect_btn.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         grid0.addWidget(self.intersect_btn, 12, 0, 1, 2)
-        grid0.addWidget(QtWidgets.QLabel(''), 14, 0, 1, 2)
+        grid0.addWidget(QtWidgets.QLabel(""), 14, 0, 1, 2)
 
         self.geo_title = QtWidgets.QLabel("<b>%s</b>" % _("GEOMETRY"))
         grid0.addWidget(self.geo_title, 16, 0, 1, 2)
@@ -750,15 +783,16 @@ class SubUI:
         # Target Geometry Object
         self.target_geo_combo = FCComboBox()
         self.target_geo_combo.setModel(self.app.collection)
-        self.target_geo_combo.setRootModelIndex(self.app.collection.index(2, 0, QtCore.QModelIndex()))
+        self.target_geo_combo.setRootModelIndex(
+            self.app.collection.index(2, 0, QtCore.QModelIndex())
+        )
         # self.target_geo_combo.setCurrentIndex(1)
         self.target_geo_combo.is_last = True
         self.target_geo_combo.obj_type = "Geometry"
 
-        self.target_geo_label = QtWidgets.QLabel('%s:' % _("Target"))
+        self.target_geo_label = QtWidgets.QLabel("%s:" % _("Target"))
         self.target_geo_label.setToolTip(
-            _("Geometry object from which to subtract\n"
-              "the subtractor Geometry object.")
+            _("Geometry object from which to subtract\n" "the subtractor Geometry object.")
         )
 
         grid0.addWidget(self.target_geo_label, 18, 0)
@@ -771,50 +805,57 @@ class SubUI:
         self.sub_geo_combo.is_last = True
         self.sub_geo_combo.obj_type = "Geometry"
 
-        self.sub_geo_label = QtWidgets.QLabel('%s:' % _("Subtractor"))
+        self.sub_geo_label = QtWidgets.QLabel("%s:" % _("Subtractor"))
         self.sub_geo_label.setToolTip(
-            _("Geometry object that will be subtracted\n"
-              "from the target Geometry object.")
+            _("Geometry object that will be subtracted\n" "from the target Geometry object.")
         )
 
         grid0.addWidget(self.sub_geo_label, 20, 0)
         grid0.addWidget(self.sub_geo_combo, 20, 1)
 
         self.close_paths_cb = FCCheckBox(_("Close paths"))
-        self.close_paths_cb.setToolTip(_("Checking this will close the paths cut by the subtractor object."))
+        self.close_paths_cb.setToolTip(
+            _("Checking this will close the paths cut by the subtractor object.")
+        )
 
         grid0.addWidget(self.close_paths_cb, 22, 0, 1, 2)
 
-        self.intersect_geo_btn = FCButton(_('Subtract Geometry'))
-        self.intersect_geo_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/subtract_btn32.png'))
-        self.intersect_geo_btn.setToolTip(
-            _("Will remove the area occupied by the subtractor\n"
-              "Geometry from the Target Geometry.")
+        self.intersect_geo_btn = FCButton(_("Subtract Geometry"))
+        self.intersect_geo_btn.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/subtract_btn32.png")
         )
-        self.intersect_geo_btn.setStyleSheet("""
+        self.intersect_geo_btn.setToolTip(
+            _(
+                "Will remove the area occupied by the subtractor\n"
+                "Geometry from the Target Geometry."
+            )
+        )
+        self.intersect_geo_btn.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
 
         grid0.addWidget(self.intersect_geo_btn, 24, 0, 1, 2)
-        grid0.addWidget(QtWidgets.QLabel(''), 26, 0, 1, 2)
+        grid0.addWidget(QtWidgets.QLabel(""), 26, 0, 1, 2)
 
         self.tools_box.addStretch()
 
         # ## Reset Tool
         self.reset_button = QtWidgets.QPushButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.tools_box.addWidget(self.reset_button)
 
         # #################################### FINSIHED GUI ###########################
@@ -822,17 +863,24 @@ class SubUI:
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

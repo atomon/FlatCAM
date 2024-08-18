@@ -31,7 +31,7 @@
 from bisect import bisect_left
 import logging
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class BilinearInterpolation(object):
@@ -50,6 +50,7 @@ class BilinearInterpolation(object):
     assert table(2.5, 2.5) == 275
 
     """
+
     def __init__(self, x_index, y_index, values):
         # sanity check
         x_length = len(x_index)
@@ -113,7 +114,9 @@ class BilinearInterpolation(object):
         z11, z12 = values[j][x_slice]
         z21, z22 = values[j + 1][x_slice]
 
-        return (z11 * (x2 - x) * (y2 - y) +
-                z21 * (x - x1) * (y2 - y) +
-                z12 * (x2 - x) * (y - y1) +
-                z22 * (x - x1) * (y - y1)) / ((x2 - x1) * (y2 - y1))
+        return (
+            z11 * (x2 - x) * (y2 - y)
+            + z21 * (x - x1) * (y2 - y)
+            + z12 * (x2 - x) * (y - y1)
+            + z22 * (x - x1) * (y - y1)
+        ) / ((x2 - x1) * (y2 - y1))

@@ -5,7 +5,13 @@
 # MIT Licence                                              #
 # ##########################################################
 
-from appGUI.GUIElements import FCFileSaveDialog, FCEntry, FCTextAreaExtended, FCTextAreaLineNumber, FCButton
+from appGUI.GUIElements import (
+    FCFileSaveDialog,
+    FCEntry,
+    FCTextAreaExtended,
+    FCTextAreaLineNumber,
+    FCButton,
+)
 from PyQt5 import QtPrintSupport, QtWidgets, QtCore, QtGui
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph
@@ -18,8 +24,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -33,8 +39,7 @@ class AppTextEditor(QtWidgets.QWidget):
         self.callback = lambda x: None
 
         self.setSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding,
-            QtWidgets.QSizePolicy.MinimumExpanding
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding
         )
 
         # UI Layout
@@ -81,9 +86,11 @@ class AppTextEditor(QtWidgets.QWidget):
         self.work_editor_layout.addLayout(control_lay, 1, 0, 1, 5)
 
         # FIND
-        self.buttonFind = FCButton(_('Find'))
-        self.buttonFind.setIcon(QtGui.QIcon(self.app.resource_location + '/find32.png'))
-        self.buttonFind.setToolTip(_("Will search and highlight in yellow the string in the Find box."))
+        self.buttonFind = FCButton(_("Find"))
+        self.buttonFind.setIcon(QtGui.QIcon(self.app.resource_location + "/find32.png"))
+        self.buttonFind.setToolTip(
+            _("Will search and highlight in yellow the string in the Find box.")
+        )
         control_lay.addWidget(self.buttonFind)
 
         # Entry FIND
@@ -92,20 +99,28 @@ class AppTextEditor(QtWidgets.QWidget):
         control_lay.addWidget(self.entryFind)
 
         # REPLACE
-        self.buttonReplace = FCButton(_('Replace With'))
-        self.buttonReplace.setIcon(QtGui.QIcon(self.app.resource_location + '/replace32.png'))
-        self.buttonReplace.setToolTip(_("Will replace the string from the Find box with the one in the Replace box."))
+        self.buttonReplace = FCButton(_("Replace With"))
+        self.buttonReplace.setIcon(QtGui.QIcon(self.app.resource_location + "/replace32.png"))
+        self.buttonReplace.setToolTip(
+            _("Will replace the string from the Find box with the one in the Replace box.")
+        )
         control_lay.addWidget(self.buttonReplace)
 
         # Entry REPLACE
         self.entryReplace = FCEntry()
-        self.entryReplace.setToolTip(_("String to replace the one in the Find box throughout the text."))
+        self.entryReplace.setToolTip(
+            _("String to replace the one in the Find box throughout the text.")
+        )
         control_lay.addWidget(self.entryReplace)
 
         # Select All
-        self.sel_all_cb = QtWidgets.QCheckBox(_('All'))
-        self.sel_all_cb.setToolTip(_("When checked it will replace all instances in the 'Find' box\n"
-                                     "with the text in the 'Replace' box.."))
+        self.sel_all_cb = QtWidgets.QCheckBox(_("All"))
+        self.sel_all_cb.setToolTip(
+            _(
+                "When checked it will replace all instances in the 'Find' box\n"
+                "with the text in the 'Replace' box.."
+            )
+        )
         control_lay.addWidget(self.sel_all_cb)
 
         # COPY All
@@ -116,38 +131,40 @@ class AppTextEditor(QtWidgets.QWidget):
 
         # Update
         self.button_update_code = QtWidgets.QToolButton()
-        self.button_update_code.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
+        self.button_update_code.setIcon(QtGui.QIcon(self.app.resource_location + "/save_as.png"))
         self.button_update_code.setToolTip(_("Save changes internally."))
         self.button_update_code.hide()
         control_lay.addWidget(self.button_update_code)
 
         # Print PREVIEW
         self.buttonPreview = QtWidgets.QToolButton()
-        self.buttonPreview.setIcon(QtGui.QIcon(self.app.resource_location + '/preview32.png'))
+        self.buttonPreview.setIcon(QtGui.QIcon(self.app.resource_location + "/preview32.png"))
         self.buttonPreview.setToolTip(_("Open a OS standard Preview Print window."))
         control_lay.addWidget(self.buttonPreview)
 
         # PRINT
         self.buttonPrint = QtWidgets.QToolButton()
-        self.buttonPrint.setIcon(QtGui.QIcon(self.app.resource_location + '/printer32.png'))
+        self.buttonPrint.setIcon(QtGui.QIcon(self.app.resource_location + "/printer32.png"))
         self.buttonPrint.setToolTip(_("Open a OS standard Print window."))
         control_lay.addWidget(self.buttonPrint)
 
         # OPEN
         self.buttonOpen = QtWidgets.QToolButton()
-        self.buttonOpen.setIcon(QtGui.QIcon(self.app.resource_location + '/folder32_bis.png'))
+        self.buttonOpen.setIcon(QtGui.QIcon(self.app.resource_location + "/folder32_bis.png"))
         self.buttonOpen.setToolTip(_("Will open a text file in the editor."))
         control_lay.addWidget(self.buttonOpen)
 
         # SAVE
         self.buttonSave = QtWidgets.QToolButton()
-        self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
+        self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + "/save_as.png"))
         self.buttonSave.setToolTip(_("Will save the text in the editor into a file."))
         control_lay.addWidget(self.buttonSave)
 
         # RUN
-        self.buttonRun = FCButton(_('Run'))
-        self.buttonRun.setToolTip(_("Will run the TCL commands found in the text file, one by one."))
+        self.buttonRun = FCButton(_("Run"))
+        self.buttonRun.setToolTip(
+            _("Will run the TCL commands found in the text file, one by one.")
+        )
         self.buttonRun.hide()
         control_lay.addWidget(self.buttonRun)
 
@@ -165,7 +182,7 @@ class AppTextEditor(QtWidgets.QWidget):
 
         self.code_editor.set_model_data(self.app.myKeywords)
 
-        self.code_edited = ''
+        self.code_edited = ""
 
     def set_callback(self, callback):
         self.callback = callback
@@ -186,9 +203,11 @@ class AppTextEditor(QtWidgets.QWidget):
         # self.ui.buttonPreview.setEnabled(enable)
 
         self.buttonSave.setStyleSheet("QPushButton {color: red;}")
-        self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as_red.png'))
+        self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + "/save_as_red.png"))
 
-    def load_text(self, text, move_to_start=False, move_to_end=False, clear_text=True, as_html=False):
+    def load_text(
+        self, text, move_to_start=False, move_to_end=False, clear_text=True, as_html=False
+    ):
         self.code_editor.textChanged.disconnect()
         if clear_text:
             # first clear previous text in text editor (if any)
@@ -211,11 +230,14 @@ class AppTextEditor(QtWidgets.QWidget):
         if filt:
             _filter_ = filt
         else:
-            _filter_ = "G-Code Files (*.nc);; G-Code Files (*.txt);; G-Code Files (*.tap);; G-Code Files (*.cnc);; " \
-                       "All Files (*.*)"
+            _filter_ = (
+                "G-Code Files (*.nc);; G-Code Files (*.txt);; G-Code Files (*.tap);; G-Code Files (*.cnc);; "
+                "All Files (*.*)"
+            )
 
         path, _f = QtWidgets.QFileDialog.getOpenFileName(
-            caption=_('Open file'), directory=self.app.get_last_folder(), filter=_filter_)
+            caption=_("Open file"), directory=self.app.get_last_folder(), filter=_filter_
+        )
 
         if path:
             file = QtCore.QFile(path)
@@ -231,60 +253,68 @@ class AppTextEditor(QtWidgets.QWidget):
         if filt:
             _filter_ = filt
         else:
-            _filter_ = "G-Code Files (*.nc);; G-Code Files (*.txt);; G-Code Files (*.tap);; G-Code Files (*.cnc);; " \
-                       "PDF Files (*.pdf);;All Files (*.*)"
+            _filter_ = (
+                "G-Code Files (*.nc);; G-Code Files (*.txt);; G-Code Files (*.tap);; G-Code Files (*.cnc);; "
+                "PDF Files (*.pdf);;All Files (*.*)"
+            )
 
         if name:
             obj_name = name
         else:
             try:
-                obj_name = self.app.collection.get_active().options['name']
+                obj_name = self.app.collection.get_active().options["name"]
             except AttributeError:
-                obj_name = 'file'
+                obj_name = "file"
                 if filt is None:
                     _filter_ = "FlatConfig Files (*.FlatConfig);;PDF Files (*.pdf);;All Files (*.*)"
 
         try:
-            filename = str(FCFileSaveDialog.get_saved_filename(
-                caption=_("Export Code ..."),
-                directory=self.app.defaults["global_last_folder"] + '/' + str(obj_name),
-                ext_filter=_filter_
-            )[0])
+            filename = str(
+                FCFileSaveDialog.get_saved_filename(
+                    caption=_("Export Code ..."),
+                    directory=self.app.defaults["global_last_folder"] + "/" + str(obj_name),
+                    ext_filter=_filter_,
+                )[0]
+            )
         except TypeError:
-            filename = str(FCFileSaveDialog.get_saved_filename(
-                caption=_("Export Code ..."),
-                ext_filter=_filter_)[0])
+            filename = str(
+                FCFileSaveDialog.get_saved_filename(
+                    caption=_("Export Code ..."), ext_filter=_filter_
+                )[0]
+            )
 
         if filename == "":
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled."))
             return
         else:
             try:
                 my_gcode = self.code_editor.toPlainText()
-                if filename.rpartition('.')[2].lower() == 'pdf':
+                if filename.rpartition(".")[2].lower() == "pdf":
                     page_size = (
-                        self.app.plotcanvas.pagesize_dict[self.app.defaults['global_workspaceT']][0] * mm,
-                        self.app.plotcanvas.pagesize_dict[self.app.defaults['global_workspaceT']][1] * mm
+                        self.app.plotcanvas.pagesize_dict[self.app.defaults["global_workspaceT"]][0]
+                        * mm,
+                        self.app.plotcanvas.pagesize_dict[self.app.defaults["global_workspaceT"]][1]
+                        * mm,
                     )
 
                     # add new line after each line
                     lined_gcode = my_gcode.replace("\n", "<br />")
 
                     styles = getSampleStyleSheet()
-                    styleN = styles['Normal']
+                    styleN = styles["Normal"]
                     # styleH = styles['Heading1']
                     story = []
 
-                    if self.app.defaults['units'].lower() == 'mm':
-                        bmargin = self.app.defaults['global_tpdf_bmargin'] * mm
-                        tmargin = self.app.defaults['global_tpdf_tmargin'] * mm
-                        rmargin = self.app.defaults['global_tpdf_rmargin'] * mm
-                        lmargin = self.app.defaults['global_tpdf_lmargin'] * mm
+                    if self.app.defaults["units"].lower() == "mm":
+                        bmargin = self.app.defaults["global_tpdf_bmargin"] * mm
+                        tmargin = self.app.defaults["global_tpdf_tmargin"] * mm
+                        rmargin = self.app.defaults["global_tpdf_rmargin"] * mm
+                        lmargin = self.app.defaults["global_tpdf_lmargin"] * mm
                     else:
-                        bmargin = self.app.defaults['global_tpdf_bmargin'] * inch
-                        tmargin = self.app.defaults['global_tpdf_tmargin'] * inch
-                        rmargin = self.app.defaults['global_tpdf_rmargin'] * inch
-                        lmargin = self.app.defaults['global_tpdf_lmargin'] * inch
+                        bmargin = self.app.defaults["global_tpdf_bmargin"] * inch
+                        tmargin = self.app.defaults["global_tpdf_tmargin"] * inch
+                        rmargin = self.app.defaults["global_tpdf_rmargin"] * inch
+                        lmargin = self.app.defaults["global_tpdf_lmargin"] * inch
 
                     doc = SimpleDocTemplate(
                         filename,
@@ -292,7 +322,8 @@ class AppTextEditor(QtWidgets.QWidget):
                         bottomMargin=bmargin,
                         topMargin=tmargin,
                         rightMargin=rmargin,
-                        leftMargin=lmargin)
+                        leftMargin=lmargin,
+                    )
 
                     P = Paragraph(lined_gcode, styleN)
                     story.append(P)
@@ -301,25 +332,29 @@ class AppTextEditor(QtWidgets.QWidget):
                         story,
                     )
                 else:
-                    with open(filename, 'w') as f:
+                    with open(filename, "w") as f:
                         for line in my_gcode:
                             f.write(line)
                 self.buttonSave.setStyleSheet("")
-                self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
+                self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + "/save_as.png"))
             except FileNotFoundError:
-                self.app.inform.emit('[WARNING] %s' % _("No such file or directory"))
+                self.app.inform.emit("[WARNING] %s" % _("No such file or directory"))
                 return
             except PermissionError:
-                self.app.inform.emit('[WARNING] %s' %
-                                     _("Permission denied, saving not possible.\n"
-                                       "Most likely another app is holding the file open and not accessible."))
+                self.app.inform.emit(
+                    "[WARNING] %s"
+                    % _(
+                        "Permission denied, saving not possible.\n"
+                        "Most likely another app is holding the file open and not accessible."
+                    )
+                )
                 return
 
         # Just for adding it to the recent files list.
         if self.app.defaults["global_open_style"] is False:
             self.app.file_opened.emit("cncjob", filename)
         self.app.file_saved.emit("cncjob", filename)
-        self.app.inform.emit('%s: %s' % (_("Saved to"), str(filename)))
+        self.app.inform.emit("%s: %s" % (_("Saved to"), str(filename)))
 
         if callback is not None:
             callback()

@@ -27,11 +27,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base2')
+log = logging.getLogger("base2")
 
 
 class ParseFont:
@@ -45,11 +45,12 @@ class ParseFont:
         try:
             import winreg
         except ImportError:
-            return os.path.join(os.environ['WINDIR'], 'Fonts')
+            return os.path.join(os.environ["WINDIR"], "Fonts")
         else:
             k = winreg.OpenKey(
                 winreg.HKEY_CURRENT_USER,
-                r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders")
+                r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders",
+            )
             try:
                 # should check that k is valid? How?
                 return winreg.QueryValueEx(k, "Fonts")[0]
@@ -67,10 +68,10 @@ class ParseFont:
         If /usr/sbin/chkfontpath isn't available, uses
         returns a set of common Linux/Unix paths
         """
-        executable = '/usr/sbin/chkfontpath'
+        executable = "/usr/sbin/chkfontpath"
         if os.path.isfile(executable):
             data = os.popen(executable).readlines()
-            match = re.compile('\d+: (.+)')
+            match = re.compile("\d+: (.+)")
             set_lst = []
             for line in data:
                 result = match.match(line)
@@ -104,8 +105,7 @@ class ParseFont:
 
     @staticmethod
     def get_mac_font_paths():
-        """Get system font directories on MacOS
-        """
+        """Get system font directories on MacOS"""
         directories = [
             # okay, now the OS X variants...
             "~/Library/Fonts/",
@@ -132,26 +132,24 @@ class ParseFont:
         """Get list of explicitly *installed* font names"""
 
         import winreg
+
         if font_directory is None:
             font_directory = ParseFont.get_win32_font_path()
         k = None
 
         items = {}
         for keyName in (
-                r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts",
-                r"SOFTWARE\Microsoft\Windows\CurrentVersion\Fonts",
+            r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts",
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\Fonts",
         ):
             try:
-                k = winreg.OpenKey(
-                    winreg.HKEY_LOCAL_MACHINE,
-                    keyName
-                )
+                k = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, keyName)
             except OSError:
                 pass
 
         if not k:
             # couldn't open either WinNT or Win98 key???
-            return glob.glob(os.path.join(font_directory, '*.ttf'))
+            return glob.glob(os.path.join(font_directory, "*.ttf"))
 
         try:
             # should check that k is valid? How?
@@ -160,7 +158,7 @@ class ParseFont:
                 if not os.path.dirname(value):
                     value = os.path.join(font_directory, value)
                 value = os.path.abspath(value).lower()
-                if value[-4:] == '.ttf':
+                if value[-4:] == ".ttf":
                     items[value] = 1
             return list(items.keys())
         finally:
@@ -181,12 +179,12 @@ class ParseFont:
 
         font = ttLib.TTFont(font_path)
 
-        for record in font['name'].names:
-            if b'\x00' in record.string:
-                name_str = record.string.decode('utf-16-be')
+        for record in font["name"].names:
+            if b"\x00" in record.string:
+                name_str = record.string.decode("utf-16-be")
             else:
                 # name_str = record.string.decode('utf-8')
-                name_str = record.string.decode('latin-1')
+                name_str = record.string.decode("latin-1")
 
             if record.nameID == ParseFont.FONT_SPECIFIER_NAME_ID and not name:
                 name = name_str
@@ -217,14 +215,16 @@ class ParseFont:
         """
         files = {}
         if paths is None:
-            if sys.platform == 'win32':
+            if sys.platform == "win32":
                 font_directory = ParseFont.get_win32_font_path()
-                paths = [font_directory, ]
+                paths = [
+                    font_directory,
+                ]
 
                 # now get all installed fonts directly...
                 for f in self.get_win32_fonts(font_directory):
                     files[f] = 1
-            elif sys.platform == 'linux':
+            elif sys.platform == "linux":
                 paths = ParseFont.get_linux_font_paths()
             else:
                 paths = ParseFont.get_mac_font_paths()
@@ -232,7 +232,7 @@ class ParseFont:
             paths = [paths]
 
         for path in paths:
-            for file in glob.glob(os.path.join(path, '*.ttf')):
+            for file in glob.glob(os.path.join(path, "*.ttf")):
                 files[os.path.abspath(file)] = 1
 
         return list(files.keys())
@@ -247,42 +247,46 @@ class ParseFont:
             try:
                 name, family = ParseFont.get_font_name(font)
             except Exception as e:
-                log.debug("ParseFont.get_fonts_by_types() --> Could not get the font name. %s" % str(e))
+                log.debug(
+                    "ParseFont.get_fonts_by_types() --> Could not get the font name. %s" % str(e)
+                )
                 continue
 
-            if 'Bold' in name and 'Italic' in name:
-                name = name.replace(" Bold Italic", '')
+            if "Bold" in name and "Italic" in name:
+                name = name.replace(" Bold Italic", "")
                 self.bold_italic_f.update({name: font})
-            elif 'Bold' in name and 'Oblique' in name:
-                name = name.replace(" Bold Oblique", '')
+            elif "Bold" in name and "Oblique" in name:
+                name = name.replace(" Bold Oblique", "")
                 self.bold_italic_f.update({name: font})
-            elif 'Bold' in name:
-                name = name.replace(" Bold", '')
+            elif "Bold" in name:
+                name = name.replace(" Bold", "")
                 self.bold_f.update({name: font})
-            elif 'SemiBold' in name:
-                name = name.replace(" SemiBold", '')
+            elif "SemiBold" in name:
+                name = name.replace(" SemiBold", "")
                 self.bold_f.update({name: font})
-            elif 'DemiBold' in name:
-                name = name.replace(" DemiBold", '')
+            elif "DemiBold" in name:
+                name = name.replace(" DemiBold", "")
                 self.bold_f.update({name: font})
-            elif 'Demi' in name:
-                name = name.replace(" Demi", '')
+            elif "Demi" in name:
+                name = name.replace(" Demi", "")
                 self.bold_f.update({name: font})
-            elif 'Italic' in name:
-                name = name.replace(" Italic", '')
+            elif "Italic" in name:
+                name = name.replace(" Italic", "")
                 self.italic_f.update({name: font})
-            elif 'Oblique' in name:
-                name = name.replace(" Italic", '')
+            elif "Oblique" in name:
+                name = name.replace(" Italic", "")
                 self.italic_f.update({name: font})
             else:
                 try:
-                    name = name.replace(" Regular", '')
+                    name = name.replace(" Regular", "")
                 except Exception:
                     pass
                 self.regular_f.update({name: font})
         log.debug("Font parsing is finished.")
 
-    def font_to_geometry(self, char_string, font_name, font_type, font_size, units='MM', coordx=0, coordy=0):
+    def font_to_geometry(
+        self, char_string, font_name, font_type, font_size, units="MM", coordx=0, coordy=0
+    ):
         path = []
         scaled_path = []
         path_filename = ""
@@ -293,16 +297,16 @@ class ParseFont:
         bold_italic_dict = self.bold_italic_f
 
         try:
-            if font_type == 'bi':
+            if font_type == "bi":
                 path_filename = bold_italic_dict[font_name]
-            elif font_type == 'bold':
+            elif font_type == "bold":
                 path_filename = bold_dict[font_name]
-            elif font_type == 'italic':
+            elif font_type == "italic":
                 path_filename = italic_dict[font_name]
-            elif font_type == 'regular':
+            elif font_type == "regular":
                 path_filename = regular_dict[font_name]
         except Exception as e:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Font not supported, try another one."))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Font not supported, try another one."))
             log.debug("[ERROR_NOTCL] Font Loading: %s" % str(e))
             return "flatcam font parse failed"
 
@@ -332,7 +336,7 @@ class ParseFont:
             start, end = 0, 0
             for i in range(len(outline.contours)):
                 end = outline.contours[i]
-                points = outline.points[start:end + 1]
+                points = outline.points[start : end + 1]
                 points.append(points[0])
 
                 char_geo = Polygon(points)
@@ -346,9 +350,13 @@ class ParseFont:
             previous = glyph_index
 
         for item in path:
-            if units == 'MM':
-                scaled_path.append(scale(item, 0.0080187969924812, 0.0080187969924812, origin=(coordx, coordy)))
+            if units == "MM":
+                scaled_path.append(
+                    scale(item, 0.0080187969924812, 0.0080187969924812, origin=(coordx, coordy))
+                )
             else:
-                scaled_path.append(scale(item, 0.00031570066, 0.00031570066, origin=(coordx, coordy)))
+                scaled_path.append(
+                    scale(item, 0.00031570066, 0.00031570066, origin=(coordx, coordy))
+                )
 
         return MultiPolygon(scaled_path)

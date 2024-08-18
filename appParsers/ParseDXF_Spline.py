@@ -12,12 +12,12 @@ import math
 
 
 def norm(v):
-    return math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+    return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
 
 
 def normalize_2(v):
     m = norm(v)
-    return [v[0]/m, v[1]/m, v[2]/m]
+    return [v[0] / m, v[1] / m, v[2] / m]
 
 
 # ------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ def spline2Polyline(xyz, degree, closed, segments, knots):
         return None, None, None
 
     # order:
-    k = degree+1
+    k = degree + 1
 
     if npts < k:
         # print "not enough control points"
@@ -66,15 +66,15 @@ def spline2Polyline(xyz, degree, closed, segments, knots):
     nseg = segments * npts
 
     # WARNING: base 1
-    b = [0.0]*(npts*3+1)        # polygon points
-    h = [1.0]*(npts+1)        # set all homogeneous weighting factors to 1.0
-    p = [0.0]*(nseg*3+1)        # returned curved points
+    b = [0.0] * (npts * 3 + 1)  # polygon points
+    h = [1.0] * (npts + 1)  # set all homogeneous weighting factors to 1.0
+    p = [0.0] * (nseg * 3 + 1)  # returned curved points
 
     i = 1
     for pt in xyz:
         b[i] = pt[0]
-        b[i+1] = pt[1]
-        b[i+2] = pt[2]
+        b[i + 1] = pt[1]
+        b[i + 2] = pt[2]
         i += 3
 
     # if periodic:
@@ -86,13 +86,13 @@ def spline2Polyline(xyz, degree, closed, segments, knots):
     x = []
     y = []
     z = []
-    for i in range(1, 3*nseg+1, 3):
+    for i in range(1, 3 * nseg + 1, 3):
         x.append(p[i])
-        y.append(p[i+1])
-        z.append(p[i+2])
+        y.append(p[i + 1])
+        z.append(p[i + 2])
 
-#    for i,xyz in enumerate(zip(x,y,z)):
-#        print i,xyz
+    #    for i,xyz in enumerate(zip(x,y,z)):
+    #        print i,xyz
 
     return x, y, z
 
@@ -107,12 +107,12 @@ def spline2Polyline(xyz, degree, closed, segments, knots):
 #    x[]          = array containing the knot vector
 # ------------------------------------------------------------------------------
 def _knot(n, order):
-    x = [0.0]*(n+order+1)
-    for i in range(2, n+order+1):
-        if order < i < n+2:
-            x[i] = x[i-1] + 1.0
+    x = [0.0] * (n + order + 1)
+    for i in range(2, n + order + 1):
+        if order < i < n + 2:
+            x[i] = x[i - 1] + 1.0
         else:
-            x[i] = x[i-1]
+            x[i] = x[i - 1]
     return x
 
 
@@ -125,9 +125,9 @@ def _knot(n, order):
 # x[]          = array containing the knot vector
 # ------------------------------------------------------------------------------
 def _knotu(n, order):
-    x = [0]*(n+order+1)
-    for i in range(2, n+order+1):
-        x[i] = float(i-1)
+    x = [0] * (n + order + 1)
+    for i in range(2, n + order + 1):
+        x[i] = float(i - 1)
     return x
 
 
@@ -141,6 +141,7 @@ def _knotu(n, order):
 # Name: rbasis
 # Subroutines called: none
 # Book reference: Chapter 4, Sec. 4. , p 296
+
 
 #   c        = order of the B-spline basis function
 #   d        = first term of the basis function recursion relation
@@ -156,27 +157,27 @@ def _knotu(n, order):
 # ------------------------------------------------------------------------------
 def _rbasis(c, t, npts, x, h, r):
     nplusc = npts + c
-    temp = [0.0]*(nplusc+1)
+    temp = [0.0] * (nplusc + 1)
 
     # calculate the first order non-rational basis functions n[i]
     for i in range(1, nplusc):
-        if x[i] <= t < x[i+1]:
+        if x[i] <= t < x[i + 1]:
             temp[i] = 1.0
         else:
             temp[i] = 0.0
 
     # calculate the higher order non-rational basis functions
-    for k in range(2, c+1):
-        for i in range(1, nplusc-k+1):
+    for k in range(2, c + 1):
+        for i in range(1, nplusc - k + 1):
             # if the lower order basis function is zero skip the calculation
             if temp[i] != 0.0:
-                d = ((t-x[i])*temp[i])/(x[i+k-1]-x[i])
+                d = ((t - x[i]) * temp[i]) / (x[i + k - 1] - x[i])
             else:
                 d = 0.0
 
             # if the lower order basis function is zero skip the calculation
-            if temp[i+1] != 0.0:
-                e = ((x[i+k]-t)*temp[i+1])/(x[i+k]-x[i+1])
+            if temp[i + 1] != 0.0:
+                e = ((x[i + k] - t) * temp[i + 1]) / (x[i + k] - x[i + 1])
             else:
                 e = 0.0
             temp[i] = d + e
@@ -187,13 +188,13 @@ def _rbasis(c, t, npts, x, h, r):
 
     # calculate sum for denominator of rational basis functions
     s = 0.0
-    for i in range(1, npts+1):
-        s += temp[i]*h[i]
+    for i in range(1, npts + 1):
+        s += temp[i] * h[i]
 
     # form rational basis functions and put in r vector
-    for i in range(1, npts+1):
+    for i in range(1, npts + 1):
         if s != 0.0:
-            r[i] = (temp[i]*h[i])/s
+            r[i] = (temp[i] * h[i]) / s
         else:
             r[i] = 0
 
@@ -228,28 +229,28 @@ def _rbasis(c, t, npts, x, h, r):
 # ------------------------------------------------------------------------------
 def _rbspline(npts, k, p1, b, h, p, x):
     nplusc = npts + k
-    nbasis = [0.0]*(npts+1)        # zero and re-dimension the basis array
+    nbasis = [0.0] * (npts + 1)  # zero and re-dimension the basis array
 
     # generate the uniform open knot vector
-    if x is None or len(x) != nplusc+1:
+    if x is None or len(x) != nplusc + 1:
         x = _knot(npts, k)
     icount = 0
     # calculate the points on the rational B-spline curve
     t = 0
-    step = float(x[nplusc])/float(p1-1)
-    for i1 in range(1, p1+1):
+    step = float(x[nplusc]) / float(p1 - 1)
+    for i1 in range(1, p1 + 1):
         if x[nplusc] - t < 5e-6:
             t = x[nplusc]
         # generate the basis function for this value of t
-        nbasis = [0.0]*(npts+1)    # zero and re-dimension the knot vector and the basis array
+        nbasis = [0.0] * (npts + 1)  # zero and re-dimension the knot vector and the basis array
         _rbasis(k, t, npts, x, h, nbasis)
         # generate a point on the curve
         for j in range(1, 4):
             jcount = j
-            p[icount+j] = 0.0
+            p[icount + j] = 0.0
             # Do local matrix multiplication
-            for i in range(1, npts+1):
-                p[icount+j] += nbasis[i]*b[jcount]
+            for i in range(1, npts + 1):
+                p[icount + j] += nbasis[i] * b[jcount]
                 jcount += 3
         icount += 3
         t += step
@@ -285,35 +286,35 @@ def _rbspline(npts, k, p1, b, h, p, x):
 # ------------------------------------------------------------------------------
 def _rbsplinu(npts, k, p1, b, h, p, x=None):
     nplusc = npts + k
-    nbasis = [0.0]*(npts+1)        # zero and re-dimension the basis array
+    nbasis = [0.0] * (npts + 1)  # zero and re-dimension the basis array
     # generate the uniform periodic knot vector
-    if x is None or len(x) != nplusc+1:
+    if x is None or len(x) != nplusc + 1:
         # zero and re dimension the knot vector and the basis array
         x = _knotu(npts, k)
     icount = 0
     # calculate the points on the rational B-spline curve
-    t = k-1
-    step = (float(npts)-(k-1))/float(p1-1)
-    for i1 in range(1, p1+1):
+    t = k - 1
+    step = (float(npts) - (k - 1)) / float(p1 - 1)
+    for i1 in range(1, p1 + 1):
         if x[nplusc] - t < 5e-6:
             t = x[nplusc]
         # generate the basis function for this value of t
-        nbasis = [0.0]*(npts+1)
+        nbasis = [0.0] * (npts + 1)
         _rbasis(k, t, npts, x, h, nbasis)
         # generate a point on the curve
         for j in range(1, 4):
             jcount = j
-            p[icount+j] = 0.0
+            p[icount + j] = 0.0
             #  Do local matrix multiplication
-            for i in range(1, npts+1):
-                p[icount+j] += nbasis[i]*b[jcount]
+            for i in range(1, npts + 1):
+                p[icount + j] += nbasis[i] * b[jcount]
                 jcount += 3
         icount += 3
         t += step
 
 
 # Accuracy for comparison operators
-_accuracy = 1E-15
+_accuracy = 1e-15
 
 
 def Cmp0(x):
@@ -410,7 +411,7 @@ class Vector(list):
         s2 = 0.0
         for a, b in zip(self, v):
             s2 += (a - b) ** 2
-        return s2 <= acc ** 2
+        return s2 <= acc**2
 
     def __eq__(self, v):
         return self.eq(v)
@@ -498,9 +499,11 @@ class Vector(list):
     def cross(self, v):
         """Cross product of 2 vectors"""
         if len(self) == 3:
-            return Vector(self[1] * v[2] - self[2] * v[1],
-                          self[2] * v[0] - self[0] * v[2],
-                          self[0] * v[1] - self[1] * v[0])
+            return Vector(
+                self[1] * v[2] - self[2] * v[1],
+                self[2] * v[0] - self[0] * v[2],
+                self[0] * v[1] - self[1] * v[0],
+            )
         elif len(self) == 2:
             return self[0] * v[1] - self[1] * v[0]
         else:
@@ -511,7 +514,7 @@ class Vector(list):
         """Return length squared of vector"""
         s2 = 0.0
         for s in self:
-            s2 += s ** 2
+            s2 += s**2
         return s2
 
     # ----------------------------------------------------------------------
@@ -519,7 +522,7 @@ class Vector(list):
         """Return length of vector"""
         s2 = 0.0
         for s in self:
-            s2 += s ** 2
+            s2 += s**2
         return math.sqrt(s2)
 
     __abs__ = length
@@ -669,6 +672,7 @@ class Vector(list):
     #     sinTheta = math.sqrt(1.0 - cosTheta ** 2)
     #     phi = 2.0 * math.pi * random.random()
     #     return Vector(math.cos(phi) * sinTheta, math.sin(phi) * sinTheta, cosTheta)
+
 
 # #===============================================================================
 # # Cardinal cubic spline class

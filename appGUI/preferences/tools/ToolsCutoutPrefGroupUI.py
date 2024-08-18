@@ -9,13 +9,13 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 settings = QSettings("Open Source", "FlatCAM")
 if settings.contains("machinist"):
-    machinist_setting = settings.value('machinist', type=int)
+    machinist_setting = settings.value("machinist", type=int)
 else:
     machinist_setting = 0
 
@@ -31,19 +31,23 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
         # ## Board cutout
         self.board_cutout_label = FCLabel("<b>%s:</b>" % _("Parameters"))
         self.board_cutout_label.setToolTip(
-            _("Create toolpaths to cut around\n"
-              "the PCB and separate it from\n"
-              "the original board.")
+            _(
+                "Create toolpaths to cut around\n"
+                "the PCB and separate it from\n"
+                "the original board."
+            )
         )
         self.layout.addWidget(self.board_cutout_label)
 
         grid0 = QtWidgets.QGridLayout()
         self.layout.addLayout(grid0)
 
-        tdclabel = FCLabel('%s:' % _('Tool Diameter'))
+        tdclabel = FCLabel("%s:" % _("Tool Diameter"))
         tdclabel.setToolTip(
-            _("Diameter of the tool used to cutout\n"
-              "the PCB shape out of the surrounding material.")
+            _(
+                "Diameter of the tool used to cutout\n"
+                "the PCB shape out of the surrounding material."
+            )
         )
 
         self.cutout_tooldia_entry = FCDoubleSpinner()
@@ -55,13 +59,8 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
         grid0.addWidget(self.cutout_tooldia_entry, 0, 1)
 
         # Cut Z
-        cutzlabel = FCLabel('%s:' % _('Cut Z'))
-        cutzlabel.setToolTip(
-            _(
-                "Cutting depth (negative)\n"
-                "below the copper surface."
-            )
-        )
+        cutzlabel = FCLabel("%s:" % _("Cut Z"))
+        cutzlabel.setToolTip(_("Cutting depth (negative)\n" "below the copper surface."))
         self.cutz_entry = FCDoubleSpinner()
         self.cutz_entry.set_precision(self.decimals)
 
@@ -76,7 +75,7 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
         grid0.addWidget(self.cutz_entry, 1, 1)
 
         # Multi-pass
-        self.mpass_cb = FCCheckBox('%s:' % _("Multi-Depth"))
+        self.mpass_cb = FCCheckBox("%s:" % _("Multi-Depth"))
         self.mpass_cb.setToolTip(
             _(
                 "Use multiple passes to limit\n"
@@ -97,26 +96,32 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
         grid0.addWidget(self.maxdepth_entry, 2, 1)
 
         # Object kind
-        kindlabel = FCLabel('%s:' % _('Kind'))
+        kindlabel = FCLabel("%s:" % _("Kind"))
         kindlabel.setToolTip(
-            _("Choice of what kind the object we want to cutout is.\n"
-              "- Single: contain a single PCB Gerber outline object.\n"
-              "- Panel: a panel PCB Gerber object, which is made\n"
-              "out of many individual PCB outlines.")
+            _(
+                "Choice of what kind the object we want to cutout is.\n"
+                "- Single: contain a single PCB Gerber outline object.\n"
+                "- Panel: a panel PCB Gerber object, which is made\n"
+                "out of many individual PCB outlines."
+            )
         )
 
-        self.obj_kind_combo = RadioSet([
-            {"label": _("Single"), "value": "single"},
-            {"label": _("Panel"), "value": "panel"},
-        ])
+        self.obj_kind_combo = RadioSet(
+            [
+                {"label": _("Single"), "value": "single"},
+                {"label": _("Panel"), "value": "panel"},
+            ]
+        )
         grid0.addWidget(kindlabel, 3, 0)
         grid0.addWidget(self.obj_kind_combo, 3, 1)
 
-        marginlabel = FCLabel('%s:' % _('Margin'))
+        marginlabel = FCLabel("%s:" % _("Margin"))
         marginlabel.setToolTip(
-            _("Margin over bounds. A positive value here\n"
-              "will make the cutout of the PCB further from\n"
-              "the actual PCB border")
+            _(
+                "Margin over bounds. A positive value here\n"
+                "will make the cutout of the PCB further from\n"
+                "the actual PCB border"
+            )
         )
 
         self.cutout_margin_entry = FCDoubleSpinner()
@@ -126,14 +131,16 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
 
         grid0.addWidget(marginlabel, 4, 0)
         grid0.addWidget(self.cutout_margin_entry, 4, 1)
-        
+
         # Gap Size
-        gaplabel = FCLabel('%s:' % _('Gap size'))
+        gaplabel = FCLabel("%s:" % _("Gap size"))
         gaplabel.setToolTip(
-            _("The size of the bridge gaps in the cutout\n"
-              "used to keep the board connected to\n"
-              "the surrounding material (the one \n"
-              "from which the PCB is cutout).")
+            _(
+                "The size of the bridge gaps in the cutout\n"
+                "used to keep the board connected to\n"
+                "the surrounding material (the one \n"
+                "from which the PCB is cutout)."
+            )
         )
 
         self.cutout_gap_entry = FCDoubleSpinner()
@@ -143,33 +150,34 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
 
         grid0.addWidget(gaplabel, 5, 0)
         grid0.addWidget(self.cutout_gap_entry, 5, 1)
-        
+
         # Gap Type
-        self.gaptype_label = FCLabel('%s:' % _("Gap type"))
+        self.gaptype_label = FCLabel("%s:" % _("Gap type"))
         self.gaptype_label.setToolTip(
-            _("The type of gap:\n"
-              "- Bridge -> the cutout will be interrupted by bridges\n"
-              "- Thin -> same as 'bridge' but it will be thinner by partially milling the gap\n"
-              "- M-Bites -> 'Mouse Bites' - same as 'bridge' but covered with drill holes")
+            _(
+                "The type of gap:\n"
+                "- Bridge -> the cutout will be interrupted by bridges\n"
+                "- Thin -> same as 'bridge' but it will be thinner by partially milling the gap\n"
+                "- M-Bites -> 'Mouse Bites' - same as 'bridge' but covered with drill holes"
+            )
         )
 
         self.gaptype_radio = RadioSet(
             [
-                {'label': _('Bridge'),      'value': 'b'},
-                {'label': _('Thin'),        'value': 'bt'},
-                {'label': "M-Bites",        'value': 'mb'}
+                {"label": _("Bridge"), "value": "b"},
+                {"label": _("Thin"), "value": "bt"},
+                {"label": "M-Bites", "value": "mb"},
             ],
-            stretch=True
+            stretch=True,
         )
 
         grid0.addWidget(self.gaptype_label, 7, 0)
         grid0.addWidget(self.gaptype_radio, 7, 1)
 
         # Thin gaps Depth
-        self.thin_depth_label = FCLabel('%s:' % _("Depth"))
+        self.thin_depth_label = FCLabel("%s:" % _("Depth"))
         self.thin_depth_label.setToolTip(
-            _("The depth until the milling is done\n"
-              "in order to thin the gaps.")
+            _("The depth until the milling is done\n" "in order to thin the gaps.")
         )
         self.thin_depth_entry = FCDoubleSpinner()
         self.thin_depth_entry.set_precision(self.decimals)
@@ -183,10 +191,8 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
         grid0.addWidget(self.thin_depth_entry, 9, 1)
 
         # Mouse Bites Tool Diameter
-        self.mb_dia_label = FCLabel('%s:' % _("Tool Diameter"))
-        self.mb_dia_label.setToolTip(
-            _("The drill hole diameter when doing mouse bites.")
-        )
+        self.mb_dia_label = FCLabel("%s:" % _("Tool Diameter"))
+        self.mb_dia_label.setToolTip(_("The drill hole diameter when doing mouse bites."))
         self.mb_dia_entry = FCDoubleSpinner()
         self.mb_dia_entry.set_precision(self.decimals)
         self.mb_dia_entry.setRange(0, 100.0000)
@@ -195,7 +201,7 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
         grid0.addWidget(self.mb_dia_entry, 11, 1)
 
         # Mouse Bites Holes Spacing
-        self.mb_spacing_label = FCLabel('%s:' % _("Spacing"))
+        self.mb_spacing_label = FCLabel("%s:" % _("Spacing"))
         self.mb_spacing_label.setToolTip(
             _("The spacing between drill holes when doing mouse bites.")
         )
@@ -205,41 +211,44 @@ class ToolsCutoutPrefGroupUI(OptionsGroupUI):
 
         grid0.addWidget(self.mb_spacing_label, 13, 0)
         grid0.addWidget(self.mb_spacing_entry, 13, 1)
-        
-        gaps_label = FCLabel('%s:' % _('Gaps'))
+
+        gaps_label = FCLabel("%s:" % _("Gaps"))
         gaps_label.setToolTip(
-            _("Number of gaps used for the cutout.\n"
-              "There can be maximum 8 bridges/gaps.\n"
-              "The choices are:\n"
-              "- None  - no gaps\n"
-              "- lr    - left + right\n"
-              "- tb    - top + bottom\n"
-              "- 4     - left + right +top + bottom\n"
-              "- 2lr   - 2*left + 2*right\n"
-              "- 2tb  - 2*top + 2*bottom\n"
-              "- 8     - 2*left + 2*right +2*top + 2*bottom")
+            _(
+                "Number of gaps used for the cutout.\n"
+                "There can be maximum 8 bridges/gaps.\n"
+                "The choices are:\n"
+                "- None  - no gaps\n"
+                "- lr    - left + right\n"
+                "- tb    - top + bottom\n"
+                "- 4     - left + right +top + bottom\n"
+                "- 2lr   - 2*left + 2*right\n"
+                "- 2tb  - 2*top + 2*bottom\n"
+                "- 8     - 2*left + 2*right +2*top + 2*bottom"
+            )
         )
 
         self.gaps_combo = FCComboBox()
         grid0.addWidget(gaps_label, 15, 0)
         grid0.addWidget(self.gaps_combo, 15, 1)
 
-        gaps_items = ['None', 'LR', 'TB', '4', '2LR', '2TB', '8']
+        gaps_items = ["None", "LR", "TB", "4", "2LR", "2TB", "8"]
         for it in gaps_items:
             self.gaps_combo.addItem(it)
             # self.gaps_combo.setStyleSheet('background-color: rgb(255,255,255)')
 
         # Surrounding convex box shape
-        self.convex_box = FCCheckBox('%s' % _("Convex Shape"))
+        self.convex_box = FCCheckBox("%s" % _("Convex Shape"))
         self.convex_box.setToolTip(
-            _("Create a convex shape surrounding the entire PCB.\n"
-              "Used only if the source object type is Gerber.")
+            _(
+                "Create a convex shape surrounding the entire PCB.\n"
+                "Used only if the source object type is Gerber."
+            )
         )
         grid0.addWidget(self.convex_box, 17, 0, 1, 2)
 
-        self.big_cursor_cb = FCCheckBox('%s' % _("Big cursor"))
-        self.big_cursor_cb.setToolTip(
-            _("Use a big cursor when adding manual gaps."))
+        self.big_cursor_cb = FCCheckBox("%s" % _("Big cursor"))
+        self.big_cursor_cb.setToolTip(_("Use a big cursor when adding manual gaps."))
         grid0.addWidget(self.big_cursor_cb, 19, 0, 1, 2)
 
         self.layout.addStretch()
