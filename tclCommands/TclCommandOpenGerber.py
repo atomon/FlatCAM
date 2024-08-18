@@ -10,33 +10,39 @@ class TclCommandOpenGerber(TclCommandSignaled):
     """
 
     # array of all command aliases, to be able use  old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['open_gerber']
+    aliases = ["open_gerber"]
 
-    description = '%s %s' % ("--", "Opens an Gerber file, parse it and create a Gerber object from it.")
+    description = "%s %s" % (
+        "--",
+        "Opens an Gerber file, parse it and create a Gerber object from it.",
+    )
 
     # dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('filename', str)
-    ])
+    arg_names = collections.OrderedDict([("filename", str)])
 
     # dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-        ('outname', str)
-    ])
+    option_types = collections.OrderedDict([("outname", str)])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['filename']
+    required = ["filename"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Opens a Gerber file.",
-        'args': collections.OrderedDict([
-            ('filename', 'Absolute path to file to open. Required.\n'
-                         'WARNING: no spaces are allowed. If unsure enclose the entire path with quotes.'),
-            ('outname', 'Name of the resulting Gerber object.')
-        ]),
-        'examples': ["open_gerber gerber_object_path -outname bla",
-                     'open_gerber "D:\\my_gerber_file with spaces in the name.GRB"']
+        "main": "Opens a Gerber file.",
+        "args": collections.OrderedDict(
+            [
+                (
+                    "filename",
+                    "Absolute path to file to open. Required.\n"
+                    "WARNING: no spaces are allowed. If unsure enclose the entire path with quotes.",
+                ),
+                ("outname", "Name of the resulting Gerber object."),
+            ]
+        ),
+        "examples": [
+            "open_gerber gerber_object_path -outname bla",
+            'open_gerber "D:\\my_gerber_file with spaces in the name.GRB"',
+        ],
     }
 
     def execute(self, args, unnamed_args):
@@ -49,17 +55,19 @@ class TclCommandOpenGerber(TclCommandSignaled):
         :return: None or exception
         """
 
-        if 'follow' in args:
-            self.raise_tcl_error("The 'follow' parameter is obsolete. To create 'follow' geometry use the 'follow' "
-                                 "parameter for the Tcl Command isolate()")
+        if "follow" in args:
+            self.raise_tcl_error(
+                "The 'follow' parameter is obsolete. To create 'follow' geometry use the 'follow' "
+                "parameter for the Tcl Command isolate()"
+            )
 
-        filename = args.pop('filename')
+        filename = args.pop("filename")
 
-        if 'outname' in args:
-            outname = args.pop('outname')
+        if "outname" in args:
+            outname = args.pop("outname")
         else:
-            outname = filename.split('/')[-1].split('\\')[-1]
+            outname = filename.split("/")[-1].split("\\")[-1]
 
-        args['plot'] = False
-        args['from_tcl'] = True
+        args["plot"] = False
+        args["from_tcl"] = True
         self.app.f_handlers.open_gerber(filename, outname, **args)

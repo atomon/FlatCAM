@@ -12,32 +12,26 @@ class TclCommandSetSys(TclCommand):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['set_sys', 'setsys']
+    aliases = ["set_sys", "setsys"]
 
-    description = '%s %s' % ("--", "Sets the value of the specified system variable.")
+    description = "%s %s" % ("--", "Sets the value of the specified system variable.")
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('name', str),
-        ('value', str)
-    ])
+    arg_names = collections.OrderedDict([("name", str), ("value", str)])
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-
-    ])
+    option_types = collections.OrderedDict([])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name', 'value']
+    required = ["name", "value"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Sets the value of the specified system variable.",
-        'args': collections.OrderedDict([
-            ('name', 'Name of the system variable. Required.'),
-            ('value', 'Value to set.')
-        ]),
-        'examples': ['set_sys global_gridx 1.0']
+        "main": "Sets the value of the specified system variable.",
+        "args": collections.OrderedDict(
+            [("name", "Name of the system variable. Required."), ("value", "Value to set.")]
+        ),
+        "examples": ["set_sys global_gridx 1.0"],
     }
 
     def execute(self, args, unnamed_args):
@@ -48,8 +42,8 @@ class TclCommandSetSys(TclCommand):
         :return:
         """
 
-        param = args['name']
-        value = args['value']
+        param = args["name"]
+        value = args["value"]
 
         # TCL string to python keywords:
         tcl2py = {
@@ -72,7 +66,7 @@ class TclCommandSetSys(TclCommand):
             "in": "IN",
             "IN": "IN",
             "mm": "MM",
-            "MM": "MM"
+            "MM": "MM",
         }
 
         if param in self.app.defaults:
@@ -86,4 +80,4 @@ class TclCommandSetSys(TclCommand):
             self.app.defaults.propagate_defaults()
 
         else:
-            self.raise_tcl_error("No such system parameter \"{}\".".format(param))
+            self.raise_tcl_error('No such system parameter "{}".'.format(param))

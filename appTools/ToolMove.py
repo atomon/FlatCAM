@@ -15,11 +15,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolMove(AppTool):
@@ -51,6 +51,7 @@ class ToolMove(AppTool):
             self.sel_shapes = ShapeCollection(parent=self.app.plotcanvas.view.scene, layers=1)
         else:
             from appGUI.PlotCanvasLegacy import ShapeCollectionLegacy
+
             self.sel_shapes = ShapeCollectionLegacy(obj=self, app=self.app, name="move")
 
         self.mm = None
@@ -60,7 +61,7 @@ class ToolMove(AppTool):
         self.replot_signal[list].connect(self.replot)
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='M', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="M", **kwargs)
 
     def run(self, toggle):
         self.app.defaults.report_usage("ToolMove()")
@@ -74,15 +75,17 @@ class ToolMove(AppTool):
             self.setVisible(False)
 
             if self.app.is_legacy is False:
-                self.app.plotcanvas.graph_event_disconnect('mouse_move', self.on_move)
-                self.app.plotcanvas.graph_event_disconnect('mouse_press', self.on_left_click)
-                self.app.plotcanvas.graph_event_disconnect('key_release', self.on_key_press)
-                self.app.plotcanvas.graph_event_connect('key_press', self.app.ui.keyPressEvent)
+                self.app.plotcanvas.graph_event_disconnect("mouse_move", self.on_move)
+                self.app.plotcanvas.graph_event_disconnect("mouse_press", self.on_left_click)
+                self.app.plotcanvas.graph_event_disconnect("key_release", self.on_key_press)
+                self.app.plotcanvas.graph_event_connect("key_press", self.app.ui.keyPressEvent)
             else:
                 self.app.plotcanvas.graph_event_disconnect(self.mm)
                 self.app.plotcanvas.graph_event_disconnect(self.mp)
                 self.app.plotcanvas.graph_event_disconnect(self.kr)
-                self.app.kr = self.app.plotcanvas.graph_event_connect('key_press', self.app.ui.keyPressEvent)
+                self.app.kr = self.app.plotcanvas.graph_event_connect(
+                    "key_press", self.app.ui.keyPressEvent
+                )
 
             self.clicked_move = 0
 
@@ -102,15 +105,15 @@ class ToolMove(AppTool):
                 self.app.inform.emit(_("MOVE: Click on the Start point ..."))
 
                 # if we have an object selected then we can safely activate the mouse events
-                self.mm = self.app.plotcanvas.graph_event_connect('mouse_move', self.on_move)
-                self.mp = self.app.plotcanvas.graph_event_connect('mouse_press', self.on_left_click)
-                self.kr = self.app.plotcanvas.graph_event_connect('key_release', self.on_key_press)
+                self.mm = self.app.plotcanvas.graph_event_connect("mouse_move", self.on_move)
+                self.mp = self.app.plotcanvas.graph_event_connect("mouse_press", self.on_left_click)
+                self.kr = self.app.plotcanvas.graph_event_connect("key_release", self.on_key_press)
 
                 # draw the selection box
                 self.draw_sel_bbox()
             else:
                 self.toggle()
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled. No object(s) to move."))
+                self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled. No object(s) to move."))
 
     def on_left_click(self, event):
         # mouse click will be accepted only if the left button is clicked
@@ -156,22 +159,27 @@ class ToolMove(AppTool):
                     dy = pos[1] - self.point1[1]
 
                     # move only the objects selected and plotted and visible
-                    obj_list = [obj for obj in self.app.collection.get_selected()
-                                if obj.options['plot'] and obj.visible is True]
+                    obj_list = [
+                        obj
+                        for obj in self.app.collection.get_selected()
+                        if obj.options["plot"] and obj.visible is True
+                    ]
 
                     def job_move(app_obj):
                         with self.app.proc_container.new(_("Moving ...")):
 
                             if not obj_list:
-                                app_obj.app.inform.emit('[ERROR_NOTCL] %s %s' % (_("Failed."),
-                                                                                 _("No object is selected.")))
+                                app_obj.app.inform.emit(
+                                    "[ERROR_NOTCL] %s %s"
+                                    % (_("Failed."), _("No object is selected."))
+                                )
                                 return "fail"
 
                             try:
                                 # remove any mark aperture shape that may be displayed
                                 for sel_obj in obj_list:
                                     # if the Gerber mark shapes are enabled they need to be disabled before move
-                                    if sel_obj.kind == 'gerber':
+                                    if sel_obj.kind == "gerber":
                                         sel_obj.ui.aperture_table_visibility_cb.setChecked(False)
 
                                     try:
@@ -184,22 +192,33 @@ class ToolMove(AppTool):
 
                                     # Update the object bounding box options
                                     a, b, c, d = sel_obj.bounds()
-                                    sel_obj.options['xmin'] = a
-                                    sel_obj.options['ymin'] = b
-                                    sel_obj.options['xmax'] = c
-                                    sel_obj.options['ymax'] = d
+                                    sel_obj.options["xmin"] = a
+                                    sel_obj.options["ymin"] = b
+                                    sel_obj.options["xmax"] = c
+                                    sel_obj.options["ymax"] = d
 
                                 # update the source_file with the new positions
                                 for sel_obj in obj_list:
                                     out_name = sel_obj.options["name"]
-                                    if sel_obj.kind == 'gerber':
+                                    if sel_obj.kind == "gerber":
                                         sel_obj.source_file = self.app.f_handlers.export_gerber(
-                                            obj_name=out_name, filename=None, local_use=sel_obj, use_thread=False)
-                                    elif sel_obj.kind == 'excellon':
+                                            obj_name=out_name,
+                                            filename=None,
+                                            local_use=sel_obj,
+                                            use_thread=False,
+                                        )
+                                    elif sel_obj.kind == "excellon":
                                         sel_obj.source_file = self.app.f_handlers.export_excellon(
-                                            obj_name=out_name, filename=None, local_use=sel_obj, use_thread=False)
+                                            obj_name=out_name,
+                                            filename=None,
+                                            local_use=sel_obj,
+                                            use_thread=False,
+                                        )
                             except Exception as err:
-                                log.debug('[ERROR_NOTCL] %s --> %s' % ('ToolMove.on_left_click()', str(err)))
+                                log.debug(
+                                    "[ERROR_NOTCL] %s --> %s"
+                                    % ("ToolMove.on_left_click()", str(err))
+                                )
                                 return "fail"
 
                             # time to plot the moved objects
@@ -207,10 +226,12 @@ class ToolMove(AppTool):
 
                         # delete the selection bounding box
                         self.delete_shape()
-                        self.app.inform.emit('[success] %s %s ...' %
-                                             (str(sel_obj.kind).capitalize(), _('object was moved')))
+                        self.app.inform.emit(
+                            "[success] %s %s ..."
+                            % (str(sel_obj.kind).capitalize(), _("object was moved"))
+                        )
 
-                    self.app.worker_task.emit({'fcn': job_move, 'params': [self]})
+                    self.app.worker_task.emit({"fcn": job_move, "params": [self]})
 
                     self.clicked_move = 0
                     self.toggle()
@@ -218,7 +239,9 @@ class ToolMove(AppTool):
 
                 except TypeError as e:
                     log.debug("ToolMove.on_left_click() --> %s" % str(e))
-                    self.app.inform.emit('[ERROR_NOTCL] ToolMove. %s' % _('Error when mouse left click.'))
+                    self.app.inform.emit(
+                        "[ERROR_NOTCL] ToolMove. %s" % _("Error when mouse left click.")
+                    )
                     return
 
             self.clicked_move = 1
@@ -226,11 +249,11 @@ class ToolMove(AppTool):
     def replot(self, obj_list):
 
         def worker_task():
-            with self.app.proc_container.new('%s ...' % _("Plotting")):
+            with self.app.proc_container.new("%s ..." % _("Plotting")):
                 for sel_obj in obj_list:
                     sel_obj.plot()
 
-        self.app.worker_task.emit({'fcn': worker_task, 'params': []})
+        self.app.worker_task.emit({"fcn": worker_task, "params": []})
 
     def on_move(self, event):
 
@@ -264,9 +287,9 @@ class ToolMove(AppTool):
             self.update_sel_bbox((dx, dy))
 
     def on_key_press(self, event):
-        if event.key == 'escape':
+        if event.key == "escape":
             # abort the move action
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("Cancelled."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("Cancelled."))
             self.toggle()
         return
 
@@ -281,7 +304,7 @@ class ToolMove(AppTool):
         # first get a bounding box to fit all
         for obj in obj_list:
             # don't move disabled objects, move only plotted objects
-            if obj.options['plot']:
+            if obj.options["plot"]:
                 xmin, ymin, xmax, ymax = obj.bounds()
                 xminlist.append(xmin)
                 yminlist.append(ymin)
@@ -323,7 +346,7 @@ class ToolMove(AppTool):
 
     def draw_shape(self, shape):
 
-        if self.app.defaults['units'].upper() == 'MM':
+        if self.app.defaults["units"].upper() == "MM":
             proc_shape = shape.buffer(-0.1)
             proc_shape = proc_shape.buffer(0.2)
         else:
@@ -333,9 +356,12 @@ class ToolMove(AppTool):
         # face = Color('blue')
         # face.alpha = 0.2
 
-        face = '#0000FF' + str(hex(int(0.2 * 255)))[2:]
-        outline = '#0000FFAF'
+        face = "#0000FF" + str(hex(int(0.2 * 255)))[2:]
+        outline = "#0000FFAF"
 
-        self.sel_shapes.add(proc_shape, color=outline, face_color=face, update=True, layer=0, tolerance=None)
+        self.sel_shapes.add(
+            proc_shape, color=outline, face_color=face, update=True, layer=0, tolerance=None
+        )
+
 
 # end of file

@@ -10,6 +10,7 @@ from random import random
 def mkstorage(paths):
     def get_pts(o):
         return [o.coords[0], o.coords[-1]]
+
     storage = FlatCAMRTreeStorage()
     storage.get_points = get_pts
     for p in paths:
@@ -24,10 +25,7 @@ class PathConnectTest1(unittest.TestCase):
         pass
 
     def test_simple_connect(self):
-        paths = [
-            LineString([[0, 0], [1, 1]]),
-            LineString([[1, 1], [2, 1]])
-        ]
+        paths = [LineString([[0, 0], [1, 1]]), LineString([[1, 1], [2, 1]])]
 
         result = Geometry.path_connect(mkstorage(paths))
 
@@ -39,7 +37,7 @@ class PathConnectTest1(unittest.TestCase):
         paths = [
             LineString([[0, 0], [1, 1]]),
             LineString([[1, 1], [2, 1]]),
-            LineString([[-0.5, 0.5], [0.5, 0]])
+            LineString([[-0.5, 0.5], [0.5, 0]]),
         ]
 
         result = Geometry.path_connect(mkstorage(paths))
@@ -56,16 +54,24 @@ class PathConnectTest1(unittest.TestCase):
 
             paths = [
                 LineString([[0 + offset_x, 0 + offset_y], [1 + offset_x, 1 + offset_y]]),
-                LineString([[1 + offset_x, 1 + offset_y], [2 + offset_x, 1 + offset_y]])
+                LineString([[1 + offset_x, 1 + offset_y], [2 + offset_x, 1 + offset_y]]),
             ]
 
             result = Geometry.path_connect(mkstorage(paths))
 
             result = list(result.get_objects())
             self.assertEqual(len(result), 1)
-            self.assertTrue(result[0].equals(LineString([[0 + offset_x, 0 + offset_y],
-                                                         [1 + offset_x, 1 + offset_y],
-                                                         [2 + offset_x, 1 + offset_y]])))
+            self.assertTrue(
+                result[0].equals(
+                    LineString(
+                        [
+                            [0 + offset_x, 0 + offset_y],
+                            [1 + offset_x, 1 + offset_y],
+                            [2 + offset_x, 1 + offset_y],
+                        ]
+                    )
+                )
+            )
 
     def test_ring_interfere_connect(self):
         print()
@@ -74,7 +80,7 @@ class PathConnectTest1(unittest.TestCase):
         paths = [
             LineString([[0, 0], [1, 1]]),
             LineString([[1, 1], [2, 1]]),
-            LinearRing([[1, 1], [2, 2], [1, 3], [0, 2]])
+            LinearRing([[1, 1], [2, 2], [1, 3], [0, 2]]),
         ]
 
         result = Geometry.path_connect(mkstorage(paths))

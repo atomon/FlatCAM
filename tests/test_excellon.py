@@ -126,7 +126,7 @@ class ExcellonFormatM72Test(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -153,7 +153,7 @@ class ExcellonFormatM71Test(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -180,7 +180,7 @@ class ExcellonFormatINCHLZTest(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -207,7 +207,7 @@ class ExcellonFormatINCHTest(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -234,7 +234,7 @@ class ExcellonFormatINCHTZTest(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -261,7 +261,7 @@ class ExcellonFormatMETRICLZTest(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -288,7 +288,7 @@ class ExcellonFormatMETRICTest(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -315,7 +315,7 @@ class ExcellonFormatMETRICTZTest(unittest.TestCase):
         X9000Y11750
         X30250Y10500
         """
-        code = code.split('\n')
+        code = code.split("\n")
         self.excellon.parse_lines(code)
 
     def test_format(self):
@@ -327,5 +327,6 @@ class ExcellonFormatMETRICTZTest(unittest.TestCase):
         self.assertEqual(self.excellon.drills[0]["point"].coords[0], (9.0, 11.75))
         self.assertEqual(self.excellon.drills[1]["point"].coords[0], (30.25, 10.5))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

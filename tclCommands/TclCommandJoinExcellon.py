@@ -13,33 +13,41 @@ class TclCommandJoinExcellon(TclCommand):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['join_excellon', 'join_excellons']
+    aliases = ["join_excellon", "join_excellons"]
 
-    description = '%s %s' % ("--", "Merge two or more Excellon objects drills and create "
-                                   "a new Excellon object with them.")
+    description = "%s %s" % (
+        "--",
+        "Merge two or more Excellon objects drills and create " "a new Excellon object with them.",
+    )
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('outname', str),
-    ])
+    arg_names = collections.OrderedDict(
+        [
+            ("outname", str),
+        ]
+    )
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-    ])
+    option_types = collections.OrderedDict([])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['outname']
+    required = ["outname"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Runs a merge operation (join) on the Excellon objects.\n"
-                "The names of the Excellon objects to be merged will be entered after the outname,\n"
-                "separated by spaces. See the example below.\n"
-                "WARNING: if the name of an Excellon objects has spaces, enclose the name with quotes.",
-        'args': collections.OrderedDict([
-            ('outname', 'Name of the new Excellon Object made by joining of other Excellon objects. Required'),
-        ]),
-        'examples': ['join_excellons merged_new_excellon exc_name_1 "exc name_2"']
+        "main": "Runs a merge operation (join) on the Excellon objects.\n"
+        "The names of the Excellon objects to be merged will be entered after the outname,\n"
+        "separated by spaces. See the example below.\n"
+        "WARNING: if the name of an Excellon objects has spaces, enclose the name with quotes.",
+        "args": collections.OrderedDict(
+            [
+                (
+                    "outname",
+                    "Name of the new Excellon Object made by joining of other Excellon objects. Required",
+                ),
+            ]
+        ),
+        "examples": ['join_excellons merged_new_excellon exc_name_1 "exc name_2"'],
     }
 
     def execute(self, args, unnamed_args):
@@ -50,7 +58,7 @@ class TclCommandJoinExcellon(TclCommand):
         :return:
         """
 
-        outname = args['outname']
+        outname = args["outname"]
         obj_names = unnamed_args
 
         objs = []

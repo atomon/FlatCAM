@@ -1,6 +1,7 @@
 # Run kernprof -l -v gerber_parsing_line_profile_1.py
 import sys
-sys.path.append('../../')
+
+sys.path.append("../../")
 from camlib import *
 from shapely.geometry import Polygon
 

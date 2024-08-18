@@ -85,12 +85,16 @@ class ColumnarFlowLayout(QLayout):
         column_count = math.floor(rect.width() / (widest + spacing))
         column_count = min(column_count, len(self.itemList))
         column_count = max(1, column_count)
-        column_width = math.floor((rect.width() - (column_count-1)*spacing - 1) / column_count)
+        column_width = math.floor((rect.width() - (column_count - 1) * spacing - 1) / column_count)
 
         # Get the heights for all of our items
         item_heights = {}
         for item in self.itemList:
-            height = item.heightForWidth(column_width) if item.hasHeightForWidth() else item.sizeHint().height()
+            height = (
+                item.heightForWidth(column_width)
+                if item.hasHeightForWidth()
+                else item.sizeHint().height()
+            )
             item_heights[item] = height
 
         # Prepare our column representation
@@ -102,13 +106,13 @@ class ColumnarFlowLayout(QLayout):
 
         def add_to_column(column: int, item):
             column_contents[column].append(item)
-            column_heights[column] += (item_heights[item] + spacing)
+            column_heights[column] += item_heights[item] + spacing
 
         def shove_one(from_column: int) -> bool:
             if len(column_contents[from_column]) >= 1:
                 item = column_contents[from_column].pop(0)
-                column_heights[from_column] -= (item_heights[item] + spacing)
-                add_to_column(from_column-1, item)
+                column_heights[from_column] -= item_heights[item] + spacing
+                add_to_column(from_column - 1, item)
                 return True
             return False
 
@@ -118,11 +122,11 @@ class ColumnarFlowLayout(QLayout):
             if len(column_contents[from_column]) > 1:
                 item = column_contents[from_column][0]
                 item_height = item_heights[item]
-                if column_heights[from_column-1] + item_height < max(column_heights):
+                if column_heights[from_column - 1] + item_height < max(column_heights):
                     changed_item = shove_one(from_column) or changed_item
 
-            if from_column+1 < column_count:
-                changed_item = shove_cascade_consider(from_column+1) or changed_item
+            if from_column + 1 < column_count:
+                changed_item = shove_cascade_consider(from_column + 1) or changed_item
 
             return changed_item
 
@@ -141,7 +145,7 @@ class ColumnarFlowLayout(QLayout):
                 if len(column_contents[column_idx]) == 0:
                     continue
                 item = column_contents[column_idx][0]
-                height_after_shove = column_heights[column_idx-1] + item_heights[item]
+                height_after_shove = column_heights[column_idx - 1] + item_heights[item]
                 if height_after_shove < best_height:
                     best_height = height_after_shove
                     best_pos = column_idx
@@ -151,7 +155,9 @@ class ColumnarFlowLayout(QLayout):
         column_index = 0
         for item in self.itemList:
             item_height = item_heights[item]
-            if column_heights[column_index] != 0 and (column_heights[column_index] + item_height) > max(column_heights):
+            if column_heights[column_index] != 0 and (
+                column_heights[column_index] + item_height
+            ) > max(column_heights):
                 column_index += 1
                 if column_index >= column_count:
                     # Run out of room, need to shove more stuff in each column
@@ -161,7 +167,7 @@ class ColumnarFlowLayout(QLayout):
                             shoving_pos = pick_best_shoving_position()
                             shove_one(shoving_pos)
                             shove_cascade()
-                    column_index = column_count-1
+                    column_index = column_count - 1
 
             add_to_column(column_index, item)
 
@@ -175,7 +181,7 @@ class ColumnarFlowLayout(QLayout):
                 for item in items:
                     height = item_heights[item]
                     item.setGeometry(QRect(x, y, column_width, height))
-                    y += (height + spacing)
+                    y += height + spacing
 
         # Return the overall height
         return max(column_heights)

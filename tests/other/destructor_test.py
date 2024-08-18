@@ -2,7 +2,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class MyObj():
+class MyObj:
 
     def __init__(self):
         pass
@@ -21,14 +21,14 @@ class Example(QtWidgets.QWidget):
     def __init__(self):
         super(Example, self).__init__()
 
-        qbtn = QtWidgets.QPushButton('Raise', self)
+        qbtn = QtWidgets.QPushButton("Raise", self)
         qbtn.clicked.connect(parse)
 
-        self.setWindowTitle('Quit button')
+        self.setWindowTitle("Quit button")
         self.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     ex = Example()
     sys.exit(app.exec_())

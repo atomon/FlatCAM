@@ -40,7 +40,7 @@ class PolyPaintTestCase(unittest.TestCase):
             self.app.processEvents()
 
         # Open SVG with polygons
-        self.fc.import_svg('tests/svg/drawing.svg')
+        self.fc.import_svg("tests/svg/drawing.svg")
 
         name = self.fc.collection.get_names()[0]
 
@@ -79,7 +79,7 @@ class PolyPaintTestCase(unittest.TestCase):
             self.app.processEvents()
 
         # Open SVG with polygons
-        self.fc.import_svg('tests/svg/drawing.svg')
+        self.fc.import_svg("tests/svg/drawing.svg")
 
         name = self.fc.collection.get_names()[0]
 
@@ -118,7 +118,7 @@ class PolyPaintTestCase(unittest.TestCase):
         for _ in range(2):
             self.app.processEvents()
 
-        self.fc.open_gerber('tests/gerber_files/simple1.gbr')
+        self.fc.open_gerber("tests/gerber_files/simple1.gbr")
         sleep(1)
         for _ in range(2):
             self.app.processEvents()
@@ -174,7 +174,7 @@ class PolyPaintTestCase(unittest.TestCase):
         for _ in range(2):
             self.app.processEvents()
 
-        self.fc.open_gerber('tests/gerber_files/simple1.gbr')
+        self.fc.open_gerber("tests/gerber_files/simple1.gbr")
         sleep(1)
         for _ in range(2):
             self.app.processEvents()

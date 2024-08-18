@@ -8,13 +8,13 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 settings = QSettings("Open Source", "FlatCAM")
 if settings.contains("machinist"):
-    machinist_setting = settings.value('machinist', type=int)
+    machinist_setting = settings.value("machinist", type=int)
 else:
     machinist_setting = 0
 
@@ -30,8 +30,7 @@ class Tools2OptimalPrefGroupUI(OptionsGroupUI):
         # ## Parameters
         self.optlabel = QtWidgets.QLabel("<b>%s:</b>" % _("Parameters"))
         self.optlabel.setToolTip(
-            _("A tool to find the minimum distance between\n"
-              "every two Gerber geometric elements")
+            _("A tool to find the minimum distance between\n" "every two Gerber geometric elements")
         )
         self.layout.addWidget(self.optlabel)
 
@@ -45,7 +44,7 @@ class Tools2OptimalPrefGroupUI(OptionsGroupUI):
         self.precision_sp.set_step(1)
         self.precision_sp.setWrapping(True)
 
-        self.precision_lbl = QtWidgets.QLabel('%s:' % _("Precision"))
+        self.precision_lbl = QtWidgets.QLabel("%s:" % _("Precision"))
         self.precision_lbl.setToolTip(
             _("Number of decimals for the distances and coordinates in this tool.")
         )

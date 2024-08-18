@@ -8,13 +8,13 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 settings = QSettings("Open Source", "FlatCAM")
 if settings.contains("machinist"):
-    machinist_setting = settings.value('machinist', type=int)
+    machinist_setting = settings.value("machinist", type=int)
 else:
     machinist_setting = 0
 
@@ -40,14 +40,13 @@ class FAGcoPrefGroupUI(OptionsGroupUI):
         # ## G-Code associations
         self.gco_list_label = QtWidgets.QLabel("<b>%s:</b>" % _("Extensions list"))
         self.gco_list_label.setToolTip(
-            _("List of file extensions to be\n"
-              "associated with FlatCAM.")
+            _("List of file extensions to be\n" "associated with FlatCAM.")
         )
         self.layout.addWidget(self.gco_list_label)
 
         qsettings = QSettings("Open Source", "FlatCAM")
         if qsettings.contains("textbox_font_size"):
-            tb_fsize = qsettings.value('textbox_font_size', type=int)
+            tb_fsize = qsettings.value("textbox_font_size", type=int)
         else:
             tb_fsize = 10
 
@@ -60,7 +59,7 @@ class FAGcoPrefGroupUI(OptionsGroupUI):
 
         self.layout.addWidget(self.gco_list_text)
 
-        self.ext_label = QtWidgets.QLabel('%s:' % _("Extension"))
+        self.ext_label = QtWidgets.QLabel("%s:" % _("Extension"))
         self.ext_label.setToolTip(_("A file extension to be added or deleted to the list."))
         self.ext_entry = FCEntry()
 
@@ -80,10 +79,14 @@ class FAGcoPrefGroupUI(OptionsGroupUI):
         hlay2.addWidget(self.del_btn)
 
         self.gco_list_btn = FCButton(_("Apply Association"))
-        self.gco_list_btn.setToolTip(_("Apply the file associations between\n"
-                                       "FlatCAM and the files with above extensions.\n"
-                                       "They will be active after next logon.\n"
-                                       "This work only in Windows."))
+        self.gco_list_btn.setToolTip(
+            _(
+                "Apply the file associations between\n"
+                "FlatCAM and the files with above extensions.\n"
+                "They will be active after next logon.\n"
+                "This work only in Windows."
+            )
+        )
         self.layout.addWidget(self.gco_list_btn)
 
         # self.layout.addStretch()

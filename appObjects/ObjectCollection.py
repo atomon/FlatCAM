@@ -14,6 +14,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QSettings
 from PyQt5.QtGui import QColor
+
 # from PyQt5.QtCore import QModelIndex
 
 from appObjects.FlatCAMObj import FlatCAMObj
@@ -35,11 +36,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class KeySensitiveListView(QtWidgets.QTreeView):
@@ -53,7 +54,7 @@ class KeySensitiveListView(QtWidgets.QTreeView):
 
         # self.setRootIsDecorated(False)
         # self.setExpandsOnDoubleClick(False)
-        self.setEditTriggers(QtWidgets.QTreeView.NoEditTriggers)    # No edit in the Project Tab Tree
+        self.setEditTriggers(QtWidgets.QTreeView.NoEditTriggers)  # No edit in the Project Tab Tree
 
         # Enable dragging and dropping onto the appGUI
         self.setAcceptDrops(True)
@@ -125,35 +126,49 @@ class KeySensitiveListView(QtWidgets.QTreeView):
                     if self.filename == "":
                         self.app.inform.emit(_("Cancelled."))
                     else:
-                        if self.filename.lower().rpartition('.')[-1] in self.app.grb_list:
-                            self.app.worker_task.emit({'fcn': self.app.f_handlers.open_gerber,
-                                                       'params': [self.filename]})
+                        if self.filename.lower().rpartition(".")[-1] in self.app.grb_list:
+                            self.app.worker_task.emit(
+                                {"fcn": self.app.f_handlers.open_gerber, "params": [self.filename]}
+                            )
                         else:
                             event.ignore()
 
-                        if self.filename.lower().rpartition('.')[-1] in self.app.exc_list:
-                            self.app.worker_task.emit({'fcn': self.app.f_handlers.open_excellon,
-                                                       'params': [self.filename]})
+                        if self.filename.lower().rpartition(".")[-1] in self.app.exc_list:
+                            self.app.worker_task.emit(
+                                {
+                                    "fcn": self.app.f_handlers.open_excellon,
+                                    "params": [self.filename],
+                                }
+                            )
                         else:
                             event.ignore()
 
-                        if self.filename.lower().rpartition('.')[-1] in self.app.gcode_list:
-                            self.app.worker_task.emit({'fcn': self.app.f_handlers.open_gcode,
-                                                       'params': [self.filename]})
+                        if self.filename.lower().rpartition(".")[-1] in self.app.gcode_list:
+                            self.app.worker_task.emit(
+                                {"fcn": self.app.f_handlers.open_gcode, "params": [self.filename]}
+                            )
                         else:
                             event.ignore()
 
-                        if self.filename.lower().rpartition('.')[-1] in self.app.svg_list:
-                            object_type = 'geometry'
-                            self.app.worker_task.emit({'fcn': self.app.f_handlers.import_svg,
-                                                       'params': [self.filename, object_type, None]})
+                        if self.filename.lower().rpartition(".")[-1] in self.app.svg_list:
+                            object_type = "geometry"
+                            self.app.worker_task.emit(
+                                {
+                                    "fcn": self.app.f_handlers.import_svg,
+                                    "params": [self.filename, object_type, None],
+                                }
+                            )
 
-                        if self.filename.lower().rpartition('.')[-1] in self.app.dxf_list:
-                            object_type = 'geometry'
-                            self.app.worker_task.emit({'fcn': self.app.f_handlers.import_dxf,
-                                                       'params': [self.filename, object_type, None]})
+                        if self.filename.lower().rpartition(".")[-1] in self.app.dxf_list:
+                            object_type = "geometry"
+                            self.app.worker_task.emit(
+                                {
+                                    "fcn": self.app.f_handlers.import_dxf,
+                                    "params": [self.filename, object_type, None],
+                                }
+                            )
 
-                        if self.filename.lower().rpartition('.')[-1] in self.app.prj_list:
+                        if self.filename.lower().rpartition(".")[-1] in self.app.prj_list:
                             # self.app.open_project() is not Thread Safe
                             self.app.f_handlers.open_project(self.filename)
                         else:
@@ -243,7 +258,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
         "cncjob": CNCJobObject,
         "geometry": GeometryObject,
         "script": ScriptObject,
-        "document": DocumentObject
+        "document": DocumentObject,
     }
 
     icon_files = {
@@ -252,7 +267,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
         "cncjob": "assets/resources/cnc16.png",
         "geometry": "assets/resources/geometry16.png",
         "script": "assets/resources/script_new16.png",
-        "document": "assets/resources/notes16_1.png"
+        "document": "assets/resources/notes16_1.png",
     }
 
     # will emit the name of the object that was just selected
@@ -272,7 +287,10 @@ class ObjectCollection(QtCore.QAbstractItemModel):
         self.icons = {}
         for kind in ObjectCollection.icon_files:
             self.icons[kind] = QtGui.QPixmap(
-                ObjectCollection.icon_files[kind].replace('assets/resources', self.app.resource_location))
+                ObjectCollection.icon_files[kind].replace(
+                    "assets/resources", self.app.resource_location
+                )
+            )
 
         # Create root tree view item
         self.root_item = TreeItem(["root"])
@@ -321,7 +339,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
         settings = QSettings("Open Source", "FlatCAM")
         if settings.contains("notebook_font_size"):
-            fsize = settings.value('notebook_font_size', type=int)
+            fsize = settings.value("notebook_font_size", type=int)
         else:
             fsize = 12
 
@@ -393,10 +411,18 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                 # if type(obj) != GeometryObject and type(obj) != ExcellonObject and type(obj) != GerberObject or \
                 #         type(obj) != CNCJobObject:
                 #     self.app.ui.menuprojectedit.setVisible(False)
-                if type(obj) != GerberObject and type(obj) != ExcellonObject and type(obj) != CNCJobObject:
+                if (
+                    type(obj) != GerberObject
+                    and type(obj) != ExcellonObject
+                    and type(obj) != CNCJobObject
+                ):
                     self.app.ui.menuprojectviewsource.setVisible(False)
-                if type(obj) != GerberObject and type(obj) != GeometryObject and type(obj) != ExcellonObject and \
-                        type(obj) != CNCJobObject:
+                if (
+                    type(obj) != GerberObject
+                    and type(obj) != GeometryObject
+                    and type(obj) != ExcellonObject
+                    and type(obj) != CNCJobObject
+                ):
                     # meaning for Scripts and for Document type of FlatCAM object
                     self.app.ui.menuprojectenable.setVisible(False)
                     self.app.ui.menuprojectdisable.setVisible(False)
@@ -464,8 +490,8 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                 return index.internalPointer().data(index.column())
 
         if role == Qt.ForegroundRole:
-            color = QColor(self.app.defaults['global_proj_item_color'])
-            color_disabled = QColor(self.app.defaults['global_proj_item_dis_color'])
+            color = QColor(self.app.defaults["global_proj_item_color"])
+            color_disabled = QColor(self.app.defaults["global_proj_item_dis_color"])
             obj = index.internalPointer().obj
             if obj:
                 return QtGui.QBrush(color) if obj.options["plot"] else QtGui.QBrush(color_disabled)
@@ -485,7 +511,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                 return None
 
             if obj:
-                text = obj.options['name']
+                text = obj.options["name"]
                 return text
             else:
                 QtWidgets.QToolTip.hideText()
@@ -498,13 +524,13 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             obj = index.internalPointer().obj
 
             if obj:
-                old_name = deepcopy(obj.options['name'])
+                old_name = deepcopy(obj.options["name"])
                 new_name = str(data)
-                if old_name != new_name and new_name != '':
+                if old_name != new_name and new_name != "":
                     # rename the object
                     obj.options["name"] = deepcopy(data)
 
-                    self.app.object_status_changed.emit(obj, 'rename', old_name)
+                    self.app.object_status_changed.emit(obj, "rename", old_name)
 
                     # update the SHELL auto-completer model data
                     try:
@@ -513,11 +539,15 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                         self.app.shell._edit.set_model_data(self.app.myKeywords)
                     except Exception as e:
                         log.debug(
-                            "setData() --> Could not remove the old object name from auto-completer model list. %s" %
-                            str(e))
+                            "setData() --> Could not remove the old object name from auto-completer model list. %s"
+                            % str(e)
+                        )
                     # obj.build_ui()
-                    self.app.inform.emit(_("Object renamed from <b>{old}</b> to <b>{new}</b>").format(old=old_name,
-                                                                                                      new=new_name))
+                    self.app.inform.emit(
+                        _("Object renamed from <b>{old}</b> to <b>{new}</b>").format(
+                            old=old_name, new=new_name
+                        )
+                    )
 
             self.dataChanged.emit(index, index)
             return True
@@ -538,8 +568,13 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             if not index.internalPointer().obj:
                 return Qt.ItemIsEnabled
             else:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | \
-                       Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+                return (
+                    Qt.ItemIsEnabled
+                    | Qt.ItemIsSelectable
+                    | Qt.ItemIsEditable
+                    | Qt.ItemIsDragEnabled
+                    | Qt.ItemIsDropEnabled
+                )
         except AttributeError:
             return Qt.ItemIsEnabled
         # return QtWidgets.QAbstractItemModel.flags(self, index)
@@ -560,9 +595,9 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             # ## Create a new name
             # Ends with number?
             log.debug("app_obj.new_object(): Object name (%s) exists, changing." % name)
-            match = re.search(r'(.*[^\d])?(\d+)$', name)
+            match = re.search(r"(.*[^\d])?(\d+)$", name)
             if match:  # Yes: Increment the number!
-                base = match.group(1) or ''
+                base = match.group(1) or ""
                 num = int(match.group(2))
                 name = base + str(num + 1)
             else:  # No: add a number!
@@ -584,7 +619,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             # Required after appending (Qt MVC)
             self.endInsertRows()
         else:
-            self.beginInsertRows(group_index, to_index.row()-1, to_index.row()-1)
+            self.beginInsertRows(group_index, to_index.row() - 1, to_index.row() - 1)
             # Append new item
             obj.item = TreeItem(None, self.icons[obj.kind], obj, group)
             # Required after appending (Qt MVC)
@@ -596,7 +631,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
         self.app.should_we_save = True
 
-        self.app.object_status_changed.emit(obj, 'append', name)
+        self.app.object_status_changed.emit(obj, "append", name)
 
         # decide if to show or hide the Notebook side of the screen
         if self.app.defaults["global_project_autohide"] is True:
@@ -612,7 +647,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
         """
 
         # log.debug(str(inspect.stack()[1][3]) + " --> OC.get_names()")
-        return [x.options['name'] for x in self.get_list()]
+        return [x.options["name"] for x in self.get_list()]
 
     def get_bounds(self):
         """
@@ -657,11 +692,11 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
         if isCaseSensitive is None or isCaseSensitive is True:
             for obj in self.get_list():
-                if obj.options['name'] == name:
+                if obj.options["name"] == name:
                     return obj
         else:
             for obj in self.get_list():
-                if obj.options['name'].lower() == name.lower():
+                if obj.options["name"].lower() == name.lower():
                     return obj
         return None
 
@@ -678,12 +713,12 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
         # some objects add a Tab on creation, close it here
         for idx in range(self.app.ui.plot_tab_area.count()):
-            if self.app.ui.plot_tab_area.widget(idx).objectName() == active.obj.options['name']:
+            if self.app.ui.plot_tab_area.widget(idx).objectName() == active.obj.options["name"]:
                 self.app.ui.plot_tab_area.removeTab(idx)
                 break
 
         # update the SHELL auto-completer model data
-        name = active.obj.options['name']
+        name = active.obj.options["name"]
         try:
             self.app.myKeywords.remove(name)
             self.app.shell._edit.set_model_data(self.app.myKeywords)
@@ -691,12 +726,16 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             # self.app.ui.code_editor.set_model_data(self.app.myKeywords)
         except Exception as e:
             log.debug(
-                "delete_active() --> Could not remove the old object name from auto-completer model list. %s" % str(e))
+                "delete_active() --> Could not remove the old object name from auto-completer model list. %s"
+                % str(e)
+            )
 
-        self.app.object_status_changed.emit(active.obj, 'delete', name)
+        self.app.object_status_changed.emit(active.obj, "delete", name)
 
         # ############ OBJECT DELETION FROM MODEL STARTS HERE ####################
-        self.beginRemoveRows(self.index(group.row(), 0, QtCore.QModelIndex()), active.row(), active.row())
+        self.beginRemoveRows(
+            self.index(group.row(), 0, QtCore.QModelIndex()), active.row(), active.row()
+        )
         group.remove_child(active)
         # after deletion of object store the current list of objects into the self.app.all_objects_list
         self.app.all_objects_list = self.get_list()
@@ -731,12 +770,12 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
         # some objects add a Tab on creation, close it here
         for idx in range(self.app.ui.plot_tab_area.count()):
-            if self.app.ui.plot_tab_area.widget(idx).objectName() == deleted.obj.options['name']:
+            if self.app.ui.plot_tab_area.widget(idx).objectName() == deleted.obj.options["name"]:
                 self.app.ui.plot_tab_area.removeTab(idx)
                 break
 
         # update the SHELL auto-completer model data
-        name = deleted.obj.options['name']
+        name = deleted.obj.options["name"]
         try:
             self.app.myKeywords.remove(name)
             self.app.shell._edit.set_model_data(self.app.myKeywords)
@@ -744,12 +783,16 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             # self.app.ui.code_editor.set_model_data(self.app.myKeywords)
         except Exception as e:
             log.debug(
-                "delete_by_name() --> Could not remove the old object name from auto-completer model list. %s" % str(e))
+                "delete_by_name() --> Could not remove the old object name from auto-completer model list. %s"
+                % str(e)
+            )
 
-        self.app.object_status_changed.emit(deleted.obj, 'delete', name)
+        self.app.object_status_changed.emit(deleted.obj, "delete", name)
 
         # ############ OBJECT DELETION FROM MODEL STARTS HERE ####################
-        self.beginRemoveRows(self.index(group.row(), 0, QtCore.QModelIndex()), deleted.row(), deleted.row())
+        self.beginRemoveRows(
+            self.index(group.row(), 0, QtCore.QModelIndex()), deleted.row(), deleted.row()
+        )
         group.remove_child(deleted)
         # after deletion of object store the current list of objects into the self.app.all_objects_list
         self.update_list_signal.emit()
@@ -777,7 +820,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
     def delete_all(self):
         log.debug(str(inspect.stack()[1][3]) + "--> OC.delete_all()")
 
-        self.app.object_status_changed.emit(None, 'delete_all', '')
+        self.app.object_status_changed.emit(None, "delete_all", "")
 
         try:
             self.app.all_objects_list.clear()
@@ -924,48 +967,48 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
         try:
             obj = current.indexes()[0].internalPointer().obj
-            self.item_selected.emit(obj.options['name'])
+            self.item_selected.emit(obj.options["name"])
 
-            if obj.kind == 'gerber':
-                self.app.inform.emit('[selected]<span style="color:{color};">{name}</span> {tx}'.format(
-                    color='green',
-                    name=str(obj.options['name']),
-                    tx=_("selected"))
+            if obj.kind == "gerber":
+                self.app.inform.emit(
+                    '[selected]<span style="color:{color};">{name}</span> {tx}'.format(
+                        color="green", name=str(obj.options["name"]), tx=_("selected")
+                    )
                 )
-            elif obj.kind == 'excellon':
-                self.app.inform.emit('[selected]<span style="color:{color};">{name}</span> {tx}'.format(
-                    color='brown',
-                    name=str(obj.options['name']),
-                    tx=_("selected"))
+            elif obj.kind == "excellon":
+                self.app.inform.emit(
+                    '[selected]<span style="color:{color};">{name}</span> {tx}'.format(
+                        color="brown", name=str(obj.options["name"]), tx=_("selected")
+                    )
                 )
-            elif obj.kind == 'cncjob':
-                self.app.inform.emit('[selected]<span style="color:{color};">{name}</span> {tx}'.format(
-                    color='blue',
-                    name=str(obj.options['name']),
-                    tx=_("selected"))
+            elif obj.kind == "cncjob":
+                self.app.inform.emit(
+                    '[selected]<span style="color:{color};">{name}</span> {tx}'.format(
+                        color="blue", name=str(obj.options["name"]), tx=_("selected")
+                    )
                 )
-            elif obj.kind == 'geometry':
-                self.app.inform.emit('[selected]<span style="color:{color};">{name}</span> {tx}'.format(
-                    color='red',
-                    name=str(obj.options['name']),
-                    tx=_("selected"))
+            elif obj.kind == "geometry":
+                self.app.inform.emit(
+                    '[selected]<span style="color:{color};">{name}</span> {tx}'.format(
+                        color="red", name=str(obj.options["name"]), tx=_("selected")
+                    )
                 )
-            elif obj.kind == 'script':
-                self.app.inform.emit('[selected]<span style="color:{color};">{name}</span> {tx}'.format(
-                    color='orange',
-                    name=str(obj.options['name']),
-                    tx=_("selected"))
+            elif obj.kind == "script":
+                self.app.inform.emit(
+                    '[selected]<span style="color:{color};">{name}</span> {tx}'.format(
+                        color="orange", name=str(obj.options["name"]), tx=_("selected")
+                    )
                 )
-            elif obj.kind == 'document':
-                self.app.inform.emit('[selected]<span style="color:{color};">{name}</span> {tx}'.format(
-                    color='darkCyan',
-                    name=str(obj.options['name']),
-                    tx=_("selected"))
+            elif obj.kind == "document":
+                self.app.inform.emit(
+                    '[selected]<span style="color:{color};">{name}</span> {tx}'.format(
+                        color="darkCyan", name=str(obj.options["name"]), tx=_("selected")
+                    )
                 )
         except IndexError:
-            self.item_selected.emit('none')
+            self.item_selected.emit("none")
             # log.debug("on_list_selection_change(): Index Error (Nothing selected?)")
-            self.app.inform.emit('')
+            self.app.inform.emit("")
             try:
                 self.app.ui.properties_scroll_area.takeWidget()
             except Exception as e:
@@ -991,7 +1034,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             try:
                 a_idx.build_ui()
             except Exception as e:
-                self.app.inform.emit('[ERROR] %s: %s' % (_("Cause of error"), str(e)))
+                self.app.inform.emit("[ERROR] %s: %s" % (_("Cause of error"), str(e)))
                 raise
 
     def get_list(self):
@@ -1024,7 +1067,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
         :param obj_name:
         :return:
         """
-        if obj_name == 'none':
+        if obj_name == "none":
             for act in self.app.ui.menuobjects.actions():
                 act.setChecked(False)
             return
@@ -1032,7 +1075,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
         # get the name of the selected objects and add them to a list
         name_list = []
         for obj in self.get_selected():
-            name_list.append(obj.options['name'])
+            name_list.append(obj.options["name"])
 
         # set all actions as unchecked but the ones selected make them checked
         for act in self.app.ui.menuobjects.actions():
@@ -1055,10 +1098,10 @@ class ObjectCollection(QtCore.QAbstractItemModel):
             "cncjob": self.app.resource_location + "/cnc16.png",
             "geometry": self.app.resource_location + "/geometry16.png",
             "script": self.app.resource_location + "/script_new16.png",
-            "document": self.app.resource_location + "/notes16_1.png"
+            "document": self.app.resource_location + "/notes16_1.png",
         }
 
-        if state == 'append':
+        if state == "append":
             for act in self.app.ui.menuobjects.actions():
                 try:
                     act.triggered.disconnect()
@@ -1075,17 +1118,17 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
             for name in self.get_names():
                 obj_named = self.get_by_name(name)
-                if obj_named.kind == 'gerber':
+                if obj_named.kind == "gerber":
                     gerber_list.append(name)
-                elif obj_named.kind == 'excellon':
+                elif obj_named.kind == "excellon":
                     exc_list.append(name)
-                elif obj_named.kind == 'cncjob':
+                elif obj_named.kind == "cncjob":
                     cncjob_list.append(name)
-                elif obj_named.kind == 'geometry':
+                elif obj_named.kind == "geometry":
                     geo_list.append(name)
-                elif obj_named.kind == 'script':
+                elif obj_named.kind == "script":
                     script_list.append(name)
-                elif obj_named.kind == 'document':
+                elif obj_named.kind == "document":
                     doc_list.append(name)
 
             def add_act(o_name):
@@ -1095,8 +1138,12 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                 menu_action.setText(o_name)
                 menu_action.setIcon(QtGui.QIcon(icon_files[obj_for_icon.kind]))
                 menu_action.triggered.connect(
-                    lambda: self.set_active(o_name) if menu_action.isChecked() is True else
-                    self.set_inactive(o_name))
+                    lambda: (
+                        self.set_active(o_name)
+                        if menu_action.isChecked() is True
+                        else self.set_inactive(o_name)
+                    )
+                )
                 self.app.ui.menuobjects.addAction(menu_action)
 
             for name in gerber_list:
@@ -1124,34 +1171,40 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
             self.app.ui.menuobjects.addSeparator()
             self.app.ui.menuobjects_selall = self.app.ui.menuobjects.addAction(
-                QtGui.QIcon(self.app.resource_location + '/select_all.png'),
-                _('Select All')
+                QtGui.QIcon(self.app.resource_location + "/select_all.png"), _("Select All")
             )
             self.app.ui.menuobjects_unselall = self.app.ui.menuobjects.addAction(
-                QtGui.QIcon(self.app.resource_location + '/deselect_all32.png'),
-                _('Deselect All')
+                QtGui.QIcon(self.app.resource_location + "/deselect_all32.png"), _("Deselect All")
             )
-            self.app.ui.menuobjects_selall.triggered.connect(lambda: self.on_objects_selection(True))
-            self.app.ui.menuobjects_unselall.triggered.connect(lambda: self.on_objects_selection(False))
+            self.app.ui.menuobjects_selall.triggered.connect(
+                lambda: self.on_objects_selection(True)
+            )
+            self.app.ui.menuobjects_unselall.triggered.connect(
+                lambda: self.on_objects_selection(False)
+            )
 
-        elif state == 'delete':
+        elif state == "delete":
             for act in self.app.ui.menuobjects.actions():
-                if act.text() == obj.options['name']:
+                if act.text() == obj.options["name"]:
                     try:
                         act.triggered.disconnect()
                     except TypeError:
                         pass
                     self.app.ui.menuobjects.removeAction(act)
                     break
-        elif state == 'rename':
+        elif state == "rename":
             for act in self.app.ui.menuobjects.actions():
                 if act.text() == old_name:
                     add_action = QtWidgets.QAction(parent=self.app.ui.menuobjects)
-                    add_action.setText(obj.options['name'])
+                    add_action.setText(obj.options["name"])
                     add_action.setIcon(QtGui.QIcon(icon_files[obj.kind]))
                     add_action.triggered.connect(
-                        lambda: self.set_active(obj.options['name']) if add_action.isChecked() is True else
-                        self.set_inactive(obj.options['name']))
+                        lambda: (
+                            self.set_active(obj.options["name"])
+                            if add_action.isChecked() is True
+                            else self.set_inactive(obj.options["name"])
+                        )
+                    )
 
                     self.app.ui.menuobjects.insertAction(act, add_action)
 
@@ -1161,7 +1214,7 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                         pass
                     self.app.ui.menuobjects.removeAction(act)
                     break
-        elif state == 'delete_all':
+        elif state == "delete_all":
             for act in self.app.ui.menuobjects.actions():
                 try:
                     act.triggered.disconnect()
@@ -1171,15 +1224,17 @@ class ObjectCollection(QtCore.QAbstractItemModel):
 
             self.app.ui.menuobjects.addSeparator()
             self.app.ui.menuobjects_selall = self.app.ui.menuobjects.addAction(
-                QtGui.QIcon(self.app.resource_location + '/select_all.png'),
-                _('Select All')
+                QtGui.QIcon(self.app.resource_location + "/select_all.png"), _("Select All")
             )
             self.app.ui.menuobjects_unselall = self.app.ui.menuobjects.addAction(
-                QtGui.QIcon(self.app.resource_location + '/deselect_all32.png'),
-                _('Deselect All')
+                QtGui.QIcon(self.app.resource_location + "/deselect_all32.png"), _("Deselect All")
             )
-            self.app.ui.menuobjects_selall.triggered.connect(lambda: self.on_objects_selection(True))
-            self.app.ui.menuobjects_unselall.triggered.connect(lambda: self.on_objects_selection(False))
+            self.app.ui.menuobjects_selall.triggered.connect(
+                lambda: self.on_objects_selection(True)
+            )
+            self.app.ui.menuobjects_unselall.triggered.connect(
+                lambda: self.on_objects_selection(False)
+            )
 
     def on_objects_selection(self, on_off):
         obj_list = self.get_names()
@@ -1192,7 +1247,9 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                 except Exception:
                     pass
             if obj_list:
-                self.app.inform[str, bool].emit('[selected] %s' % _("All objects are selected."), False)
+                self.app.inform[str, bool].emit(
+                    "[selected] %s" % _("All objects are selected."), False
+                )
         else:
             self.set_all_inactive()
             for act in self.app.ui.menuobjects.actions():
@@ -1202,6 +1259,6 @@ class ObjectCollection(QtCore.QAbstractItemModel):
                     pass
 
             if obj_list:
-                self.app.inform[str, bool].emit('%s' % _("Objects selection is cleared."), False)
+                self.app.inform[str, bool].emit("%s" % _("Objects selection is cleared."), False)
             else:
-                self.app.inform[str, bool].emit('', False)
+                self.app.inform[str, bool].emit("", False)

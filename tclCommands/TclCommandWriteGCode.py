@@ -10,40 +10,37 @@ class TclCommandWriteGCode(TclCommandSignaled):
 
     # array of all command aliases, to be able use
     # old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['write_gcode']
+    aliases = ["write_gcode"]
 
-    description = '%s %s' % ("--", "Saves G-code of a CNC Job object to file.")
+    description = "%s %s" % ("--", "Saves G-code of a CNC Job object to file.")
 
     # Dictionary of types from Tcl command, needs to be ordered.
     # For positional arguments
-    arg_names = collections.OrderedDict([
-        ('name', str),
-        ('filename', str)
-    ])
+    arg_names = collections.OrderedDict([("name", str), ("filename", str)])
 
     # Dictionary of types from Tcl command, needs to be ordered.
     # For options like -optionname value
-    option_types = collections.OrderedDict([
-        ('preamble', str),
-        ('postamble', str),
-        ('muted', str)
-    ])
+    option_types = collections.OrderedDict([("preamble", str), ("postamble", str), ("muted", str)])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name', 'filename']
+    required = ["name", "filename"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Saves G-code of a CNC Job object to file.",
-        'args': collections.OrderedDict([
-            ('name', 'Source CNC Job object. Required.'),
-            ('filename', 'Output filename. Required.'),
-            ('preamble', 'Text to append at the beginning.'),
-            ('postamble', 'Text to append at the end.'),
-            ('muted', 'It will not put errors in the Shell or status bar. True (1) or False (0)')
-
-        ]),
-        'examples': ["write_gcode name c:\\\\gcode_repo"]
+        "main": "Saves G-code of a CNC Job object to file.",
+        "args": collections.OrderedDict(
+            [
+                ("name", "Source CNC Job object. Required."),
+                ("filename", "Output filename. Required."),
+                ("preamble", "Text to append at the beginning."),
+                ("postamble", "Text to append at the end."),
+                (
+                    "muted",
+                    "It will not put errors in the Shell or status bar. True (1) or False (0)",
+                ),
+            ]
+        ),
+        "examples": ["write_gcode name c:\\\\gcode_repo"],
     }
 
     def execute(self, args, unnamed_args):
@@ -62,17 +59,17 @@ class TclCommandWriteGCode(TclCommandSignaled):
         promises and send to background if there are promises.
         """
 
-        obj_name = args['name']
-        filename = args['filename']
+        obj_name = args["name"]
+        filename = args["filename"]
 
-        preamble = args['preamble'] if 'preamble' in args else ''
-        postamble = args['postamble'] if 'postamble' in args else ''
+        preamble = args["preamble"] if "preamble" in args else ""
+        postamble = args["postamble"] if "postamble" in args else ""
 
-        if 'muted' in args:
+        if "muted" in args:
             try:
-                par = args['muted'].capitalize()
+                par = args["muted"].capitalize()
             except AttributeError:
-                par = args['muted']
+                par = args["muted"]
             muted = bool(eval(par))
         else:
             muted = False

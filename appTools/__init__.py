@@ -1,4 +1,3 @@
-
 from appTools.ToolCalculators import ToolCalculator
 from appTools.ToolCalibration import ToolCalibration
 

@@ -8,9 +8,20 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from appTool import AppTool
-from appGUI.GUIElements import FCCheckBox, FCDoubleSpinner, RadioSet, FCTable, FCButton, \
-    FCComboBox, OptionalInputSection, FCSpinner, NumericalEvalEntry, OptionalHideInputSection, FCLabel, \
-    NumericalEvalTupleEntry
+from appGUI.GUIElements import (
+    FCCheckBox,
+    FCDoubleSpinner,
+    RadioSet,
+    FCTable,
+    FCButton,
+    FCComboBox,
+    OptionalInputSection,
+    FCSpinner,
+    NumericalEvalEntry,
+    OptionalHideInputSection,
+    FCLabel,
+    NumericalEvalTupleEntry,
+)
 from appParsers.ParseExcellon import Excellon
 
 from copy import deepcopy
@@ -31,15 +42,15 @@ import appTranslation as fcTranslate
 import builtins
 import platform
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 settings = QtCore.QSettings("Open Source", "FlatCAM")
 if settings.contains("machinist"):
-    machinist_setting = settings.value('machinist', type=int)
+    machinist_setting = settings.value("machinist", type=int)
 else:
     machinist_setting = 0
 
@@ -62,7 +73,7 @@ class ToolDrilling(AppTool, Excellon):
         # #############################################################################
         # ########################## VARIABLES ########################################
         # #############################################################################
-        self.units = ''
+        self.units = ""
         self.excellon_tools = {}
         self.tooluid = 0
         self.kind = "excellon"
@@ -79,7 +90,7 @@ class ToolDrilling(AppTool, Excellon):
         self.excellon_obj = None
 
         # this holds the resulting GCode
-        self.total_gcode = ''
+        self.total_gcode = ""
 
         # this holds the resulting Parsed Gcode
         self.total_gcode_parsed = []
@@ -130,85 +141,70 @@ class ToolDrilling(AppTool, Excellon):
         self.tools_db_dict = None
 
         self.tool_form_fields = {
-            "tools_drill_cutz":             self.t_ui.cutz_entry,
-            "tools_drill_multidepth":       self.t_ui.mpass_cb,
-            "tools_drill_depthperpass":     self.t_ui.maxdepth_entry,
-            "tools_drill_travelz":          self.t_ui.travelz_entry,
-            "tools_drill_feedrate_z":       self.t_ui.feedrate_z_entry,
-            "tools_drill_feedrate_rapid":   self.t_ui.feedrate_rapid_entry,
-
-            "tools_drill_spindlespeed":     self.t_ui.spindlespeed_entry,
-            "tools_drill_dwell":            self.t_ui.dwell_cb,
-            "tools_drill_dwelltime":        self.t_ui.dwelltime_entry,
-
-            "tools_drill_offset":           self.t_ui.offset_entry,
-
-            "tools_drill_drill_slots":      self.t_ui.drill_slots_cb,
-            "tools_drill_drill_overlap":    self.t_ui.drill_overlap_entry,
-            "tools_drill_last_drill":       self.t_ui.last_drill_cb
+            "tools_drill_cutz": self.t_ui.cutz_entry,
+            "tools_drill_multidepth": self.t_ui.mpass_cb,
+            "tools_drill_depthperpass": self.t_ui.maxdepth_entry,
+            "tools_drill_travelz": self.t_ui.travelz_entry,
+            "tools_drill_feedrate_z": self.t_ui.feedrate_z_entry,
+            "tools_drill_feedrate_rapid": self.t_ui.feedrate_rapid_entry,
+            "tools_drill_spindlespeed": self.t_ui.spindlespeed_entry,
+            "tools_drill_dwell": self.t_ui.dwell_cb,
+            "tools_drill_dwelltime": self.t_ui.dwelltime_entry,
+            "tools_drill_offset": self.t_ui.offset_entry,
+            "tools_drill_drill_slots": self.t_ui.drill_slots_cb,
+            "tools_drill_drill_overlap": self.t_ui.drill_overlap_entry,
+            "tools_drill_last_drill": self.t_ui.last_drill_cb,
         }
 
         self.general_form_fields = {
-            "tools_drill_toolchange":       self.t_ui.toolchange_cb,
-            "tools_drill_toolchangez":      self.t_ui.toolchangez_entry,
-            "tools_drill_startz":           self.t_ui.estartz_entry,
-
-            "tools_drill_endz":             self.t_ui.endz_entry,
-            "tools_drill_endxy":            self.t_ui.endxy_entry,
-
-            "tools_drill_z_pdepth":         self.t_ui.pdepth_entry,
-            "tools_drill_feedrate_probe":   self.t_ui.feedrate_probe_entry,
-
-            "tools_drill_ppname_e":         self.t_ui.pp_excellon_name_cb,
-
-            "tools_drill_area_exclusion":   self.t_ui.exclusion_cb,
-            "tools_drill_area_strategy":    self.t_ui.strategy_radio,
-            "tools_drill_area_overz":       self.t_ui.over_z_entry,
-            "tools_drill_area_shape":       self.t_ui.area_shape_radio
+            "tools_drill_toolchange": self.t_ui.toolchange_cb,
+            "tools_drill_toolchangez": self.t_ui.toolchangez_entry,
+            "tools_drill_startz": self.t_ui.estartz_entry,
+            "tools_drill_endz": self.t_ui.endz_entry,
+            "tools_drill_endxy": self.t_ui.endxy_entry,
+            "tools_drill_z_pdepth": self.t_ui.pdepth_entry,
+            "tools_drill_feedrate_probe": self.t_ui.feedrate_probe_entry,
+            "tools_drill_ppname_e": self.t_ui.pp_excellon_name_cb,
+            "tools_drill_area_exclusion": self.t_ui.exclusion_cb,
+            "tools_drill_area_strategy": self.t_ui.strategy_radio,
+            "tools_drill_area_overz": self.t_ui.over_z_entry,
+            "tools_drill_area_shape": self.t_ui.area_shape_radio,
         }
 
         self.name2option = {
-            "e_cutz":                   "tools_drill_cutz",
-            "e_multidepth":             "tools_drill_multidepth",
-            "e_depthperpass":           "tools_drill_depthperpass",
-            "e_travelz":                "tools_drill_travelz",
-            "e_feedratez":              "tools_drill_feedrate_z",
-            "e_fr_rapid":               "tools_drill_feedrate_rapid",
-
-            "e_spindlespeed":           "tools_drill_spindlespeed",
-            "e_dwell":                  "tools_drill_dwell",
-            "e_dwelltime":              "tools_drill_dwelltime",
-
-            "e_offset":                 "tools_drill_offset",
-
-            "e_drill_slots":            "tools_drill_drill_slots",
-            "e_drill_slots_overlap":    "tools_drill_drill_overlap",
-            "e_drill_last_drill":       "tools_drill_last_drill",
-
+            "e_cutz": "tools_drill_cutz",
+            "e_multidepth": "tools_drill_multidepth",
+            "e_depthperpass": "tools_drill_depthperpass",
+            "e_travelz": "tools_drill_travelz",
+            "e_feedratez": "tools_drill_feedrate_z",
+            "e_fr_rapid": "tools_drill_feedrate_rapid",
+            "e_spindlespeed": "tools_drill_spindlespeed",
+            "e_dwell": "tools_drill_dwell",
+            "e_dwelltime": "tools_drill_dwelltime",
+            "e_offset": "tools_drill_offset",
+            "e_drill_slots": "tools_drill_drill_slots",
+            "e_drill_slots_overlap": "tools_drill_drill_overlap",
+            "e_drill_last_drill": "tools_drill_last_drill",
             # General Parameters
-            "e_toolchange":             "tools_drill_toolchange",
-            "e_toolchangez":            "tools_drill_toolchangez",
-            "e_startz":                 "tools_drill_startz",
-
-            "e_endz":                   "tools_drill_endz",
-            "e_endxy":                  "tools_drill_endxy",
-
-            "e_depth_probe":            "tools_drill_z_pdepth",
-            "e_fr_probe":               "tools_drill_feedrate_probe",
-
-            "e_pp":                     "tools_drill_ppname_e",
-
-            "e_area_exclusion":         "tools_drill_area_exclusion",
-            "e_area_strategy":          "tools_drill_area_strategy",
-            "e_area_overz":             "tools_drill_area_overz",
-            "e_area_shape":             "tools_drill_area_shape",
+            "e_toolchange": "tools_drill_toolchange",
+            "e_toolchangez": "tools_drill_toolchangez",
+            "e_startz": "tools_drill_startz",
+            "e_endz": "tools_drill_endz",
+            "e_endxy": "tools_drill_endxy",
+            "e_depth_probe": "tools_drill_z_pdepth",
+            "e_fr_probe": "tools_drill_feedrate_probe",
+            "e_pp": "tools_drill_ppname_e",
+            "e_area_exclusion": "tools_drill_area_exclusion",
+            "e_area_strategy": "tools_drill_area_strategy",
+            "e_area_overz": "tools_drill_area_overz",
+            "e_area_shape": "tools_drill_area_shape",
         }
 
         self.poly_drawn = False
         self.connect_signals_at_init()
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+D', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+D", **kwargs)
 
     def run(self, toggle=True):
         self.app.defaults.report_usage("ToolDrilling()")
@@ -256,7 +252,9 @@ class ToolDrilling(AppTool, Excellon):
         self.t_ui.tools_table.drag_drop_sig.connect(self.rebuild_ui)
 
         # Exclusion areas signals
-        self.t_ui.exclusion_table.horizontalHeader().sectionClicked.connect(self.exclusion_table_toggle_all)
+        self.t_ui.exclusion_table.horizontalHeader().sectionClicked.connect(
+            self.exclusion_table_toggle_all
+        )
         self.t_ui.exclusion_table.lost_focus.connect(self.clear_selection)
         self.t_ui.exclusion_table.itemClicked.connect(self.draw_sel_shape)
         self.t_ui.add_area_button.clicked.connect(self.on_add_area_click)
@@ -271,13 +269,13 @@ class ToolDrilling(AppTool, Excellon):
         self.app.cleanup.connect(self.set_tool_ui)
 
     def set_tool_ui(self):
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         # try to select in the Excellon combobox the active object
         try:
             selected_obj = self.app.collection.get_active()
-            if selected_obj.kind == 'excellon':
-                current_name = selected_obj.options['name']
+            if selected_obj.kind == "excellon":
+                current_name = selected_obj.options["name"]
                 self.t_ui.object_combo.set_value(current_name)
         except Exception:
             pass
@@ -287,13 +285,14 @@ class ToolDrilling(AppTool, Excellon):
         # populate Excellon preprocessor combobox list
         for name in list(self.app.preprocessors.keys()):
             # the HPGL preprocessor is only for Geometry not for Excellon job therefore don't add it
-            if name == 'hpgl':
+            if name == "hpgl":
                 continue
             self.t_ui.pp_excellon_name_cb.addItem(name)
         # add tooltips
         for it in range(self.t_ui.pp_excellon_name_cb.count()):
             self.t_ui.pp_excellon_name_cb.setItemData(
-                it, self.t_ui.pp_excellon_name_cb.itemText(it), QtCore.Qt.ToolTipRole)
+                it, self.t_ui.pp_excellon_name_cb.itemText(it), QtCore.Qt.ToolTipRole
+            )
 
         # update the changes in UI depending on the selected preprocessor in Preferences
         # after this moment all the changes in the Posprocessor combo will be handled by the activated signal of the
@@ -302,12 +301,12 @@ class ToolDrilling(AppTool, Excellon):
 
         app_mode = self.app.defaults["global_app_level"]
         # Show/Hide Advanced Options
-        if app_mode == 'b':
-            self.t_ui.level.setText('<span style="color:green;"><b>%s</b></span>' % _('Basic'))
+        if app_mode == "b":
+            self.t_ui.level.setText('<span style="color:green;"><b>%s</b></span>' % _("Basic"))
             self.t_ui.estartz_label.hide()
             self.t_ui.estartz_entry.hide()
         else:
-            self.t_ui.level.setText('<span style="color:red;"><b>%s</b></span>' % _('Advanced'))
+            self.t_ui.level.setText('<span style="color:red;"><b>%s</b></span>' % _("Advanced"))
             self.t_ui.estartz_label.show()
             self.t_ui.estartz_entry.show()
 
@@ -317,74 +316,67 @@ class ToolDrilling(AppTool, Excellon):
 
         loaded_obj = self.app.collection.get_by_name(self.t_ui.object_combo.get_value())
         if loaded_obj:
-            outname = loaded_obj.options['name']
+            outname = loaded_obj.options["name"]
         else:
-            outname = ''
+            outname = ""
 
         # init the working variables
         self.default_data.clear()
         self.default_data = {
-            "name":                         outname + '_drill',
-            "plot":                         self.app.defaults["excellon_plot"],
-            "solid":                        self.app.defaults["excellon_solid"],
-            "multicolored":                 self.app.defaults["excellon_multicolored"],
-            "merge_fuse_tools":             self.app.defaults["excellon_merge_fuse_tools"],
-            "format_upper_in":              self.app.defaults["excellon_format_upper_in"],
-            "format_lower_in":              self.app.defaults["excellon_format_lower_in"],
-            "format_upper_mm":              self.app.defaults["excellon_format_upper_mm"],
-            "lower_mm":                     self.app.defaults["excellon_format_lower_mm"],
-            "zeros":                        self.app.defaults["excellon_zeros"],
-
-            "tools_drill_tool_order":       self.app.defaults["tools_drill_tool_order"],
-            "tools_drill_cutz":             self.app.defaults["tools_drill_cutz"],
-            "tools_drill_multidepth":       self.app.defaults["tools_drill_multidepth"],
-            "tools_drill_depthperpass":     self.app.defaults["tools_drill_depthperpass"],
-
-            "tools_drill_travelz":          self.app.defaults["tools_drill_travelz"],
-            "tools_drill_endz":             self.app.defaults["tools_drill_endz"],
-            "tools_drill_endxy":            self.app.defaults["tools_drill_endxy"],
-            "tools_drill_feedrate_z":       self.app.defaults["tools_drill_feedrate_z"],
-
-            "tools_drill_spindlespeed":     self.app.defaults["tools_drill_spindlespeed"],
-            "tools_drill_dwell":            self.app.defaults["tools_drill_dwell"],
-            "tools_drill_dwelltime":        self.app.defaults["tools_drill_dwelltime"],
-
-            "tools_drill_toolchange":       self.app.defaults["tools_drill_toolchange"],
-            "tools_drill_toolchangez":      self.app.defaults["tools_drill_toolchangez"],
-            "tools_drill_ppname_e":         self.app.defaults["tools_drill_ppname_e"],
-
+            "name": outname + "_drill",
+            "plot": self.app.defaults["excellon_plot"],
+            "solid": self.app.defaults["excellon_solid"],
+            "multicolored": self.app.defaults["excellon_multicolored"],
+            "merge_fuse_tools": self.app.defaults["excellon_merge_fuse_tools"],
+            "format_upper_in": self.app.defaults["excellon_format_upper_in"],
+            "format_lower_in": self.app.defaults["excellon_format_lower_in"],
+            "format_upper_mm": self.app.defaults["excellon_format_upper_mm"],
+            "lower_mm": self.app.defaults["excellon_format_lower_mm"],
+            "zeros": self.app.defaults["excellon_zeros"],
+            "tools_drill_tool_order": self.app.defaults["tools_drill_tool_order"],
+            "tools_drill_cutz": self.app.defaults["tools_drill_cutz"],
+            "tools_drill_multidepth": self.app.defaults["tools_drill_multidepth"],
+            "tools_drill_depthperpass": self.app.defaults["tools_drill_depthperpass"],
+            "tools_drill_travelz": self.app.defaults["tools_drill_travelz"],
+            "tools_drill_endz": self.app.defaults["tools_drill_endz"],
+            "tools_drill_endxy": self.app.defaults["tools_drill_endxy"],
+            "tools_drill_feedrate_z": self.app.defaults["tools_drill_feedrate_z"],
+            "tools_drill_spindlespeed": self.app.defaults["tools_drill_spindlespeed"],
+            "tools_drill_dwell": self.app.defaults["tools_drill_dwell"],
+            "tools_drill_dwelltime": self.app.defaults["tools_drill_dwelltime"],
+            "tools_drill_toolchange": self.app.defaults["tools_drill_toolchange"],
+            "tools_drill_toolchangez": self.app.defaults["tools_drill_toolchangez"],
+            "tools_drill_ppname_e": self.app.defaults["tools_drill_ppname_e"],
             # Drill Slots
-            "tools_drill_drill_slots":      self.app.defaults["tools_drill_drill_slots"],
-            "tools_drill_drill_overlap":    self.app.defaults["tools_drill_drill_overlap"],
-            "tools_drill_last_drill":       self.app.defaults["tools_drill_last_drill"],
-
+            "tools_drill_drill_slots": self.app.defaults["tools_drill_drill_slots"],
+            "tools_drill_drill_overlap": self.app.defaults["tools_drill_drill_overlap"],
+            "tools_drill_last_drill": self.app.defaults["tools_drill_last_drill"],
             # Advanced Options
-            "tools_drill_offset":           self.app.defaults["tools_drill_offset"],
-            "tools_drill_toolchangexy":     self.app.defaults["tools_drill_toolchangexy"],
-            "tools_drill_startz":           self.app.defaults["tools_drill_startz"],
-            "tools_drill_feedrate_rapid":   self.app.defaults["tools_drill_feedrate_rapid"],
-            "tools_drill_z_pdepth":         self.app.defaults["tools_drill_z_pdepth"],
-            "tools_drill_feedrate_probe":   self.app.defaults["tools_drill_feedrate_probe"],
-            "tools_drill_spindledir":       self.app.defaults["tools_drill_spindledir"],
-            "tools_drill_f_plunge":         self.app.defaults["tools_drill_f_plunge"],
-            "tools_drill_f_retract":        self.app.defaults["tools_drill_f_retract"],
-
-            "tools_drill_area_exclusion":   self.app.defaults["tools_drill_area_exclusion"],
-            "tools_drill_area_shape":       self.app.defaults["tools_drill_area_shape"],
-            "tools_drill_area_strategy":    self.app.defaults["tools_drill_area_strategy"],
-            "tools_drill_area_overz":       self.app.defaults["tools_drill_area_overz"],
+            "tools_drill_offset": self.app.defaults["tools_drill_offset"],
+            "tools_drill_toolchangexy": self.app.defaults["tools_drill_toolchangexy"],
+            "tools_drill_startz": self.app.defaults["tools_drill_startz"],
+            "tools_drill_feedrate_rapid": self.app.defaults["tools_drill_feedrate_rapid"],
+            "tools_drill_z_pdepth": self.app.defaults["tools_drill_z_pdepth"],
+            "tools_drill_feedrate_probe": self.app.defaults["tools_drill_feedrate_probe"],
+            "tools_drill_spindledir": self.app.defaults["tools_drill_spindledir"],
+            "tools_drill_f_plunge": self.app.defaults["tools_drill_f_plunge"],
+            "tools_drill_f_retract": self.app.defaults["tools_drill_f_retract"],
+            "tools_drill_area_exclusion": self.app.defaults["tools_drill_area_exclusion"],
+            "tools_drill_area_shape": self.app.defaults["tools_drill_area_shape"],
+            "tools_drill_area_strategy": self.app.defaults["tools_drill_area_strategy"],
+            "tools_drill_area_overz": self.app.defaults["tools_drill_area_overz"],
         }
 
         # fill in self.default_data values from self.options
         for opt_key, opt_val in self.app.options.items():
-            if opt_key.find('excellon_') == 0 or opt_key.find('tools_drill_') == 0:
+            if opt_key.find("excellon_") == 0 or opt_key.find("tools_drill_") == 0:
                 self.default_data[opt_key] = deepcopy(opt_val)
 
         self.first_click = False
         self.cursor_pos = None
         self.mouse_is_dragging = False
 
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         # ########################################
         # #######3 TEMP SETTINGS #################
@@ -438,7 +430,7 @@ class ToolDrilling(AppTool, Excellon):
         self.t_ui.last_drill_cb.hide()
 
         # if the app mode is Basic then disable this feature
-        if app_mode == 'b':
+        if app_mode == "b":
             self.t_ui.drill_slots_cb.set_value(False)
             self.t_ui.drill_slots_cb.hide()
         else:
@@ -480,12 +472,12 @@ class ToolDrilling(AppTool, Excellon):
         # order the tools by tool diameter if it's the case
         sorted_tools = []
         for k, v in self.excellon_tools.items():
-            sorted_tools.append(self.dec_format(float(v['tooldia'])))
+            sorted_tools.append(self.dec_format(float(v["tooldia"])))
 
         order = self.t_ui.order_radio.get_value()
-        if order == 'fwd':
+        if order == "fwd":
             sorted_tools.sort(reverse=False)
-        elif order == 'rev':
+        elif order == "rev":
             sorted_tools.sort(reverse=True)
         else:
             pass
@@ -495,7 +487,7 @@ class ToolDrilling(AppTool, Excellon):
         new_tools = {}
         for tooldia in sorted_tools:
             for old_tool in self.excellon_tools:
-                if self.dec_format(float(self.excellon_tools[old_tool]['tooldia'])) == tooldia:
+                if self.dec_format(float(self.excellon_tools[old_tool]["tooldia"])) == tooldia:
                     new_tools[new_id] = deepcopy(self.excellon_tools[old_tool])
                     new_id += 1
 
@@ -521,30 +513,40 @@ class ToolDrilling(AppTool, Excellon):
 
             # Find no of drills for the current tool
             try:
-                drill_cnt = len(self.excellon_tools[tool_no]["drills"])  # variable to store the nr of drills per tool
+                drill_cnt = len(
+                    self.excellon_tools[tool_no]["drills"]
+                )  # variable to store the nr of drills per tool
             except KeyError:
                 drill_cnt = 0
             tot_drill_cnt += drill_cnt
 
             # Find no of slots for the current tool
             try:
-                slot_cnt = len(self.excellon_tools[tool_no]["slots"])   # variable to store the nr of slots per tool
+                slot_cnt = len(
+                    self.excellon_tools[tool_no]["slots"]
+                )  # variable to store the nr of slots per tool
             except KeyError:
                 slot_cnt = 0
             tot_slot_cnt += slot_cnt
 
             # Tool name/id
-            exc_id_item = QtWidgets.QTableWidgetItem('%d' % int(tool_no))
-            exc_id_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled)
+            exc_id_item = QtWidgets.QTableWidgetItem("%d" % int(tool_no))
+            exc_id_item.setFlags(
+                QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled
+            )
             self.t_ui.tools_table.setItem(self.tool_row, 0, exc_id_item)
 
             # Tool Diameter
-            dia_item = QtWidgets.QTableWidgetItem(str(self.dec_format(self.excellon_tools[tool_no]['tooldia'])))
-            dia_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled)
+            dia_item = QtWidgets.QTableWidgetItem(
+                str(self.dec_format(self.excellon_tools[tool_no]["tooldia"]))
+            )
+            dia_item.setFlags(
+                QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled
+            )
             self.t_ui.tools_table.setItem(self.tool_row, 1, dia_item)
 
             # Number of drills per tool
-            drill_count_item = QtWidgets.QTableWidgetItem('%d' % drill_cnt)
+            drill_count_item = QtWidgets.QTableWidgetItem("%d" % drill_cnt)
             drill_count_item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled)
             self.t_ui.tools_table.setItem(self.tool_row, 2, drill_count_item)
 
@@ -555,7 +557,7 @@ class ToolDrilling(AppTool, Excellon):
 
             # Number of slots per tool
             # if the slot number is zero is better to not clutter the GUI with zero's so we print a space
-            slot_count_str = '%d' % slot_cnt if slot_cnt > 0 else ''
+            slot_count_str = "%d" % slot_cnt if slot_cnt > 0 else ""
             slot_count_item = QtWidgets.QTableWidgetItem(slot_count_str)
             slot_count_item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled)
             self.t_ui.tools_table.setItem(self.tool_row, 4, slot_count_item)
@@ -563,15 +565,15 @@ class ToolDrilling(AppTool, Excellon):
             self.tool_row += 1
 
         # add a last row with the Total number of drills
-        empty_1 = QtWidgets.QTableWidgetItem('')
+        empty_1 = QtWidgets.QTableWidgetItem("")
         empty_1.setFlags(~QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        empty_1_1 = QtWidgets.QTableWidgetItem('')
+        empty_1_1 = QtWidgets.QTableWidgetItem("")
         empty_1_1.setFlags(~QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
-        label_tot_drill_count = QtWidgets.QTableWidgetItem(_('Total Drills'))
+        label_tot_drill_count = QtWidgets.QTableWidgetItem(_("Total Drills"))
         label_tot_drill_count.setFlags(QtCore.Qt.ItemIsEnabled)
 
-        tot_drill_count = QtWidgets.QTableWidgetItem('%d' % tot_drill_cnt)
+        tot_drill_count = QtWidgets.QTableWidgetItem("%d" % tot_drill_cnt)
         tot_drill_count.setFlags(QtCore.Qt.ItemIsEnabled)
 
         self.t_ui.tools_table.setItem(self.tool_row, 0, empty_1)
@@ -590,13 +592,13 @@ class ToolDrilling(AppTool, Excellon):
         self.tool_row += 1
 
         # add a last row with the Total number of slots
-        empty_2 = QtWidgets.QTableWidgetItem('')
+        empty_2 = QtWidgets.QTableWidgetItem("")
         empty_2.setFlags(~QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-        empty_2_1 = QtWidgets.QTableWidgetItem('')
+        empty_2_1 = QtWidgets.QTableWidgetItem("")
         empty_2_1.setFlags(~QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
-        label_tot_slot_count = QtWidgets.QTableWidgetItem(_('Total Slots'))
-        tot_slot_count = QtWidgets.QTableWidgetItem('%d' % tot_slot_cnt)
+        label_tot_slot_count = QtWidgets.QTableWidgetItem(_("Total Slots"))
+        tot_slot_count = QtWidgets.QTableWidgetItem("%d" % tot_slot_cnt)
         label_tot_slot_count.setFlags(QtCore.Qt.ItemIsEnabled)
         tot_slot_count.setFlags(QtCore.Qt.ItemIsEnabled)
 
@@ -652,19 +654,19 @@ class ToolDrilling(AppTool, Excellon):
 
             area_dict = self.app.exc_areas.exclusion_areas_storage[area]
 
-            area_id_item = QtWidgets.QTableWidgetItem('%d' % int(area_id))
+            area_id_item = QtWidgets.QTableWidgetItem("%d" % int(area_id))
             area_id_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.t_ui.exclusion_table.setItem(area, 0, area_id_item)  # Area id
 
-            object_item = QtWidgets.QTableWidgetItem('%s' % area_dict["obj_type"])
+            object_item = QtWidgets.QTableWidgetItem("%s" % area_dict["obj_type"])
             object_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.t_ui.exclusion_table.setItem(area, 1, object_item)  # Origin Object
 
-            strategy_item = QtWidgets.QTableWidgetItem('%s' % area_dict["strategy"])
+            strategy_item = QtWidgets.QTableWidgetItem("%s" % area_dict["strategy"])
             strategy_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.t_ui.exclusion_table.setItem(area, 2, strategy_item)  # Strategy
 
-            overz_item = QtWidgets.QTableWidgetItem('%s' % area_dict["overz"])
+            overz_item = QtWidgets.QTableWidgetItem("%s" % area_dict["overz"])
             overz_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.t_ui.exclusion_table.setItem(area, 3, overz_item)  # Over Z
 
@@ -702,19 +704,21 @@ class ToolDrilling(AppTool, Excellon):
             sel_rows.add(it.row())
         if len(sel_rows) > 1:
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s</font></b>" % (_('Parameters for'), _("Multiple Tools"))
+                "<b>%s: <font color='#0000FF'>%s</font></b>"
+                % (_("Parameters for"), _("Multiple Tools"))
             )
         elif len(sel_rows) == 1:
             # update the QLabel that shows for which Tool we have the parameters in the UI form
             toolnr = int(self.t_ui.tools_table.item(list(sel_rows)[0], 0).text())
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s %d</font></b>" % (_('Parameters for'), _("Tool"), toolnr)
+                "<b>%s: <font color='#0000FF'>%s %d</font></b>"
+                % (_("Parameters for"), _("Tool"), toolnr)
             )
 
     def on_object_changed(self):
         log.debug("ToolDrilling.on_object_changed()")
         # updated units
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         # load the Excellon object
         self.obj_name = self.t_ui.object_combo.currentText()
@@ -723,7 +727,9 @@ class ToolDrilling(AppTool, Excellon):
         try:
             self.excellon_obj = self.app.collection.get_by_name(self.obj_name)
         except Exception:
-            self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), str(self.obj_name)))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), str(self.obj_name))
+            )
             return
 
         if self.excellon_obj is None:
@@ -751,7 +757,8 @@ class ToolDrilling(AppTool, Excellon):
         if not sel_rows or len(sel_rows) == 0:
             self.t_ui.generate_cnc_button.setDisabled(True)
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s</font></b>" % (_('Parameters for'), _("No Tool Selected"))
+                "<b>%s: <font color='#0000FF'>%s</font></b>"
+                % (_("Parameters for"), _("No Tool Selected"))
             )
         else:
             self.t_ui.generate_cnc_button.setDisabled(False)
@@ -778,7 +785,9 @@ class ToolDrilling(AppTool, Excellon):
                 current_widget.stateChanged.connect(self.form_to_storage)
             if isinstance(current_widget, RadioSet):
                 current_widget.activated_custom.connect(self.form_to_storage)
-            elif isinstance(current_widget, FCDoubleSpinner) or isinstance(current_widget, FCSpinner):
+            elif isinstance(current_widget, FCDoubleSpinner) or isinstance(
+                current_widget, FCSpinner
+            ):
                 current_widget.returnPressed.connect(self.form_to_storage)
             elif isinstance(current_widget, FCComboBox):
                 current_widget.currentIndexChanged.connect(self.form_to_storage)
@@ -790,7 +799,9 @@ class ToolDrilling(AppTool, Excellon):
                 current_widget2.stateChanged.connect(self.form_to_storage)
             if isinstance(current_widget2, RadioSet):
                 current_widget2.activated_custom.connect(self.form_to_storage)
-            elif isinstance(current_widget2, FCDoubleSpinner) or isinstance(current_widget2, FCSpinner):
+            elif isinstance(current_widget2, FCDoubleSpinner) or isinstance(
+                current_widget2, FCSpinner
+            ):
                 current_widget2.returnPressed.connect(self.form_to_storage)
             elif isinstance(current_widget2, FCComboBox):
                 current_widget2.currentIndexChanged.connect(self.form_to_storage)
@@ -808,7 +819,9 @@ class ToolDrilling(AppTool, Excellon):
         except (TypeError, AttributeError):
             pass
         try:
-            self.t_ui.tools_table.horizontalHeader().sectionClicked.disconnect(self.on_toggle_all_rows)
+            self.t_ui.tools_table.horizontalHeader().sectionClicked.disconnect(
+                self.on_toggle_all_rows
+            )
         except (TypeError, AttributeError):
             pass
 
@@ -833,7 +846,9 @@ class ToolDrilling(AppTool, Excellon):
                     current_widget.activated_custom.disconnect(self.form_to_storage)
                 except (TypeError, ValueError):
                     pass
-            elif isinstance(current_widget, FCDoubleSpinner) or isinstance(current_widget, FCSpinner):
+            elif isinstance(current_widget, FCDoubleSpinner) or isinstance(
+                current_widget, FCSpinner
+            ):
                 try:
                     current_widget.returnPressed.disconnect(self.form_to_storage)
                 except (TypeError, ValueError):
@@ -857,7 +872,9 @@ class ToolDrilling(AppTool, Excellon):
                     current_widget2.activated_custom.disconnect(self.form_to_storage)
                 except (TypeError, ValueError):
                     pass
-            elif isinstance(current_widget2, FCDoubleSpinner) or isinstance(current_widget2, FCSpinner):
+            elif isinstance(current_widget2, FCDoubleSpinner) or isinstance(
+                current_widget2, FCSpinner
+            ):
                 try:
                     current_widget2.returnPressed.disconnect(self.form_to_storage)
                 except (TypeError, ValueError):
@@ -892,7 +909,7 @@ class ToolDrilling(AppTool, Excellon):
                 tools = f.read()
         except IOError:
             self.app.log.error("Could not load tools DB file.")
-            self.app.inform.emit('[ERROR] %s' % _("Could not load Tools DB file."))
+            self.app.inform.emit("[ERROR] %s" % _("Could not load Tools DB file."))
             return
 
         try:
@@ -900,11 +917,11 @@ class ToolDrilling(AppTool, Excellon):
         except Exception:
             e = sys.exc_info()[0]
             self.app.log.error(str(e))
-            self.app.inform.emit('[ERROR] %s' % _("Failed to parse Tools DB file."))
+            self.app.inform.emit("[ERROR] %s" % _("Failed to parse Tools DB file."))
             return
 
         if not self.tools_db_dict:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Tools DB empty."))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Tools DB empty."))
             return
 
         self.replace_tools()
@@ -916,44 +933,48 @@ class ToolDrilling(AppTool, Excellon):
             new_tools_dict = deepcopy(self.excellon_tools)
 
             for orig_tool, orig_tool_val in self.excellon_tools.items():
-                orig_tooldia = orig_tool_val['tooldia']
+                orig_tooldia = orig_tool_val["tooldia"]
 
                 tool_found = 0
 
                 # look in database tools
                 for db_tool, db_tool_val in self.tools_db_dict.items():
-                    db_tooldia = db_tool_val['tooldia']
-                    low_limit = float(db_tool_val['data']['tol_min'])
-                    high_limit = float(db_tool_val['data']['tol_max'])
+                    db_tooldia = db_tool_val["tooldia"]
+                    low_limit = float(db_tool_val["data"]["tol_min"])
+                    high_limit = float(db_tool_val["data"]["tol_max"])
 
                     # if we find a tool with the same diameter in the Tools DB just update it's data
                     if orig_tooldia == db_tooldia:
                         tool_found += 1
-                        for d in db_tool_val['data']:
-                            if d.find('tools_drill') == 0:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
-                            elif d.find('tools_') == 0:
+                        for d in db_tool_val["data"]:
+                            if d.find("tools_drill") == 0:
+                                new_tools_dict[orig_tool]["data"][d] = db_tool_val["data"][d]
+                            elif d.find("tools_") == 0:
                                 # don't need data for other App Tools; this tests after 'tools_drill_'
                                 continue
                             else:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
+                                new_tools_dict[orig_tool]["data"][d] = db_tool_val["data"][d]
                     # search for a tool that has a tolerance that the tool fits in
                     elif high_limit >= orig_tooldia >= low_limit:
                         tool_found += 1
-                        new_tools_dict[orig_tool]['tooldia'] = db_tooldia
-                        for d in db_tool_val['data']:
-                            if d.find('tools_drill') == 0:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
-                            elif d.find('tools_') == 0:
+                        new_tools_dict[orig_tool]["tooldia"] = db_tooldia
+                        for d in db_tool_val["data"]:
+                            if d.find("tools_drill") == 0:
+                                new_tools_dict[orig_tool]["data"][d] = db_tool_val["data"][d]
+                            elif d.find("tools_") == 0:
                                 # don't need data for other App Tools; this tests after 'tools_drill_'
                                 continue
                             else:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
+                                new_tools_dict[orig_tool]["data"][d] = db_tool_val["data"][d]
 
                 if tool_found > 1:
                     self.app.inform.emit(
-                        '[WARNING_NOTCL] %s' % _("Cancelled.\n"
-                                                 "Multiple tools for one tool diameter found in Tools Database."))
+                        "[WARNING_NOTCL] %s"
+                        % _(
+                            "Cancelled.\n"
+                            "Multiple tools for one tool diameter found in Tools Database."
+                        )
+                    )
                     self.blockSignals(False)
                     return
 
@@ -980,14 +1001,16 @@ class ToolDrilling(AppTool, Excellon):
 
             self.t_ui.generate_cnc_button.setDisabled(True)
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s</font></b>" % (_('Parameters for'), _("No Tool Selected"))
+                "<b>%s: <font color='#0000FF'>%s</font></b>"
+                % (_("Parameters for"), _("No Tool Selected"))
             )
         else:
             self.t_ui.tools_table.selectAll()
             self.t_ui.exc_param_frame.setDisabled(False)
             self.t_ui.generate_cnc_button.setDisabled(False)
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s</font></b>" % (_('Parameters for'), _("Multiple Tools"))
+                "<b>%s: <font color='#0000FF'>%s</font></b>"
+                % (_("Parameters for"), _("Multiple Tools"))
             )
 
     def on_row_selection_change(self):
@@ -1018,7 +1041,8 @@ class ToolDrilling(AppTool, Excellon):
             self.t_ui.generate_cnc_button.setDisabled(True)
             self.t_ui.exc_param_frame.setDisabled(True)
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s</font></b>" % (_('Parameters for'), _("No Tool Selected"))
+                "<b>%s: <font color='#0000FF'>%s</font></b>"
+                % (_("Parameters for"), _("No Tool Selected"))
             )
             self.blockSignals(False)
             return
@@ -1030,11 +1054,13 @@ class ToolDrilling(AppTool, Excellon):
             # update the QLabel that shows for which Tool we have the parameters in the UI form
             tooluid = int(self.t_ui.tools_table.item(list(sel_rows)[0], 0).text())
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s %d</font></b>" % (_('Parameters for'), _("Tool"), tooluid)
+                "<b>%s: <font color='#0000FF'>%s %d</font></b>"
+                % (_("Parameters for"), _("Tool"), tooluid)
             )
         else:
             self.t_ui.tool_data_label.setText(
-                "<b>%s: <font color='#0000FF'>%s</font></b>" % (_('Parameters for'), _("Multiple Tools"))
+                "<b>%s: <font color='#0000FF'>%s</font></b>"
+                % (_("Parameters for"), _("Multiple Tools"))
             )
 
         for c_row in sel_rows:
@@ -1043,7 +1069,7 @@ class ToolDrilling(AppTool, Excellon):
                 item = self.t_ui.tools_table.item(c_row, 3)
                 if type(item) is not None:
                     tooluid = int(item.text())
-                    self.storage_to_form(self.excellon_tools[tooluid]['data'])
+                    self.storage_to_form(self.excellon_tools[tooluid]["data"])
                 else:
                     self.blockSignals(False)
                     return
@@ -1064,8 +1090,13 @@ class ToolDrilling(AppTool, Excellon):
         """
         for form_key in self.tool_form_fields:
             for storage_key in dict_storage:
-                if form_key == storage_key and form_key not in \
-                        ["tools_drill_toolchange", "tools_drill_toolchangez", "startz", "endz", "tools_drill_ppname_e"]:
+                if form_key == storage_key and form_key not in [
+                    "tools_drill_toolchange",
+                    "tools_drill_toolchangez",
+                    "startz",
+                    "endz",
+                    "tools_drill_ppname_e",
+                ]:
                     try:
                         self.tool_form_fields[form_key].set_value(dict_storage[form_key])
                     except Exception as e:
@@ -1104,8 +1135,8 @@ class ToolDrilling(AppTool, Excellon):
                         new_option_value = self.tool_form_fields[option_changed].get_value()
                         if option_changed in tooluid_val:
                             tooluid_val[option_changed] = new_option_value
-                        if option_changed in tooluid_val['data']:
-                            tooluid_val['data'][option_changed] = new_option_value
+                        if option_changed in tooluid_val["data"]:
+                            tooluid_val["data"][option_changed] = new_option_value
 
         # update general parameters
         # they are updated for all tools
@@ -1114,8 +1145,8 @@ class ToolDrilling(AppTool, Excellon):
                 new_option_value = self.general_form_fields[option_changed].get_value()
                 if option_changed in tooluid_val:
                     tooluid_val[option_changed] = new_option_value
-                if option_changed in tooluid_val['data']:
-                    tooluid_val['data'][option_changed] = new_option_value
+                if option_changed in tooluid_val["data"]:
+                    tooluid_val["data"][option_changed] = new_option_value
 
         self.blockSignals(False)
 
@@ -1144,7 +1175,7 @@ class ToolDrilling(AppTool, Excellon):
             rows.add(x.row())
 
         for row in rows:
-            txt = ''
+            txt = ""
             elem = []
 
             for column in range(self.t_ui.tools_table.columnCount()):
@@ -1170,7 +1201,9 @@ class ToolDrilling(AppTool, Excellon):
     def on_apply_param_to_all_clicked(self):
         if self.t_ui.tools_table.rowCount() == 0:
             # there is no tool in tool table so we can't save the GUI elements values to storage
-            log.debug("ToolDrilling.on_apply_param_to_all_clicked() --> no tool in Tools Table, aborting.")
+            log.debug(
+                "ToolDrilling.on_apply_param_to_all_clicked() --> no tool in Tools Table, aborting."
+            )
             return
 
         self.blockSignals(True)
@@ -1186,23 +1219,26 @@ class ToolDrilling(AppTool, Excellon):
             if int(tooluid_key) == tooluid_item:
                 # this will hold the 'data' key of the self.tools[tool] dictionary that corresponds to
                 # the current row in the tool table
-                temp_tool_data = tooluid_val['data']
+                temp_tool_data = tooluid_val["data"]
                 break
 
         for tooluid_key, tooluid_val in self.excellon_tools.items():
-            tooluid_val['data'] = deepcopy(temp_tool_data)
+            tooluid_val["data"] = deepcopy(temp_tool_data)
 
-        self.app.inform.emit('[success] %s' % _("Current Tool parameters were applied to all tools."))
+        self.app.inform.emit(
+            "[success] %s" % _("Current Tool parameters were applied to all tools.")
+        )
         self.blockSignals(False)
 
     def on_order_changed(self, order):
-        if order != 'no':
+        if order != "no":
             self.build_tool_ui()
 
     def on_tooltable_cellwidget_change(self):
         cw = self.sender()
-        assert isinstance(cw, QtWidgets.QComboBox), \
-            "Expected a QtWidgets.QComboBox, got %s" % isinstance(cw, QtWidgets.QComboBox)
+        assert isinstance(
+            cw, QtWidgets.QComboBox
+        ), "Expected a QtWidgets.QComboBox, got %s" % isinstance(cw, QtWidgets.QComboBox)
 
         cw_index = self.t_ui.tools_table.indexAt(cw.pos())
         cw_row = cw_index.row()
@@ -1213,12 +1249,14 @@ class ToolDrilling(AppTool, Excellon):
         # if the sender is in the column with index 2 then we update the tool_type key
         if cw_col == 2:
             tt = cw.currentText()
-            typ = 'Iso' if tt == 'V' else 'Rough'
+            typ = "Iso" if tt == "V" else "Rough"
 
-            self.excellon_tools[current_uid].update({
-                'type': typ,
-                'tool_type': tt,
-            })
+            self.excellon_tools[current_uid].update(
+                {
+                    "type": typ,
+                    "tool_type": tt,
+                }
+            )
 
     def on_pp_changed(self):
         current_pp = self.t_ui.pp_excellon_name_cb.get_value()
@@ -1236,14 +1274,14 @@ class ToolDrilling(AppTool, Excellon):
             self.t_ui.feedrate_probe_entry.setVisible(False)
             self.t_ui.feedrate_probe_label.hide()
 
-        if 'marlin' in current_pp.lower():
+        if "marlin" in current_pp.lower():
             self.t_ui.feedrate_rapid_label.show()
             self.t_ui.feedrate_rapid_entry.show()
         else:
             self.t_ui.feedrate_rapid_label.hide()
             self.t_ui.feedrate_rapid_entry.hide()
 
-        if 'laser' in current_pp.lower():
+        if "laser" in current_pp.lower():
             self.t_ui.cutzlabel.hide()
             self.t_ui.cutz_entry.hide()
             try:
@@ -1252,8 +1290,8 @@ class ToolDrilling(AppTool, Excellon):
             except AttributeError:
                 pass
 
-            if 'marlin' in current_pp.lower():
-                self.t_ui.travelzlabel.setText('%s:' % _("Focus Z"))
+            if "marlin" in current_pp.lower():
+                self.t_ui.travelzlabel.setText("%s:" % _("Focus Z"))
                 self.t_ui.travelzlabel.show()
                 self.t_ui.travelz_entry.show()
 
@@ -1275,7 +1313,7 @@ class ToolDrilling(AppTool, Excellon):
             self.t_ui.dwell_cb.hide()
             self.t_ui.dwelltime_entry.hide()
 
-            self.t_ui.spindle_label.setText('%s:' % _("Laser Power"))
+            self.t_ui.spindle_label.setText("%s:" % _("Laser Power"))
 
             try:
                 self.t_ui.tool_offset_label.hide()
@@ -1291,7 +1329,7 @@ class ToolDrilling(AppTool, Excellon):
             except AttributeError:
                 pass
 
-            self.t_ui.travelzlabel.setText('%s:' % _('Travel Z'))
+            self.t_ui.travelzlabel.setText("%s:" % _("Travel Z"))
 
             self.t_ui.travelzlabel.show()
             self.t_ui.travelz_entry.show()
@@ -1307,7 +1345,7 @@ class ToolDrilling(AppTool, Excellon):
             self.t_ui.dwell_cb.show()
             self.t_ui.dwelltime_entry.show()
 
-            self.t_ui.spindle_label.setText('%s:' % _('Spindle speed'))
+            self.t_ui.spindle_label.setText("%s:" % _("Spindle speed"))
 
             try:
                 self.t_ui.tool_offset_label.show()
@@ -1325,7 +1363,9 @@ class ToolDrilling(AppTool, Excellon):
         # events from the GUI are of type QKeyEvent
         elif type(event) == QtGui.QKeyEvent:
             key = event.key()
-        elif isinstance(event, mpl_key_event):  # MatPlotLib key events are trickier to interpret than the rest
+        elif isinstance(
+            event, mpl_key_event
+        ):  # MatPlotLib key events are trickier to interpret than the rest
             # matplotlib_key_flag = True
 
             key = event.key
@@ -1333,15 +1373,15 @@ class ToolDrilling(AppTool, Excellon):
 
             # check for modifiers
             key_string = key.toString().lower()
-            if '+' in key_string:
-                mod, __, key_text = key_string.rpartition('+')
-                if mod.lower() == 'ctrl':
+            if "+" in key_string:
+                mod, __, key_text = key_string.rpartition("+")
+                if mod.lower() == "ctrl":
                     # modifiers = QtCore.Qt.ControlModifier
                     pass
-                elif mod.lower() == 'alt':
+                elif mod.lower() == "alt":
                     # modifiers = QtCore.Qt.AltModifier
                     pass
-                elif mod.lower() == 'shift':
+                elif mod.lower() == "shift":
                     # modifiers = QtCore.Qt.ShiftModifier
                     pass
                 else:
@@ -1353,7 +1393,7 @@ class ToolDrilling(AppTool, Excellon):
         else:
             key = event.key
 
-        if key == QtCore.Qt.Key_Escape or key == 'Escape':
+        if key == QtCore.Qt.Key_Escape or key == "Escape":
             self.points = []
             self.poly_drawn = False
             self.delete_moving_selection_shape()
@@ -1368,12 +1408,19 @@ class ToolDrilling(AppTool, Excellon):
         obj_type = self.excellon_obj.kind
 
         self.app.exc_areas.on_add_area_click(
-            shape_button=shape_button, overz_button=overz_button, cnc_button=cnc_button, strategy_radio=strategy_radio,
-            solid_geo=solid_geo, obj_type=obj_type)
+            shape_button=shape_button,
+            overz_button=overz_button,
+            cnc_button=cnc_button,
+            strategy_radio=strategy_radio,
+            solid_geo=solid_geo,
+            obj_type=obj_type,
+        )
 
     def on_clear_area_click(self):
         if not self.app.exc_areas.exclusion_areas_storage:
-            self.app.inform.emit("[WARNING_NOTCL] %s" % _("Delete failed. There are no exclusion areas to delete."))
+            self.app.inform.emit(
+                "[WARNING_NOTCL] %s" % _("Delete failed. There are no exclusion areas to delete.")
+            )
             return
 
         self.app.exc_areas.on_clear_area_click()
@@ -1408,16 +1455,17 @@ class ToolDrilling(AppTool, Excellon):
         self.delete_sel_shape()
 
         if self.app.is_legacy is False:
-            face = self.app.defaults['global_sel_fill'][:-2] + str(hex(int(0.2 * 255)))[2:]
-            outline = self.app.defaults['global_sel_line'][:-2] + str(hex(int(0.8 * 255)))[2:]
+            face = self.app.defaults["global_sel_fill"][:-2] + str(hex(int(0.2 * 255)))[2:]
+            outline = self.app.defaults["global_sel_line"][:-2] + str(hex(int(0.8 * 255)))[2:]
         else:
-            face = self.app.defaults['global_sel_fill'][:-2] + str(hex(int(0.4 * 255)))[2:]
-            outline = self.app.defaults['global_sel_line'][:-2] + str(hex(int(1.0 * 255)))[2:]
+            face = self.app.defaults["global_sel_fill"][:-2] + str(hex(int(0.4 * 255)))[2:]
+            outline = self.app.defaults["global_sel_line"][:-2] + str(hex(int(1.0 * 255)))[2:]
 
         for row in sel_rows:
-            sel_rect = self.app.exc_areas.exclusion_areas_storage[row]['shape']
-            self.app.move_tool.sel_shapes.add(sel_rect, color=outline, face_color=face, update=True, layer=0,
-                                              tolerance=None)
+            sel_rect = self.app.exc_areas.exclusion_areas_storage[row]["shape"]
+            self.app.move_tool.sel_shapes.add(
+                sel_rect, color=outline, face_color=face, update=True, layer=0, tolerance=None
+            )
         if self.app.is_legacy is True:
             self.app.move_tool.sel_shapes.redraw()
 
@@ -1435,7 +1483,7 @@ class ToolDrilling(AppTool, Excellon):
         self.t_ui.exclusion_cb.set_value(self.exclusion_area_cb_is_checked)
 
     def on_strategy(self, val):
-        if val == 'around':
+        if val == "around":
             self.t_ui.over_z_label.setDisabled(True)
             self.t_ui.over_z_entry.setDisabled(True)
         else:
@@ -1481,7 +1529,7 @@ class ToolDrilling(AppTool, Excellon):
                 break
             drills_list.append(new_pt)
 
-        if add_last_pt and stop_pt.distance(drills_list[-1]) >= overlap/10:
+        if add_last_pt and stop_pt.distance(drills_list[-1]) >= overlap / 10:
             drills_list.append(stop_pt)
         return drills_list
 
@@ -1490,12 +1538,12 @@ class ToolDrilling(AppTool, Excellon):
 
         has_drills = None
         for tool_key, tool_dict in self.excellon_tools.items():
-            if 'drills' in tool_dict and tool_dict['drills']:
+            if "drills" in tool_dict and tool_dict["drills"]:
                 has_drills = True
                 break
         has_slots = None
         for tool_key, tool_dict in self.excellon_tools.items():
-            if 'slots' in tool_dict and tool_dict['slots']:
+            if "slots" in tool_dict and tool_dict["slots"]:
                 has_slots = True
                 break
 
@@ -1521,8 +1569,8 @@ class ToolDrilling(AppTool, Excellon):
         # create drill points out of the drills locations
         for tool_key, tl_dict in self.excellon_tools.items():
             if tool_key in selected_tools:
-                if 'drills' in tl_dict and tl_dict['drills']:
-                    for drill_pt in tl_dict['drills']:
+                if "drills" in tl_dict and tl_dict["drills"]:
+                    for drill_pt in tl_dict["drills"]:
                         try:
                             points[tool_key].append(drill_pt)
                         except KeyError:
@@ -1537,7 +1585,7 @@ class ToolDrilling(AppTool, Excellon):
         should_add_last_pt = self.t_ui.last_drill_cb.get_value()
 
         for tool_key, tl_dict in self.excellon_tools.items():
-            convert_slots = tl_dict['data']['tools_drill_drill_slots']
+            convert_slots = tl_dict["data"]["tools_drill_drill_slots"]
             if convert_slots:
                 if tool_key in selected_tools:
                     overlap = 1 - (self.t_ui.drill_overlap_entry.get_value() / 100.0)
@@ -1549,10 +1597,11 @@ class ToolDrilling(AppTool, Excellon):
                             break
 
                     new_drills = []
-                    if 'slots' in tl_dict and tl_dict['slots']:
-                        for slot in tl_dict['slots']:
-                            new_drills += self.process_slot_as_drills(slot=slot, overlap=drill_overlap,
-                                                                      add_last_pt=should_add_last_pt)
+                    if "slots" in tl_dict and tl_dict["slots"]:
+                        for slot in tl_dict["slots"]:
+                            new_drills += self.process_slot_as_drills(
+                                slot=slot, overlap=drill_overlap, add_last_pt=should_add_last_pt
+                            )
                         if new_drills:
                             try:
                                 points[tool_key] += new_drills
@@ -1566,8 +1615,8 @@ class ToolDrilling(AppTool, Excellon):
         for tool_key in points:
             for pt in points[tool_key]:
                 for area in self.app.exc_areas.exclusion_areas_storage:
-                    pt_buf = pt.buffer(self.excellon_tools[tool_key]['tooldia'] / 2.0)
-                    if pt_buf.within(area['shape']) or pt_buf.intersects(area['shape']):
+                    pt_buf = pt.buffer(self.excellon_tools[tool_key]["tooldia"] / 2.0)
+                    if pt_buf.within(area["shape"]) or pt_buf.intersects(area["shape"]):
                         return True
         return False
 
@@ -1579,25 +1628,31 @@ class ToolDrilling(AppTool, Excellon):
         try:
             obj = self.app.collection.get_by_name(obj_name)
         except Exception:
-            self.app.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Could not retrieve object"), str(obj_name)))
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s: %s" % (_("Could not retrieve object"), str(obj_name))
+            )
             return
 
         if obj is None:
-            self.app.inform.emit('[ERROR_NOTCL] %s.' % _("Object not found"))
+            self.app.inform.emit("[ERROR_NOTCL] %s." % _("Object not found"))
             return
 
-        xmin = obj.options['xmin']
-        ymin = obj.options['ymin']
-        xmax = obj.options['xmax']
-        ymax = obj.options['ymax']
+        xmin = obj.options["xmin"]
+        ymin = obj.options["ymin"]
+        xmax = obj.options["xmax"]
+        ymax = obj.options["ymax"]
 
         job_name = obj.options["name"] + "_cnc"
         obj.pp_excellon_name = self.t_ui.pp_excellon_name_cb.get_value()
 
         if self.is_valid_excellon() is False:
-            log.debug("camlib.CNCJob.generate_from_excellon_by_tool() --> "
-                      "The loaded Excellon file has no drills ...")
-            self.app.inform.emit('[ERROR_NOTCL] %s...' % _('The loaded Excellon file has no drills'))
+            log.debug(
+                "camlib.CNCJob.generate_from_excellon_by_tool() --> "
+                "The loaded Excellon file has no drills ..."
+            )
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s..." % _("The loaded Excellon file has no drills")
+            )
             return
 
         # Get the tools from the Tool Table
@@ -1609,7 +1664,9 @@ class ToolDrilling(AppTool, Excellon):
             if self.t_ui.tools_table.rowCount() >= 3:
                 selected_tools_id.append(int(self.t_ui.tools_table.item(0, 3).text()))
             else:
-                msg = '[ERROR_NOTCL] %s' % _("Please select one or more tools from the list and try again.")
+                msg = "[ERROR_NOTCL] %s" % _(
+                    "Please select one or more tools from the list and try again."
+                )
                 self.app.inform.emit(msg)
                 return
 
@@ -1622,12 +1679,12 @@ class ToolDrilling(AppTool, Excellon):
         # #############################################################################################################
         all_tools = []
         for tool_as_key, v in list(self.excellon_tools.items()):
-            all_tools.append((int(tool_as_key), float(v['tooldia'])))
+            all_tools.append((int(tool_as_key), float(v["tooldia"])))
 
         order = self.t_ui.order_radio.get_value()
-        if order == 'fwd':
+        if order == "fwd":
             sorted_tools = sorted(all_tools, key=lambda t1: t1[1])
-        elif order == 'rev':
+        elif order == "rev":
             sorted_tools = sorted(all_tools, key=lambda t1: t1[1], reverse=True)
         else:
             sorted_tools = all_tools
@@ -1645,31 +1702,37 @@ class ToolDrilling(AppTool, Excellon):
         self.app.inform.emit(_("Creating a list of points to drill..."))
 
         # points is a dictionary: keys are tools ad values are lists of Shapely Points
-        points = self.create_drill_points(selected_tools=sel_tools, selected_sorted_tools=sorted_tools)
+        points = self.create_drill_points(
+            selected_tools=sel_tools, selected_sorted_tools=sorted_tools
+        )
 
         # check if there are drill points in the exclusion areas (if any areas)
         if self.app.exc_areas.exclusion_areas_storage and self.check_intersection(points) is True:
-            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed. Drill points inside the exclusion zones."))
-            return 'fail'
+            self.app.inform.emit(
+                "[ERROR_NOTCL] %s" % _("Failed. Drill points inside the exclusion zones.")
+            )
+            return "fail"
 
         # #############################################################################################################
         # General Parameters
         # #############################################################################################################
         used_excellon_optimization_type = self.app.defaults["excellon_optimization_type"]
         current_platform = platform.architecture()[0]
-        if current_platform != '64bit':
-            used_excellon_optimization_type = 'T'
+        if current_platform != "64bit":
+            used_excellon_optimization_type = "T"
 
         # #############################################################################################################
         # #############################################################################################################
         # GCODE creation
         # #############################################################################################################
         # #############################################################################################################
-        self.app.inform.emit('%s...' % _("Starting G-Code"))
+        self.app.inform.emit("%s..." % _("Starting G-Code"))
 
         # Object initialization function for app.app_obj.new_object()
         def job_init(job_obj, app_obj):
-            assert job_obj.kind == 'cncjob', "Initializer expected a CNCJobObject, got %s" % type(job_obj)
+            assert job_obj.kind == "cncjob", "Initializer expected a CNCJobObject, got %s" % type(
+                job_obj
+            )
             app_obj.inform.emit(_("Generating CNCJob..."))
 
             # #########################################################################################################
@@ -1679,11 +1742,11 @@ class ToolDrilling(AppTool, Excellon):
             # #########################################################################################################
             # #########################################################################################################
             build_tools_in_use_list = False
-            if 'Tools_in_use' not in job_obj.options:
-                job_obj.options['Tools_in_use'] = []
+            if "Tools_in_use" not in job_obj.options:
+                job_obj.options["Tools_in_use"] = []
 
             # if the list is empty (either we just added the key or it was already there but empty) signal to build it
-            if not job_obj.options['Tools_in_use']:
+            if not job_obj.options["Tools_in_use"]:
                 build_tools_in_use_list = True
 
             # #########################################################################################################
@@ -1703,23 +1766,30 @@ class ToolDrilling(AppTool, Excellon):
                         if to_ol in points and points[to_ol]:
                             drill_no = len(points[to_ol])
                             for drill in points[to_ol]:
-                                sol_geo.append(drill.buffer((it[1] / 2.0), resolution=job_obj.geo_steps_per_circle))
+                                sol_geo.append(
+                                    drill.buffer(
+                                        (it[1] / 2.0), resolution=job_obj.geo_steps_per_circle
+                                    )
+                                )
 
                         slot_no = 0
-                        convert_slots = self.excellon_tools[to_ol]['data']['tools_drill_drill_slots']
-                        if 'slots' in self.excellon_tools[to_ol] and convert_slots is False:
-                            slot_no = len(self.excellon_tools[to_ol]['slots'])
-                            for eslot in self.excellon_tools[to_ol]['slots']:
+                        convert_slots = self.excellon_tools[to_ol]["data"][
+                            "tools_drill_drill_slots"
+                        ]
+                        if "slots" in self.excellon_tools[to_ol] and convert_slots is False:
+                            slot_no = len(self.excellon_tools[to_ol]["slots"])
+                            for eslot in self.excellon_tools[to_ol]["slots"]:
                                 start = (eslot[0].x, eslot[0].y)
                                 stop = (eslot[1].x, eslot[1].y)
                                 sol_geo.append(
-                                    LineString([start, stop]).buffer((it[1] / 2.0),
-                                                                     resolution=job_obj.geo_steps_per_circle)
+                                    LineString([start, stop]).buffer(
+                                        (it[1] / 2.0), resolution=job_obj.geo_steps_per_circle
+                                    )
                                 )
 
                         # adjust Offset for current tool
                         try:
-                            z_off = float(self.excellon_tools[it[0]]['data']['offset']) * (-1)
+                            z_off = float(self.excellon_tools[it[0]]["data"]["offset"]) * (-1)
                         except KeyError:
                             z_off = 0
 
@@ -1727,23 +1797,25 @@ class ToolDrilling(AppTool, Excellon):
                         default_data = {}
                         for kk, vv in list(obj.options.items()):
                             default_data[kk] = deepcopy(vv)
-                        default_data['tools_drill_cutz'] = float(self.excellon_tools[it[0]]['data']['tools_drill_cutz'])
+                        default_data["tools_drill_cutz"] = float(
+                            self.excellon_tools[it[0]]["data"]["tools_drill_cutz"]
+                        )
 
                         # populate the Excellon CNC tools storage
                         job_obj.exc_cnc_tools[it[1]] = {}
-                        job_obj.exc_cnc_tools[it[1]]['tool'] = it[0]
-                        job_obj.exc_cnc_tools[it[1]]['nr_drills'] = drill_no
-                        job_obj.exc_cnc_tools[it[1]]['nr_slots'] = slot_no
-                        job_obj.exc_cnc_tools[it[1]]['offset'] = z_off
-                        job_obj.exc_cnc_tools[it[1]]['data'] = default_data
-                        job_obj.exc_cnc_tools[it[1]]['gcode'] = ''
-                        job_obj.exc_cnc_tools[it[1]]['gcode_parsed'] = []
-                        job_obj.exc_cnc_tools[it[1]]['solid_geometry'] = deepcopy(sol_geo)
+                        job_obj.exc_cnc_tools[it[1]]["tool"] = it[0]
+                        job_obj.exc_cnc_tools[it[1]]["nr_drills"] = drill_no
+                        job_obj.exc_cnc_tools[it[1]]["nr_slots"] = slot_no
+                        job_obj.exc_cnc_tools[it[1]]["offset"] = z_off
+                        job_obj.exc_cnc_tools[it[1]]["data"] = default_data
+                        job_obj.exc_cnc_tools[it[1]]["gcode"] = ""
+                        job_obj.exc_cnc_tools[it[1]]["gcode_parsed"] = []
+                        job_obj.exc_cnc_tools[it[1]]["solid_geometry"] = deepcopy(sol_geo)
 
                         # build a self.options['Tools_in_use'] list from scratch if we don't have one like in the case
                         # of running this method from a Tcl Command
                         if build_tools_in_use_list is True:
-                            job_obj.options['Tools_in_use'].append(
+                            job_obj.options["Tools_in_use"].append(
                                 [it[0], it[1], drill_no, slot_no]
                             )
 
@@ -1762,16 +1834,16 @@ class ToolDrilling(AppTool, Excellon):
             tool_table_items.insert(0, [_("Tool_nr"), _("Diameter"), _("Drills_Nr"), _("Slots_Nr")])
 
             # ## Add properties to the object
-            job_obj.options['Tools_in_use'] = tool_table_items
-            job_obj.options['type'] = 'Excellon'
-            job_obj.options['ppname_e'] = obj.pp_excellon_name
+            job_obj.options["Tools_in_use"] = tool_table_items
+            job_obj.options["type"] = "Excellon"
+            job_obj.options["ppname_e"] = obj.pp_excellon_name
 
-            job_obj.options['xmin'] = xmin
-            job_obj.options['ymin'] = ymin
-            job_obj.options['xmax'] = xmax
-            job_obj.options['ymax'] = ymax
+            job_obj.options["xmin"] = xmin
+            job_obj.options["ymin"] = ymin
+            job_obj.options["xmax"] = xmax
+            job_obj.options["ymax"] = ymax
 
-            job_obj.origin_kind = 'excellon'
+            job_obj.origin_kind = "excellon"
             job_obj.use_ui = True
             job_obj.toolchange_xy_type = "excellon"
             job_obj.coords_decimals = int(self.app.defaults["cncjob_coords_decimals"])
@@ -1782,13 +1854,13 @@ class ToolDrilling(AppTool, Excellon):
             job_obj.xy_toolchange = self.app.defaults["tools_drill_toolchangexy"]
             x_tc, y_tc = [0, 0]
             try:
-                if job_obj.xy_toolchange != '':
-                    tcxy_temp = re.sub('[()\[\]]', '', str(job_obj.xy_toolchange))
+                if job_obj.xy_toolchange != "":
+                    tcxy_temp = re.sub("[()\[\]]", "", str(job_obj.xy_toolchange))
                     if tcxy_temp:
                         x_tc, y_tc = [float(eval(a)) for a in tcxy_temp.split(",")]
             except Exception:
                 x_tc, y_tc = [0, 0]
-                self.app.inform.emit('[ERROR]%s' % _("The Toolchange X,Y format has to be (x, y)."))
+                self.app.inform.emit("[ERROR]%s" % _("The Toolchange X,Y format has to be (x, y)."))
 
             job_obj.oldx = x_tc
             job_obj.oldy = y_tc
@@ -1804,11 +1876,11 @@ class ToolDrilling(AppTool, Excellon):
 
                 # use the first tool in the selection as the tool that we are going to use
                 used_tool = sel_tools[0]
-                used_tooldia = self.excellon_tools[used_tool]['tooldia']
+                used_tooldia = self.excellon_tools[used_tool]["tooldia"]
 
                 # those are used by the preprocessors to display data on the toolchange line
                 job_obj.tool = str(used_tool)
-                job_obj.postdata['toolC'] = used_tooldia
+                job_obj.postdata["toolC"] = used_tooldia
 
                 # reconstitute the tool_table_items to hold the total number of drills and slots since we are going to
                 # process all in one go with no toolchange and with only one tool
@@ -1818,41 +1890,49 @@ class ToolDrilling(AppTool, Excellon):
 
                 # calculate the total number of drills and of slots
                 for e_tool_dia in job_obj.exc_cnc_tools:
-                    nr_drills += int(job_obj.exc_cnc_tools[e_tool_dia]['nr_drills'])
-                    nr_slots += int(job_obj.exc_cnc_tools[e_tool_dia]['nr_slots'])
-                    total_solid_geo += job_obj.exc_cnc_tools[e_tool_dia]['solid_geometry']
+                    nr_drills += int(job_obj.exc_cnc_tools[e_tool_dia]["nr_drills"])
+                    nr_slots += int(job_obj.exc_cnc_tools[e_tool_dia]["nr_slots"])
+                    total_solid_geo += job_obj.exc_cnc_tools[e_tool_dia]["solid_geometry"]
 
                 tool_table_items.clear()
-                tool_table_items = [[str(used_tool), str(used_tooldia), str(nr_drills), str(nr_slots)]]
-                tool_table_items.insert(0, [_("Tool_nr"), _("Diameter"), _("Drills_Nr"), _("Slots_Nr")])
-                job_obj.options['Tools_in_use'] = tool_table_items
+                tool_table_items = [
+                    [str(used_tool), str(used_tooldia), str(nr_drills), str(nr_slots)]
+                ]
+                tool_table_items.insert(
+                    0, [_("Tool_nr"), _("Diameter"), _("Drills_Nr"), _("Slots_Nr")]
+                )
+                job_obj.options["Tools_in_use"] = tool_table_items
 
                 # generate GCode
-                tool_gcode, __, start_gcode = job_obj.excellon_tool_gcode_gen(used_tool, tool_points,
-                                                                              self.excellon_tools,
-                                                                              first_pt=first_drill_point,
-                                                                              is_first=True,
-                                                                              is_last=True,
-                                                                              opt_type=used_excellon_optimization_type,
-                                                                              toolchange=True)
+                tool_gcode, __, start_gcode = job_obj.excellon_tool_gcode_gen(
+                    used_tool,
+                    tool_points,
+                    self.excellon_tools,
+                    first_pt=first_drill_point,
+                    is_first=True,
+                    is_last=True,
+                    opt_type=used_excellon_optimization_type,
+                    toolchange=True,
+                )
 
                 # parse the Gcode
-                tool_gcode_parsed = job_obj.excellon_tool_gcode_parse(used_tooldia, gcode=tool_gcode,
-                                                                      start_pt=first_drill_point)
+                tool_gcode_parsed = job_obj.excellon_tool_gcode_parse(
+                    used_tooldia, gcode=tool_gcode, start_pt=first_drill_point
+                )
 
                 # store the results in Excellon CNC tools storage
-                job_obj.exc_cnc_tools[used_tooldia]['nr_drills'] = nr_drills
-                job_obj.exc_cnc_tools[used_tooldia]['nr_slots'] = nr_slots
-                job_obj.exc_cnc_tools[used_tooldia]['gcode'] = tool_gcode
-                job_obj.exc_cnc_tools[used_tooldia]['gcode_parsed'] = tool_gcode_parsed
-                job_obj.exc_cnc_tools[used_tooldia]['solid_geometry'] = total_solid_geo
+                job_obj.exc_cnc_tools[used_tooldia]["nr_drills"] = nr_drills
+                job_obj.exc_cnc_tools[used_tooldia]["nr_slots"] = nr_slots
+                job_obj.exc_cnc_tools[used_tooldia]["gcode"] = tool_gcode
+                job_obj.exc_cnc_tools[used_tooldia]["gcode_parsed"] = tool_gcode_parsed
+                job_obj.exc_cnc_tools[used_tooldia]["solid_geometry"] = total_solid_geo
 
                 # delete all tools from the Excellon CNC tools storage except the used one
                 for e_tool_dia in list(job_obj.exc_cnc_tools.keys()):
                     if e_tool_dia != used_tooldia:
                         job_obj.exc_cnc_tools.pop(e_tool_dia, None)
 
-                if start_gcode != '':
+                if start_gcode != "":
                     job_obj.gc_start = start_gcode
 
                 self.total_gcode = tool_gcode
@@ -1862,21 +1942,22 @@ class ToolDrilling(AppTool, Excellon):
             else:
                 for tool in sel_tools:
                     tool_points = points[tool]
-                    used_tooldia = self.excellon_tools[tool]['tooldia']
+                    used_tooldia = self.excellon_tools[tool]["tooldia"]
 
                     # if slots are converted to drill for this tool, update the number of drills and make slots nr zero
-                    convert_slots = self.excellon_tools[tool]['data']['tools_drill_drill_slots']
+                    convert_slots = self.excellon_tools[tool]["data"]["tools_drill_drill_slots"]
                     if convert_slots is True:
                         nr_drills = len(points[tool])
                         nr_slots = 0
-                        job_obj.exc_cnc_tools[used_tooldia]['nr_drills'] = nr_drills
-                        job_obj.exc_cnc_tools[used_tooldia]['nr_slots'] = nr_slots
+                        job_obj.exc_cnc_tools[used_tooldia]["nr_drills"] = nr_drills
+                        job_obj.exc_cnc_tools[used_tooldia]["nr_slots"] = nr_slots
 
-                        for line in range(1, len(job_obj.options['Tools_in_use'])):
-                            if self.dec_format(float(job_obj.options['Tools_in_use'][line][1])) == \
-                                    self.dec_format(used_tooldia):
-                                job_obj.options['Tools_in_use'][line][2] = str(nr_drills)
-                                job_obj.options['Tools_in_use'][line][3] = str(nr_slots)
+                        for line in range(1, len(job_obj.options["Tools_in_use"])):
+                            if self.dec_format(
+                                float(job_obj.options["Tools_in_use"][line][1])
+                            ) == self.dec_format(used_tooldia):
+                                job_obj.options["Tools_in_use"][line][2] = str(nr_drills)
+                                job_obj.options["Tools_in_use"][line][3] = str(nr_slots)
 
                     # calculate if the current tool is the first one or if it is the last one
                     # for the first tool we add some extra GCode (start Gcode, header etc)
@@ -1886,23 +1967,27 @@ class ToolDrilling(AppTool, Excellon):
 
                     # Generate Gcode for the current tool
                     tool_gcode, last_pt, start_gcode = job_obj.excellon_tool_gcode_gen(
-                        tool, tool_points, self.excellon_tools,
+                        tool,
+                        tool_points,
+                        self.excellon_tools,
                         first_pt=first_drill_point,
                         is_first=is_first_tool,
                         is_last=is_last_tool,
                         opt_type=used_excellon_optimization_type,
-                        toolchange=True)
+                        toolchange=True,
+                    )
 
                     # parse Gcode for the current tool
-                    tool_gcode_parsed = job_obj.excellon_tool_gcode_parse(used_tooldia, gcode=tool_gcode,
-                                                                          start_pt=first_drill_point)
+                    tool_gcode_parsed = job_obj.excellon_tool_gcode_parse(
+                        used_tooldia, gcode=tool_gcode, start_pt=first_drill_point
+                    )
                     first_drill_point = last_pt
 
                     # store the results of GCode generation and parsing
-                    job_obj.exc_cnc_tools[used_tooldia]['gcode'] = tool_gcode
-                    job_obj.exc_cnc_tools[used_tooldia]['gcode_parsed'] = tool_gcode_parsed
+                    job_obj.exc_cnc_tools[used_tooldia]["gcode"] = tool_gcode
+                    job_obj.exc_cnc_tools[used_tooldia]["gcode_parsed"] = tool_gcode_parsed
 
-                    if start_gcode != '':
+                    if start_gcode != "":
                         job_obj.gc_start = start_gcode
 
                     self.total_gcode += tool_gcode
@@ -1911,26 +1996,33 @@ class ToolDrilling(AppTool, Excellon):
             job_obj.gcode = self.total_gcode
             job_obj.source_file = self.total_gcode
             job_obj.gcode_parsed = self.total_gcode_parsed
-            if job_obj.gcode == 'fail':
-                return 'fail'
+            if job_obj.gcode == "fail":
+                return "fail"
 
             # create Geometry for plotting
             # FIXME is it necessary? didn't we do it previously when filling data in self.exc_cnc_tools dictionary?
             job_obj.create_geometry()
 
-            if used_excellon_optimization_type == 'M':
-                log.debug("The total travel distance with OR-TOOLS Metaheuristics is: %s" %
-                          str(job_obj.measured_distance))
-            elif used_excellon_optimization_type == 'B':
-                log.debug("The total travel distance with OR-TOOLS Basic Algorithm is: %s" %
-                          str(job_obj.measured_distance))
-            elif used_excellon_optimization_type == 'T':
+            if used_excellon_optimization_type == "M":
                 log.debug(
-                    "The total travel distance with Travelling Salesman Algorithm is: %s" %
-                    str(job_obj.measured_distance))
+                    "The total travel distance with OR-TOOLS Metaheuristics is: %s"
+                    % str(job_obj.measured_distance)
+                )
+            elif used_excellon_optimization_type == "B":
+                log.debug(
+                    "The total travel distance with OR-TOOLS Basic Algorithm is: %s"
+                    % str(job_obj.measured_distance)
+                )
+            elif used_excellon_optimization_type == "T":
+                log.debug(
+                    "The total travel distance with Travelling Salesman Algorithm is: %s"
+                    % str(job_obj.measured_distance)
+                )
             else:
-                log.debug("The total travel distance with with no optimization is: %s" %
-                          str(job_obj.measured_distance))
+                log.debug(
+                    "The total travel distance with with no optimization is: %s"
+                    % str(job_obj.measured_distance)
+                )
 
             # #########################################################################################################
             # ############################# Calculate DISTANCE and ESTIMATED TIME #####################################
@@ -1938,19 +2030,23 @@ class ToolDrilling(AppTool, Excellon):
             if job_obj.xy_end is None:
                 job_obj.xy_end = [job_obj.oldx, job_obj.oldy]
 
-            job_obj.measured_distance += abs(distance_euclidian(
-                job_obj.oldx, job_obj.oldy, job_obj.xy_end[0], job_obj.xy_end[1])
+            job_obj.measured_distance += abs(
+                distance_euclidian(job_obj.oldx, job_obj.oldy, job_obj.xy_end[0], job_obj.xy_end[1])
             )
-            log.debug("The total travel distance including travel to end position is: %s" %
-                      str(job_obj.measured_distance) + '\n')
+            log.debug(
+                "The total travel distance including travel to end position is: %s"
+                % str(job_obj.measured_distance)
+                + "\n"
+            )
             job_obj.travel_distance = job_obj.measured_distance
 
             # I use the value of self.feedrate_rapid for the feadrate in case of the measure_lift_distance and for
             # traveled_time because it is not always possible to determine the feedrate that the CNC machine uses
             # for G0 move (the fastest speed available to the CNC router). Although self.feedrate_rapids is used only
             # with Marlin preprocessor and derivatives.
-            job_obj.routing_time = \
-                (job_obj.measured_down_distance + job_obj.measured_up_to_zero_distance) / job_obj.z_feedrate
+            job_obj.routing_time = (
+                job_obj.measured_down_distance + job_obj.measured_up_to_zero_distance
+            ) / job_obj.z_feedrate
             lift_time = job_obj.measured_lift_distance / job_obj.feedrate_rapid
             traveled_time = job_obj.measured_distance / job_obj.feedrate_rapid
             job_obj.routing_time += lift_time + traveled_time
@@ -1968,7 +2064,7 @@ class ToolDrilling(AppTool, Excellon):
 
         # Send to worker
         # self.app.worker.add_task(job_thread, [self.app])
-        self.app.worker_task.emit({'fcn': job_thread, 'params': [self.app]})
+        self.app.worker_task.emit({"fcn": job_thread, "params": [self.app]})
 
     def reset_fields(self):
         self.object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
@@ -1995,16 +2091,16 @@ class DrillingUI:
 
         # ## Title
         title_label = QtWidgets.QLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
-        title_label.setToolTip(
-            _("Create CNCJob with toolpaths for drilling or milling holes.")
+                                """
         )
+        title_label.setToolTip(_("Create CNCJob with toolpaths for drilling or milling holes."))
 
         self.title_box.addWidget(title_label)
 
@@ -2029,10 +2125,8 @@ class DrillingUI:
         grid0.setColumnStretch(1, 1)
         self.tools_box.addLayout(grid0)
 
-        self.obj_combo_label = QtWidgets.QLabel('<b>%s</b>:' % _("EXCELLON"))
-        self.obj_combo_label.setToolTip(
-            _("Excellon object for drilling/milling operation.")
-        )
+        self.obj_combo_label = QtWidgets.QLabel("<b>%s</b>:" % _("EXCELLON"))
+        self.obj_combo_label.setToolTip(_("Excellon object for drilling/milling operation."))
 
         grid0.addWidget(self.obj_combo_label, 0, 0, 1, 2)
 
@@ -2062,44 +2156,64 @@ class DrillingUI:
         self.tools_table.setColumnHidden(3, True)
         self.tools_table.setSortingEnabled(False)
 
-        self.tools_table.setHorizontalHeaderLabels(['#', _('Diameter'), _('Drills'), '', _('Slots')])
+        self.tools_table.setHorizontalHeaderLabels(
+            ["#", _("Diameter"), _("Drills"), "", _("Slots")]
+        )
         self.tools_table.horizontalHeaderItem(0).setToolTip(
-            _("This is the Tool Number.\n"
-              "When ToolChange is checked, on toolchange event this value\n"
-              "will be showed as a T1, T2 ... Tn in the Machine Code.\n\n"
-              "Here the tools are selected for G-code generation."))
+            _(
+                "This is the Tool Number.\n"
+                "When ToolChange is checked, on toolchange event this value\n"
+                "will be showed as a T1, T2 ... Tn in the Machine Code.\n\n"
+                "Here the tools are selected for G-code generation."
+            )
+        )
         self.tools_table.horizontalHeaderItem(1).setToolTip(
-            _("Tool Diameter. Its value\n"
-              "is the cut width into the material."))
+            _("Tool Diameter. Its value\n" "is the cut width into the material.")
+        )
         self.tools_table.horizontalHeaderItem(2).setToolTip(
-            _("The number of Drill holes. Holes that are drilled with\n"
-              "a drill bit."))
+            _("The number of Drill holes. Holes that are drilled with\n" "a drill bit.")
+        )
         self.tools_table.horizontalHeaderItem(4).setToolTip(
-            _("The number of Slot holes. Holes that are created by\n"
-              "milling them with an endmill bit."))
+            _(
+                "The number of Slot holes. Holes that are created by\n"
+                "milling them with an endmill bit."
+            )
+        )
 
         # Tool order
-        self.order_label = QtWidgets.QLabel('%s:' % _('Tool order'))
-        self.order_label.setToolTip(_("This set the way that the tools in the tools table are used.\n"
-                                      "'No' --> means that the used order is the one in the tool table\n"
-                                      "'Forward' --> means that the tools will be ordered from small to big\n"
-                                      "'Reverse' --> means that the tools will ordered from big to small\n\n"
-                                      "WARNING: using rest machining will automatically set the order\n"
-                                      "in reverse and disable this control."))
+        self.order_label = QtWidgets.QLabel("%s:" % _("Tool order"))
+        self.order_label.setToolTip(
+            _(
+                "This set the way that the tools in the tools table are used.\n"
+                "'No' --> means that the used order is the one in the tool table\n"
+                "'Forward' --> means that the tools will be ordered from small to big\n"
+                "'Reverse' --> means that the tools will ordered from big to small\n\n"
+                "WARNING: using rest machining will automatically set the order\n"
+                "in reverse and disable this control."
+            )
+        )
 
-        self.order_radio = RadioSet([{'label': _('No'), 'value': 'no'},
-                                     {'label': _('Forward'), 'value': 'fwd'},
-                                     {'label': _('Reverse'), 'value': 'rev'}])
+        self.order_radio = RadioSet(
+            [
+                {"label": _("No"), "value": "no"},
+                {"label": _("Forward"), "value": "fwd"},
+                {"label": _("Reverse"), "value": "rev"},
+            ]
+        )
 
         grid0.addWidget(self.order_label, 4, 0)
         grid0.addWidget(self.order_radio, 4, 1)
 
         # Manual Load of Tools from DB
         self.search_load_db_btn = FCButton(_("Search DB"))
-        self.search_load_db_btn.setIcon(QtGui.QIcon(self.app.resource_location + '/search_db32.png'))
+        self.search_load_db_btn.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/search_db32.png")
+        )
         self.search_load_db_btn.setToolTip(
-            _("Will search and try to replace the tools from Tools Table\n"
-              "with tools from DB that have a close diameter value.")
+            _(
+                "Will search and try to replace the tools from Tools Table\n"
+                "with tools from DB that have a close diameter value."
+            )
         )
 
         grid0.addWidget(self.search_load_db_btn, 5, 0, 1, 2)
@@ -2113,12 +2227,11 @@ class DrillingUI:
         # ############# Create CNC Job ##############################
         # ###########################################################
         self.tool_data_label = QtWidgets.QLabel(
-            "<b>%s: <font color='#0000FF'>%s %d</font></b>" % (_('Parameters for'), _("Tool"), int(1)))
+            "<b>%s: <font color='#0000FF'>%s %d</font></b>"
+            % (_("Parameters for"), _("Tool"), int(1))
+        )
         self.tool_data_label.setToolTip(
-            _(
-                "The data used for creating GCode.\n"
-                "Each tool store it's own set of such data."
-            )
+            _("The data used for creating GCode.\n" "Each tool store it's own set of such data.")
         )
         grid0.addWidget(self.tool_data_label, 8, 0, 1, 2)
 
@@ -2140,11 +2253,8 @@ class DrillingUI:
         self.exc_tools_box.addLayout(self.grid1)
 
         # Cut Z
-        self.cutzlabel = QtWidgets.QLabel('%s:' % _('Cut Z'))
-        self.cutzlabel.setToolTip(
-            _("Drill depth (negative)\n"
-              "below the copper surface.")
-        )
+        self.cutzlabel = QtWidgets.QLabel("%s:" % _("Cut Z"))
+        self.cutzlabel.setToolTip(_("Drill depth (negative)\n" "below the copper surface."))
 
         self.cutz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.cutz_entry.set_precision(self.decimals)
@@ -2161,7 +2271,7 @@ class DrillingUI:
         self.grid1.addWidget(self.cutz_entry, 4, 1)
 
         # Multi-Depth
-        self.mpass_cb = FCCheckBox('%s:' % _("Multi-Depth"))
+        self.mpass_cb = FCCheckBox("%s:" % _("Multi-Depth"))
         self.mpass_cb.setToolTip(
             _(
                 "Use multiple passes to limit\n"
@@ -2186,11 +2296,8 @@ class DrillingUI:
         self.grid1.addWidget(self.maxdepth_entry, 5, 1)
 
         # Travel Z (z_move)
-        self.travelzlabel = QtWidgets.QLabel('%s:' % _('Travel Z'))
-        self.travelzlabel.setToolTip(
-            _("Tool height when travelling\n"
-              "across the XY plane.")
-        )
+        self.travelzlabel = QtWidgets.QLabel("%s:" % _("Travel Z"))
+        self.travelzlabel.setToolTip(_("Tool height when travelling\n" "across the XY plane."))
 
         self.travelz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.travelz_entry.set_precision(self.decimals)
@@ -2207,12 +2314,14 @@ class DrillingUI:
         self.grid1.addWidget(self.travelz_entry, 6, 1)
 
         # Excellon Feedrate Z
-        self.frzlabel = QtWidgets.QLabel('%s:' % _('Feedrate Z'))
+        self.frzlabel = QtWidgets.QLabel("%s:" % _("Feedrate Z"))
         self.frzlabel.setToolTip(
-            _("Tool speed while drilling\n"
-              "(in units per minute).\n"
-              "So called 'Plunge' feedrate.\n"
-              "This is for linear move G01.")
+            _(
+                "Tool speed while drilling\n"
+                "(in units per minute).\n"
+                "So called 'Plunge' feedrate.\n"
+                "This is for linear move G01."
+            )
         )
         self.feedrate_z_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.feedrate_z_entry.set_precision(self.decimals)
@@ -2224,13 +2333,15 @@ class DrillingUI:
         self.grid1.addWidget(self.feedrate_z_entry, 14, 1)
 
         # Excellon Rapid Feedrate
-        self.feedrate_rapid_label = QtWidgets.QLabel('%s:' % _('Feedrate Rapids'))
+        self.feedrate_rapid_label = QtWidgets.QLabel("%s:" % _("Feedrate Rapids"))
         self.feedrate_rapid_label.setToolTip(
-            _("Tool speed while drilling\n"
-              "(in units per minute).\n"
-              "This is for the rapid move G00.\n"
-              "It is useful only for Marlin,\n"
-              "ignore for any other cases.")
+            _(
+                "Tool speed while drilling\n"
+                "(in units per minute).\n"
+                "This is for the rapid move G00.\n"
+                "It is useful only for Marlin,\n"
+                "ignore for any other cases."
+            )
         )
         self.feedrate_rapid_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.feedrate_rapid_entry.set_precision(self.decimals)
@@ -2246,11 +2357,8 @@ class DrillingUI:
         self.feedrate_rapid_entry.hide()
 
         # Spindlespeed
-        self.spindle_label = QtWidgets.QLabel('%s:' % _('Spindle speed'))
-        self.spindle_label.setToolTip(
-            _("Speed of the spindle\n"
-              "in RPM (optional)")
-        )
+        self.spindle_label = QtWidgets.QLabel("%s:" % _("Spindle speed"))
+        self.spindle_label.setToolTip(_("Speed of the spindle\n" "in RPM (optional)"))
 
         self.spindlespeed_entry = FCSpinner(callback=self.confirmation_message_int)
         self.spindlespeed_entry.set_range(0, 1000000)
@@ -2261,10 +2369,9 @@ class DrillingUI:
         self.grid1.addWidget(self.spindlespeed_entry, 19, 1)
 
         # Dwell
-        self.dwell_cb = FCCheckBox('%s:' % _('Dwell'))
+        self.dwell_cb = FCCheckBox("%s:" % _("Dwell"))
         self.dwell_cb.setToolTip(
-            _("Pause to allow the spindle to reach its\n"
-              "speed before cutting.")
+            _("Pause to allow the spindle to reach its\n" "speed before cutting.")
         )
         self.dwell_cb.setObjectName("e_dwell")
 
@@ -2274,9 +2381,7 @@ class DrillingUI:
         self.dwelltime_entry.set_range(0.0, 10000.0000)
         self.dwelltime_entry.setSingleStep(0.1)
 
-        self.dwelltime_entry.setToolTip(
-            _("Number of time units for spindle to dwell.")
-        )
+        self.dwelltime_entry.setToolTip(_("Number of time units for spindle to dwell."))
         self.dwelltime_entry.setObjectName("e_dwelltime")
 
         self.grid1.addWidget(self.dwell_cb, 20, 0)
@@ -2285,11 +2390,13 @@ class DrillingUI:
         self.ois_dwell = OptionalInputSection(self.dwell_cb, [self.dwelltime_entry])
 
         # Tool Offset
-        self.tool_offset_label = QtWidgets.QLabel('%s:' % _('Offset Z'))
+        self.tool_offset_label = QtWidgets.QLabel("%s:" % _("Offset Z"))
         self.tool_offset_label.setToolTip(
-            _("Some drill bits (the larger ones) need to drill deeper\n"
-              "to create the desired exit hole diameter due of the tip shape.\n"
-              "The value here can compensate the Cut Z parameter.")
+            _(
+                "Some drill bits (the larger ones) need to drill deeper\n"
+                "to create the desired exit hole diameter due of the tip shape.\n"
+                "The value here can compensate the Cut Z parameter."
+            )
         )
 
         self.offset_entry = FCDoubleSpinner(callback=self.confirmation_message)
@@ -2301,7 +2408,7 @@ class DrillingUI:
         self.grid1.addWidget(self.offset_entry, 25, 1)
 
         # Drill slots
-        self.drill_slots_cb = FCCheckBox('%s' % _('Drill slots'))
+        self.drill_slots_cb = FCCheckBox("%s" % _("Drill slots"))
         self.drill_slots_cb.setToolTip(
             _("If the selected tool has slots then they will be drilled.")
         )
@@ -2309,12 +2416,12 @@ class DrillingUI:
         self.grid1.addWidget(self.drill_slots_cb, 27, 0, 1, 2)
 
         # Drill Overlap
-        self.drill_overlap_label = QtWidgets.QLabel('%s:' % _('Overlap'))
+        self.drill_overlap_label = QtWidgets.QLabel("%s:" % _("Overlap"))
         self.drill_overlap_label.setToolTip(
             _("How much (percentage) of the tool diameter to overlap previous drill hole.")
         )
 
-        self.drill_overlap_entry = FCDoubleSpinner(suffix='%', callback=self.confirmation_message)
+        self.drill_overlap_entry = FCDoubleSpinner(suffix="%", callback=self.confirmation_message)
         self.drill_overlap_entry.set_precision(self.decimals)
         self.drill_overlap_entry.set_range(0.0, 100.0000)
         self.drill_overlap_entry.setSingleStep(0.1)
@@ -2325,10 +2432,12 @@ class DrillingUI:
         self.grid1.addWidget(self.drill_overlap_entry, 28, 1)
 
         # Last drill in slot
-        self.last_drill_cb = FCCheckBox('%s' % _('Last drill'))
+        self.last_drill_cb = FCCheckBox("%s" % _("Last drill"))
         self.last_drill_cb.setToolTip(
-            _("If the slot length is not completely covered by drill holes,\n"
-              "add a drill hole on the slot end point.")
+            _(
+                "If the slot length is not completely covered by drill holes,\n"
+                "add a drill hole on the slot end point."
+            )
         )
         self.last_drill_cb.setObjectName("e_drill_last_drill")
         self.grid1.addWidget(self.last_drill_cb, 30, 0, 1, 2)
@@ -2339,11 +2448,7 @@ class DrillingUI:
 
         self.ois_drill_overlap = OptionalHideInputSection(
             self.drill_slots_cb,
-            [
-                self.drill_overlap_label,
-                self.drill_overlap_entry,
-                self.last_drill_cb
-            ]
+            [self.drill_overlap_label, self.drill_overlap_entry, self.last_drill_cb],
         )
 
         # #################################################################
@@ -2362,10 +2467,14 @@ class DrillingUI:
         self.grid3.addWidget(separator_line2, 0, 0, 1, 2)
 
         self.apply_param_to_all = FCButton(_("Apply parameters to all tools"))
-        self.apply_param_to_all.setIcon(QtGui.QIcon(self.app.resource_location + '/param_all32.png'))
+        self.apply_param_to_all.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/param_all32.png")
+        )
         self.apply_param_to_all.setToolTip(
-            _("The parameters in the current form will be applied\n"
-              "on all the tools from the Tool Table.")
+            _(
+                "The parameters in the current form will be applied\n"
+                "on all the tools from the Tool Table."
+            )
         )
         self.grid3.addWidget(self.apply_param_to_all, 1, 0, 1, 2)
 
@@ -2375,27 +2484,21 @@ class DrillingUI:
         self.grid3.addWidget(separator_line2, 2, 0, 1, 2)
 
         # General Parameters
-        self.gen_param_label = QtWidgets.QLabel('<b>%s</b>' % _("Common Parameters"))
-        self.gen_param_label.setToolTip(
-            _("Parameters that are common for all tools.")
-        )
+        self.gen_param_label = QtWidgets.QLabel("<b>%s</b>" % _("Common Parameters"))
+        self.gen_param_label.setToolTip(_("Parameters that are common for all tools."))
         self.grid3.addWidget(self.gen_param_label, 3, 0, 1, 2)
 
         # Tool change
-        self.toolchange_cb = FCCheckBox('%s' % _("Tool change"))
+        self.toolchange_cb = FCCheckBox("%s" % _("Tool change"))
         self.toolchange_cb.setToolTip(
-            _("Include tool-change sequence\n"
-              "in G-Code (Pause for tool change).")
+            _("Include tool-change sequence\n" "in G-Code (Pause for tool change).")
         )
         self.toolchange_cb.setObjectName("e_toolchange")
         self.grid3.addWidget(self.toolchange_cb, 5, 0, 1, 2)
 
         # Toolchange Z
-        self.toolchangez_label = QtWidgets.QLabel('%s:' % _("Tool change Z"))
-        self.toolchangez_label.setToolTip(
-            _("Z-axis position (height) for\n"
-              "tool change.")
-        )
+        self.toolchangez_label = QtWidgets.QLabel("%s:" % _("Tool change Z"))
+        self.toolchangez_label.setToolTip(_("Z-axis position (height) for\n" "tool change."))
 
         self.toolchangez_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.toolchangez_entry.set_precision(self.decimals)
@@ -2412,22 +2515,23 @@ class DrillingUI:
         self.grid3.addWidget(self.toolchangez_entry, 7, 1)
 
         # Start move Z:
-        self.estartz_label = QtWidgets.QLabel('%s:' % _("Start Z"))
+        self.estartz_label = QtWidgets.QLabel("%s:" % _("Start Z"))
         self.estartz_label.setToolTip(
-            _("Height of the tool just after starting the work.\n"
-              "Delete the value if you don't need this feature.")
+            _(
+                "Height of the tool just after starting the work.\n"
+                "Delete the value if you don't need this feature."
+            )
         )
-        self.estartz_entry = NumericalEvalEntry(border_color='#0069A9')
+        self.estartz_entry = NumericalEvalEntry(border_color="#0069A9")
         self.estartz_entry.setObjectName("e_startz")
 
         self.grid3.addWidget(self.estartz_label, 9, 0)
         self.grid3.addWidget(self.estartz_entry, 9, 1)
 
         # End move Z:
-        self.endz_label = QtWidgets.QLabel('%s:' % _("End move Z"))
+        self.endz_label = QtWidgets.QLabel("%s:" % _("End move Z"))
         self.endz_label.setToolTip(
-            _("Height of the tool after\n"
-              "the last move at the end of the job.")
+            _("Height of the tool after\n" "the last move at the end of the job.")
         )
         self.endz_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.endz_entry.set_precision(self.decimals)
@@ -2444,13 +2548,15 @@ class DrillingUI:
         self.grid3.addWidget(self.endz_entry, 11, 1)
 
         # End Move X,Y
-        endmove_xy_label = QtWidgets.QLabel('%s:' % _('End move X,Y'))
+        endmove_xy_label = QtWidgets.QLabel("%s:" % _("End move X,Y"))
         endmove_xy_label.setToolTip(
-            _("End move X,Y position. In format (x,y).\n"
-              "If no value is entered then there is no move\n"
-              "on X,Y plane at the end of the job.")
+            _(
+                "End move X,Y position. In format (x,y).\n"
+                "If no value is entered then there is no move\n"
+                "on X,Y plane at the end of the job."
+            )
         )
-        self.endxy_entry = NumericalEvalTupleEntry(border_color='#0069A9')
+        self.endxy_entry = NumericalEvalTupleEntry(border_color="#0069A9")
         self.endxy_entry.setPlaceholderText(_("X,Y coordinates"))
         self.endxy_entry.setObjectName("e_endxy")
 
@@ -2458,10 +2564,12 @@ class DrillingUI:
         self.grid3.addWidget(self.endxy_entry, 12, 1)
 
         # Probe depth
-        self.pdepth_label = QtWidgets.QLabel('%s:' % _("Probe Z depth"))
+        self.pdepth_label = QtWidgets.QLabel("%s:" % _("Probe Z depth"))
         self.pdepth_label.setToolTip(
-            _("The maximum depth that the probe is allowed\n"
-              "to probe. Negative value, in current units.")
+            _(
+                "The maximum depth that the probe is allowed\n"
+                "to probe. Negative value, in current units."
+            )
         )
 
         self.pdepth_entry = FCDoubleSpinner(callback=self.confirmation_message)
@@ -2477,10 +2585,8 @@ class DrillingUI:
         self.pdepth_entry.setVisible(False)
 
         # Probe feedrate
-        self.feedrate_probe_label = QtWidgets.QLabel('%s:' % _("Feedrate Probe"))
-        self.feedrate_probe_label.setToolTip(
-            _("The feedrate used while the probe is probing.")
-        )
+        self.feedrate_probe_label = QtWidgets.QLabel("%s:" % _("Feedrate Probe"))
+        self.feedrate_probe_label.setToolTip(_("The feedrate used while the probe is probing."))
 
         self.feedrate_probe_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.feedrate_probe_entry.set_precision(self.decimals)
@@ -2495,10 +2601,9 @@ class DrillingUI:
         self.feedrate_probe_entry.setVisible(False)
 
         # Preprocessor Excellon selection
-        pp_excellon_label = QtWidgets.QLabel('%s:' % _("Preprocessor"))
+        pp_excellon_label = QtWidgets.QLabel("%s:" % _("Preprocessor"))
         pp_excellon_label.setToolTip(
-            _("The preprocessor JSON file that dictates\n"
-              "Gcode output for Excellon Objects.")
+            _("The preprocessor JSON file that dictates\n" "Gcode output for Excellon Objects.")
         )
         self.pp_excellon_name_cb = FCComboBox()
         self.pp_excellon_name_cb.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -2512,13 +2617,14 @@ class DrillingUI:
         # ------------------------------------------------------------------------------------------------------------
 
         # Exclusion Areas
-        self.exclusion_cb = FCCheckBox('%s' % _("Add exclusion areas"))
+        self.exclusion_cb = FCCheckBox("%s" % _("Add exclusion areas"))
         self.exclusion_cb.setToolTip(
             _(
                 "Include exclusion areas.\n"
                 "In those areas the travel of the tools\n"
                 "is forbidden."
-            ))
+            )
+        )
         self.exclusion_cb.setObjectName("e_area_exclusion")
 
         self.grid3.addWidget(self.exclusion_cb, 20, 0, 1, 2)
@@ -2537,16 +2643,23 @@ class DrillingUI:
 
         self.exclusion_table.setColumnCount(4)
         self.exclusion_table.setColumnWidth(0, 20)
-        self.exclusion_table.setHorizontalHeaderLabels(['#', _('Object'), _('Strategy'), _('Over Z')])
+        self.exclusion_table.setHorizontalHeaderLabels(
+            ["#", _("Object"), _("Strategy"), _("Over Z")]
+        )
 
         self.exclusion_table.horizontalHeaderItem(0).setToolTip(_("This is the Area ID."))
         self.exclusion_table.horizontalHeaderItem(1).setToolTip(
-            _("Type of the object where the exclusion area was added."))
+            _("Type of the object where the exclusion area was added.")
+        )
         self.exclusion_table.horizontalHeaderItem(2).setToolTip(
-            _("The strategy used for exclusion area. Go around the exclusion areas or over it."))
+            _("The strategy used for exclusion area. Go around the exclusion areas or over it.")
+        )
         self.exclusion_table.horizontalHeaderItem(3).setToolTip(
-            _("If the strategy is to go over the area then this is the height at which the tool will go to avoid the "
-              "exclusion area."))
+            _(
+                "If the strategy is to go over the area then this is the height at which the tool will go to avoid the "
+                "exclusion area."
+            )
+        )
 
         self.exclusion_table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
 
@@ -2556,22 +2669,31 @@ class DrillingUI:
         self.exclusion_box.addLayout(grid_a1)
 
         # Chose Strategy
-        self.strategy_label = FCLabel('%s:' % _("Strategy"))
-        self.strategy_label.setToolTip(_("The strategy followed when encountering an exclusion area.\n"
-                                         "Can be:\n"
-                                         "- Over -> when encountering the area, the tool will go to a set height\n"
-                                         "- Around -> will avoid the exclusion area by going around the area"))
-        self.strategy_radio = RadioSet([{'label': _('Over'), 'value': 'over'},
-                                        {'label': _('Around'), 'value': 'around'}])
+        self.strategy_label = FCLabel("%s:" % _("Strategy"))
+        self.strategy_label.setToolTip(
+            _(
+                "The strategy followed when encountering an exclusion area.\n"
+                "Can be:\n"
+                "- Over -> when encountering the area, the tool will go to a set height\n"
+                "- Around -> will avoid the exclusion area by going around the area"
+            )
+        )
+        self.strategy_radio = RadioSet(
+            [{"label": _("Over"), "value": "over"}, {"label": _("Around"), "value": "around"}]
+        )
         self.strategy_radio.setObjectName("e_area_strategy")
 
         grid_a1.addWidget(self.strategy_label, 1, 0)
         grid_a1.addWidget(self.strategy_radio, 1, 1)
 
         # Over Z
-        self.over_z_label = FCLabel('%s:' % _("Over Z"))
-        self.over_z_label.setToolTip(_("The height Z to which the tool will rise in order to avoid\n"
-                                       "an interdiction area."))
+        self.over_z_label = FCLabel("%s:" % _("Over Z"))
+        self.over_z_label.setToolTip(
+            _(
+                "The height Z to which the tool will rise in order to avoid\n"
+                "an interdiction area."
+            )
+        )
         self.over_z_entry = FCDoubleSpinner()
         self.over_z_entry.set_range(0.000, 10000.0000)
         self.over_z_entry.set_precision(self.decimals)
@@ -2581,15 +2703,14 @@ class DrillingUI:
         grid_a1.addWidget(self.over_z_entry, 2, 1)
 
         # Button Add Area
-        self.add_area_button = QtWidgets.QPushButton(_('Add Area:'))
+        self.add_area_button = QtWidgets.QPushButton(_("Add Area:"))
         self.add_area_button.setToolTip(_("Add an Exclusion Area."))
 
         # Area Selection shape
-        self.area_shape_radio = RadioSet([{'label': _("Square"), 'value': 'square'},
-                                          {'label': _("Polygon"), 'value': 'polygon'}])
-        self.area_shape_radio.setToolTip(
-            _("The kind of selection shape used for area selection.")
+        self.area_shape_radio = RadioSet(
+            [{"label": _("Square"), "value": "square"}, {"label": _("Polygon"), "value": "polygon"}]
         )
+        self.area_shape_radio.setToolTip(_("The kind of selection shape used for area selection."))
         self.area_shape_radio.setObjectName("e_area_shape")
 
         grid_a1.addWidget(self.add_area_button, 4, 0)
@@ -2599,12 +2720,14 @@ class DrillingUI:
         self.exclusion_box.addLayout(h_lay_1)
 
         # Button Delete All Areas
-        self.delete_area_button = QtWidgets.QPushButton(_('Delete All'))
+        self.delete_area_button = QtWidgets.QPushButton(_("Delete All"))
         self.delete_area_button.setToolTip(_("Delete all exclusion areas."))
 
         # Button Delete Selected Areas
-        self.delete_sel_area_button = QtWidgets.QPushButton(_('Delete Selected'))
-        self.delete_sel_area_button.setToolTip(_("Delete all exclusion areas that are selected in the table."))
+        self.delete_sel_area_button = QtWidgets.QPushButton(_("Delete Selected"))
+        self.delete_sel_area_button.setToolTip(
+            _("Delete all exclusion areas that are selected in the table.")
+        )
 
         h_lay_1.addWidget(self.delete_area_button)
         h_lay_1.addWidget(self.delete_sel_area_button)
@@ -2626,57 +2749,68 @@ class DrillingUI:
         self.grid4.setColumnStretch(1, 1)
         self.tools_box.addLayout(self.grid4)
 
-        self.generate_cnc_button = QtWidgets.QPushButton(_('Generate CNCJob object'))
-        self.generate_cnc_button.setIcon(QtGui.QIcon(self.app.resource_location + '/cnc16.png'))
+        self.generate_cnc_button = QtWidgets.QPushButton(_("Generate CNCJob object"))
+        self.generate_cnc_button.setIcon(QtGui.QIcon(self.app.resource_location + "/cnc16.png"))
         self.generate_cnc_button.setToolTip(
-            _("Generate the CNC Job.\n"
-              "If milling then an additional Geometry object will be created.\n"
-              "Add / Select at least one tool in the tool-table.\n"
-              "Click the # header to select all, or Ctrl + LMB\n"
-              "for custom selection of tools.")
+            _(
+                "Generate the CNC Job.\n"
+                "If milling then an additional Geometry object will be created.\n"
+                "Add / Select at least one tool in the tool-table.\n"
+                "Click the # header to select all, or Ctrl + LMB\n"
+                "for custom selection of tools."
+            )
         )
-        self.generate_cnc_button.setStyleSheet("""
+        self.generate_cnc_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.grid4.addWidget(self.generate_cnc_button, 3, 0, 1, 3)
 
         self.tools_box.addStretch()
 
         # ## Reset Tool
         self.reset_button = QtWidgets.QPushButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.tools_box.addWidget(self.reset_button)
         # ############################ FINSIHED GUI ###################################
         # #############################################################################
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
 
 def distance(pt1, pt2):

@@ -1,6 +1,6 @@
-
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import io
@@ -16,7 +16,7 @@ def gen_data():
     x = np.random.rand(N) * 10
     y = np.random.rand(N) * 10
     colors = np.random.rand(N)
-    area = np.pi * (15 * np.random.rand(N))**2  # 0 to 15 point radiuses
+    area = np.pi * (15 * np.random.rand(N)) ** 2  # 0 to 15 point radiuses
     data = x, y, area, colors
     return data
 
@@ -77,6 +77,7 @@ def small_plot(data):
 
     return img
 
+
 def doit():
     d = gen_data()
     img = large_plot(d)
@@ -87,9 +88,7 @@ if __name__ == "__main__":
 
     d = gen_data()
 
-    if sys.argv[1] == 'large':
-        cProfile.runctx('large_plot(d)', None, locals())
+    if sys.argv[1] == "large":
+        cProfile.runctx("large_plot(d)", None, locals())
     else:
-        cProfile.runctx('small_plot(d)', None, locals())
-
-
+        cProfile.runctx("small_plot(d)", None, locals())

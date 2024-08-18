@@ -19,8 +19,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -44,23 +44,24 @@ class PcbWizard(AppTool):
         self.inf_loaded = False
         self.process_finished = False
 
-        self.modified_excellon_file = ''
+        self.modified_excellon_file = ""
 
         # ## Signals
         self.ui.excellon_brn.clicked.connect(self.on_load_excellon_click)
         self.ui.inf_btn.clicked.connect(self.on_load_inf_click)
-        self.ui.import_button.clicked.connect(lambda: self.on_import_excellon(
-            excellon_fileobj=self.modified_excellon_file))
+        self.ui.import_button.clicked.connect(
+            lambda: self.on_import_excellon(excellon_fileobj=self.modified_excellon_file)
+        )
 
         self.file_loaded.connect(self.on_file_loaded)
         self.ui.units_radio.activated_custom.connect(self.ui.on_units_change)
 
-        self.units = 'INCH'
-        self.zeros = 'LZ'
+        self.units = "INCH"
+        self.zeros = "LZ"
         self.integral = 2
         self.fractional = 4
 
-        self.outname = 'file'
+        self.outname = "file"
 
         self.exc_file_content = None
         self.tools_from_inf = {}
@@ -96,12 +97,12 @@ class PcbWizard(AppTool):
         AppTool.install(self, icon, separator, **kwargs)
 
     def set_tool_ui(self):
-        self.units = 'INCH'
-        self.zeros = 'LZ'
+        self.units = "INCH"
+        self.zeros = "LZ"
         self.integral = 2
         self.fractional = 4
 
-        self.outname = 'file'
+        self.outname = "file"
 
         self.exc_file_content = None
         self.tools_from_inf = {}
@@ -115,7 +116,7 @@ class PcbWizard(AppTool):
         self.excellon_loaded = False
         self.inf_loaded = False
         self.process_finished = False
-        self.modified_excellon_file = ''
+        self.modified_excellon_file = ""
 
         self.build_ui()
 
@@ -134,7 +135,7 @@ class PcbWizard(AppTool):
 
         tool_row = 0
         for tool in sorted_tools:
-            tool_id_item = QtWidgets.QTableWidgetItem('%d' % int(tool))
+            tool_id_item = QtWidgets.QTableWidgetItem("%d" % int(tool))
             tool_id_item.setFlags(QtCore.Qt.ItemIsEnabled)
             self.ui.tools_table.setItem(tool_row, 0, tool_id_item)  # Tool name/id
 
@@ -176,55 +177,63 @@ class PcbWizard(AppTool):
 
         _filter = "Excellon Files(*.DRL *.DRD *.TXT);;All Files (*.*)"
         try:
-            filename, _f = QtWidgets.QFileDialog.getOpenFileName(caption=_("Load PcbWizard Excellon file"),
-                                                                 directory=self.app.get_last_folder(),
-                                                                 filter=_filter)
+            filename, _f = QtWidgets.QFileDialog.getOpenFileName(
+                caption=_("Load PcbWizard Excellon file"),
+                directory=self.app.get_last_folder(),
+                filter=_filter,
+            )
         except TypeError:
-            filename, _f = QtWidgets.QFileDialog.getOpenFileName(caption=_("Load PcbWizard Excellon file"),
-                                                                 filter=_filter)
+            filename, _f = QtWidgets.QFileDialog.getOpenFileName(
+                caption=_("Load PcbWizard Excellon file"), filter=_filter
+            )
 
         filename = str(filename)
 
         if filename == "":
             self.app.inform.emit(_("Cancelled."))
         else:
-            self.app.worker_task.emit({'fcn': self.load_excellon, 'params': [filename]})
+            self.app.worker_task.emit({"fcn": self.load_excellon, "params": [filename]})
 
     def on_load_inf_click(self):
         """
 
-                :return: None
-                """
+        :return: None
+        """
         self.app.log.debug("on_load_inf_click()")
 
         _filter = "INF Files(*.INF);;All Files (*.*)"
         try:
-            filename, _f = QtWidgets.QFileDialog.getOpenFileName(caption=_("Load PcbWizard INF file"),
-                                                                 directory=self.app.get_last_folder(),
-                                                                 filter=_filter)
+            filename, _f = QtWidgets.QFileDialog.getOpenFileName(
+                caption=_("Load PcbWizard INF file"),
+                directory=self.app.get_last_folder(),
+                filter=_filter,
+            )
         except TypeError:
-            filename, _f = QtWidgets.QFileDialog.getOpenFileName(caption=_("Load PcbWizard INF file"),
-                                                                 filter=_filter)
+            filename, _f = QtWidgets.QFileDialog.getOpenFileName(
+                caption=_("Load PcbWizard INF file"), filter=_filter
+            )
 
         filename = str(filename)
 
         if filename == "":
             self.app.inform.emit(_("Cancelled."))
         else:
-            self.app.worker_task.emit({'fcn': self.load_inf, 'params': [filename]})
+            self.app.worker_task.emit({"fcn": self.load_inf, "params": [filename]})
 
     def load_inf(self, filename):
         self.app.log.debug("ToolPcbWizard.load_inf()")
 
-        with open(filename, 'r') as inf_f:
+        with open(filename, "r") as inf_f:
             inf_file_content = inf_f.readlines()
 
-        tool_re = re.compile(r'^T(\d+)\s+(\d*\.?\d+)$')
-        format_re = re.compile(r'^(\d+)\.?(\d+)\s*format,\s*(inches|metric)?,\s*(absolute|incremental)?.*$')
+        tool_re = re.compile(r"^T(\d+)\s+(\d*\.?\d+)$")
+        format_re = re.compile(
+            r"^(\d+)\.?(\d+)\s*format,\s*(inches|metric)?,\s*(absolute|incremental)?.*$"
+        )
 
         for eline in inf_file_content:
             # Cleanup lines
-            eline = eline.strip(' \r\n')
+            eline = eline.strip(" \r\n")
 
             match = tool_re.search(eline)
             if match:
@@ -241,25 +250,29 @@ class PcbWizard(AppTool):
                 self.integral = int(match.group(1))
                 self.fractional = int(match.group(2))
                 units = match.group(3)
-                if units == 'inches':
-                    self.units = 'INCH'
+                if units == "inches":
+                    self.units = "INCH"
                 else:
-                    self.units = 'METRIC'
+                    self.units = "METRIC"
                 self.ui.units_radio.set_value(self.units)
                 self.ui.int_entry.set_value(self.integral)
                 self.ui.frac_entry.set_value(self.fractional)
 
         if not self.tools_from_inf:
-            self.app.inform.emit('[ERROR] %s' %
-                                 _("The INF file does not contain the tool table.\n"
-                                   "Try to open the Excellon file from File -> Open -> Excellon\n"
-                                   "and edit the drill diameters manually."))
+            self.app.inform.emit(
+                "[ERROR] %s"
+                % _(
+                    "The INF file does not contain the tool table.\n"
+                    "Try to open the Excellon file from File -> Open -> Excellon\n"
+                    "and edit the drill diameters manually."
+                )
+            )
             return "fail"
 
-        self.file_loaded.emit('inf', filename)
+        self.file_loaded.emit("inf", filename)
 
     def load_excellon(self, filename):
-        with open(filename, 'r') as exc_f:
+        with open(filename, "r") as exc_f:
             self.exc_file_content = exc_f.readlines()
 
         self.file_loaded.emit("excellon", filename)
@@ -268,29 +281,32 @@ class PcbWizard(AppTool):
         self.build_ui()
         time_str = "{:%A, %d %B %Y at %H:%M}".format(datetime.now())
 
-        if signal == 'inf':
+        if signal == "inf":
             self.inf_loaded = True
             self.ui.tools_table.setVisible(True)
-            self.app.inform.emit('[success] %s' % _("PcbWizard .INF file loaded."))
-        elif signal == 'excellon':
+            self.app.inform.emit("[success] %s" % _("PcbWizard .INF file loaded."))
+        elif signal == "excellon":
             self.excellon_loaded = True
             self.outname = os.path.split(str(filename))[1]
-            self.app.inform.emit('[success] %s' % _("Main PcbWizard Excellon file loaded."))
+            self.app.inform.emit("[success] %s" % _("Main PcbWizard Excellon file loaded."))
 
         if self.excellon_loaded and self.inf_loaded:
             self.update_params()
-            excellon_string = ''
+            excellon_string = ""
             for line in self.exc_file_content:
                 excellon_string += line
-                if 'M48' in line:
-                    header = ';EXCELLON RE-GENERATED BY FLATCAM v%s - www.flatcam.org - Version Date: %s\n' % \
-                              (str(self.app.version), str(self.app.version_date))
-                    header += ';Created on : %s' % time_str + '\n'
-                    header += ';FILE_FORMAT={integral}:{fractional}\n'.format(integral=self.integral,
-                                                                              fractional=self.fractional)
-                    header += '{units},{zeros}\n'.format(units=self.units, zeros=self.zeros)
+                if "M48" in line:
+                    header = (
+                        ";EXCELLON RE-GENERATED BY FLATCAM v%s - www.flatcam.org - Version Date: %s\n"
+                        % (str(self.app.version), str(self.app.version_date))
+                    )
+                    header += ";Created on : %s" % time_str + "\n"
+                    header += ";FILE_FORMAT={integral}:{fractional}\n".format(
+                        integral=self.integral, fractional=self.fractional
+                    )
+                    header += "{units},{zeros}\n".format(units=self.units, zeros=self.zeros)
                     for k, v in self.tools_from_inf.items():
-                        header += 'T{tool}C{dia}\n'.format(tool=int(k), dia=float(v))
+                        header += "T{tool}C{dia}\n".format(tool=int(k), dia=float(v))
                     excellon_string += header
             self.modified_excellon_file = StringIO(excellon_string)
             self.process_finished = True
@@ -307,56 +323,60 @@ class PcbWizard(AppTool):
                 ret = excellon_obj.parse_file(file_obj=excellon_fileobj)
                 if ret == "fail":
                     app_obj.log.debug("Excellon parsing failed.")
-                    app_obj.inform.emit('[ERROR_NOTCL] %s' % _("This is not Excellon file."))
+                    app_obj.inform.emit("[ERROR_NOTCL] %s" % _("This is not Excellon file."))
                     return "fail"
             except IOError:
-                app_obj.inform.emit('[ERROR_NOTCL] %s: %s' % (_("Cannot parse file"), self.outname))
+                app_obj.inform.emit("[ERROR_NOTCL] %s: %s" % (_("Cannot parse file"), self.outname))
                 app_obj.log.debug("Could not import Excellon object.")
                 return "fail"
             except Exception as e:
                 app_obj.log.debug("PcbWizard.on_import_excellon().obj_init() %s" % str(e))
-                msg = '[ERROR_NOTCL] %s' % _("An internal error has occurred. See shell.\n")
+                msg = "[ERROR_NOTCL] %s" % _("An internal error has occurred. See shell.\n")
                 msg += app_obj.traceback.format_exc()
                 app_obj.inform.emit(msg)
                 return "fail"
 
             ret = excellon_obj.create_geometry()
-            if ret == 'fail':
+            if ret == "fail":
                 app_obj.log.debug("Could not create geometry for Excellon object.")
                 return "fail"
 
             for tool in excellon_obj.tools:
-                if excellon_obj.tools[tool]['solid_geometry']:
+                if excellon_obj.tools[tool]["solid_geometry"]:
                     return
-            app_obj.inform.emit('[ERROR_NOTCL] %s: %s' % (_("No geometry found in file"), name))
+            app_obj.inform.emit("[ERROR_NOTCL] %s: %s" % (_("No geometry found in file"), name))
             return "fail"
 
-        if excellon_fileobj is not None and excellon_fileobj != '':
+        if excellon_fileobj is not None and excellon_fileobj != "":
             if self.process_finished:
-                with self.app.proc_container.new('%s ...' % _("Importing")):
+                with self.app.proc_container.new("%s ..." % _("Importing")):
 
                     # Object name
                     name = self.outname
 
-                    ret_val = self.app.app_obj.new_object("excellon", name, obj_init, autoselected=False)
-                    if ret_val == 'fail':
-                        self.app.inform.emit('[ERROR_NOTCL] %s' % _('Import Excellon file failed.'))
+                    ret_val = self.app.app_obj.new_object(
+                        "excellon", name, obj_init, autoselected=False
+                    )
+                    if ret_val == "fail":
+                        self.app.inform.emit("[ERROR_NOTCL] %s" % _("Import Excellon file failed."))
                         return
 
                         # Register recent file
                     self.app.file_opened.emit("excellon", name)
 
                     # GUI feedback
-                    self.app.inform.emit('[success] %s: %s' % (_("Imported"), name))
+                    self.app.inform.emit("[success] %s: %s" % (_("Imported"), name))
                     self.app.ui.notebook.setCurrentWidget(self.app.ui.project_tab)
             else:
-                self.app.inform.emit('[WARNING_NOTCL] %s' % _('Excellon merging is in progress. Please wait...'))
+                self.app.inform.emit(
+                    "[WARNING_NOTCL] %s" % _("Excellon merging is in progress. Please wait...")
+                )
         else:
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _('The imported Excellon file is empty.'))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("The imported Excellon file is empty."))
 
 
 class WizardUI:
-    
+
     toolName = _("PcbWizard Import Tool")
 
     def __init__(self, layout, app):
@@ -366,13 +386,15 @@ class WizardUI:
 
         # ## Title
         title_label = FCLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
         self.layout.addWidget(FCLabel(""))
 
@@ -382,18 +404,15 @@ class WizardUI:
         form_layout = QtWidgets.QFormLayout()
         self.layout.addLayout(form_layout)
 
-        self.excellon_label = FCLabel('%s:' % _("Excellon file"))
+        self.excellon_label = FCLabel("%s:" % _("Excellon file"))
         self.excellon_label.setToolTip(
-            _("Load the Excellon file.\n"
-              "Usually it has a .DRL extension")
+            _("Load the Excellon file.\n" "Usually it has a .DRL extension")
         )
         self.excellon_brn = FCButton(_("Open"))
         form_layout.addRow(self.excellon_label, self.excellon_brn)
 
-        self.inf_label = FCLabel('%s:' % _("INF file"))
-        self.inf_label.setToolTip(
-            _("Load the INF file.")
-        )
+        self.inf_label = FCLabel("%s:" % _("INF file"))
+        self.inf_label.setToolTip(_("Load the INF file."))
         self.inf_btn = FCButton(_("Open"))
         form_layout.addRow(self.inf_label, self.inf_btn)
 
@@ -401,12 +420,10 @@ class WizardUI:
         self.layout.addWidget(self.tools_table)
 
         self.tools_table.setColumnCount(2)
-        self.tools_table.setHorizontalHeaderLabels(['#Tool', _('Diameter')])
+        self.tools_table.setHorizontalHeaderLabels(["#Tool", _("Diameter")])
 
-        self.tools_table.horizontalHeaderItem(0).setToolTip(
-            _("Tool Number"))
-        self.tools_table.horizontalHeaderItem(1).setToolTip(
-            _("Tool diameter in file units."))
+        self.tools_table.horizontalHeaderItem(0).setToolTip(_("Tool Number"))
+        self.tools_table.horizontalHeaderItem(1).setToolTip(_("Tool diameter in file units."))
 
         # start with apertures table hidden
         self.tools_table.setVisible(False)
@@ -420,7 +437,7 @@ class WizardUI:
         # Integral part of the coordinates
         self.int_entry = FCSpinner(callback=self.confirmation_message_int)
         self.int_entry.set_range(1, 10)
-        self.int_label = FCLabel('%s:' % _("Int. digits"))
+        self.int_label = FCLabel("%s:" % _("Int. digits"))
         self.int_label.setToolTip(
             _("The number of digits for the integral part of the coordinates.")
         )
@@ -429,33 +446,42 @@ class WizardUI:
         # Fractional part of the coordinates
         self.frac_entry = FCSpinner(callback=self.confirmation_message_int)
         self.frac_entry.set_range(1, 10)
-        self.frac_label = FCLabel('%s:' % _("Frac. digits"))
+        self.frac_label = FCLabel("%s:" % _("Frac. digits"))
         self.frac_label.setToolTip(
             _("The number of digits for the fractional part of the coordinates.")
         )
         form_layout1.addRow(self.frac_label, self.frac_entry)
 
         # Zeros suppression for coordinates
-        self.zeros_radio = RadioSet([{'label': _('LZ'), 'value': 'LZ'},
-                                     {'label': _('TZ'), 'value': 'TZ'},
-                                     {'label': _('No Suppression'), 'value': 'D'}])
-        self.zeros_label = FCLabel('%s:' % _("Zeros supp."))
+        self.zeros_radio = RadioSet(
+            [
+                {"label": _("LZ"), "value": "LZ"},
+                {"label": _("TZ"), "value": "TZ"},
+                {"label": _("No Suppression"), "value": "D"},
+            ]
+        )
+        self.zeros_label = FCLabel("%s:" % _("Zeros supp."))
         self.zeros_label.setToolTip(
-            _("The type of zeros suppression used.\n"
-              "Can be of type:\n"
-              "- LZ = leading zeros are kept\n"
-              "- TZ = trailing zeros are kept\n"
-              "- No Suppression = no zero suppression")
+            _(
+                "The type of zeros suppression used.\n"
+                "Can be of type:\n"
+                "- LZ = leading zeros are kept\n"
+                "- TZ = trailing zeros are kept\n"
+                "- No Suppression = no zero suppression"
+            )
         )
         form_layout1.addRow(self.zeros_label, self.zeros_radio)
 
         # Units type
-        self.units_radio = RadioSet([{'label': _('Inch'), 'value': 'INCH'},
-                                     {'label': _('mm'), 'value': 'METRIC'}])
-        self.units_label = FCLabel("<b>%s:</b>" % _('Units'))
+        self.units_radio = RadioSet(
+            [{"label": _("Inch"), "value": "INCH"}, {"label": _("mm"), "value": "METRIC"}]
+        )
+        self.units_label = FCLabel("<b>%s:</b>" % _("Units"))
         self.units_label.setToolTip(
-            _("The type of units that the coordinates and tool\n"
-              "diameters are using. Can be INCH or MM.")
+            _(
+                "The type of units that the coordinates and tool\n"
+                "diameters are using. Can be INCH or MM."
+            )
         )
         form_layout1.addRow(self.units_label, self.units_radio)
 
@@ -463,10 +489,12 @@ class WizardUI:
 
         self.import_button = QtWidgets.QPushButton(_("Import Excellon"))
         self.import_button.setToolTip(
-            _("Import an Excellon file\n"
-              "that store it's information's in 2 files.\n"
-              "One usually has .DRL extension while\n"
-              "the other has .INF extension.")
+            _(
+                "Import an Excellon file\n"
+                "that store it's information's in 2 files.\n"
+                "One usually has .DRL extension while\n"
+                "the other has .INF extension."
+            )
         )
         self.layout.addWidget(self.import_button)
 
@@ -476,26 +504,33 @@ class WizardUI:
         # #############################################################################
 
     def on_units_change(self, val):
-        if val == 'INCH':
+        if val == "INCH":
             self.int_entry.set_value(2)
             self.frac_entry.set_value(4)
         else:
             self.int_entry.set_value(3)
             self.frac_entry.set_value(3)
-            
+
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

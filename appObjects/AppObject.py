@@ -24,8 +24,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -56,7 +56,16 @@ class AppObject(QtCore.QObject):
         self.object_plotted.connect(self.on_object_plotted)
         self.plots_updated.connect(self.app.on_plots_updated)
 
-    def new_object(self, kind, name, initialize, plot=True, autoselected=True, callback=None, callback_params=None):
+    def new_object(
+        self,
+        kind,
+        name,
+        initialize,
+        plot=True,
+        autoselected=True,
+        callback=None,
+        callback_params=None,
+    ):
         """
         Creates a new specialized FlatCAMObj and attaches it to the application,
         this is, updates the GUI accordingly, any other records and plots it.
@@ -103,7 +112,7 @@ class AppObject(QtCore.QObject):
             "cncjob": CNCJobObject,
             "geometry": GeometryObject,
             "script": ScriptObject,
-            "document": DocumentObject
+            "document": DocumentObject,
         }
 
         log.debug("Calling object constructor...")
@@ -132,21 +141,21 @@ class AppObject(QtCore.QObject):
         # ############################################################################################################
         for option in self.app.options:
             if option.find(kind + "_") == 0:
-                oname = option[len(kind) + 1:]
+                oname = option[len(kind) + 1 :]
                 obj.options[oname] = self.app.options[option]
 
         # add some of the FlatCAM Tools related properties
-        if kind == 'excellon':
+        if kind == "excellon":
             for option in self.app.options:
-                if option.find('tools_drill_') == 0 or option.find('tools_mill_') == 0:
+                if option.find("tools_drill_") == 0 or option.find("tools_mill_") == 0:
                     obj.options[option] = self.app.options[option]
-        if kind == 'gerber':
+        if kind == "gerber":
             for option in self.app.options:
-                if option.find('tools_iso_') == 0:
+                if option.find("tools_iso_") == 0:
                     obj.options[option] = self.app.options[option]
-        if kind == 'geometry':
+        if kind == "geometry":
             for option in self.app.options:
-                if option.find('tools_mill_') == 0:
+                if option.find("tools_mill_") == 0:
                     obj.options[option] = self.app.options[option]
         # ############################################################################################################
         # ############################################################################################################
@@ -161,18 +170,22 @@ class AppObject(QtCore.QObject):
         try:
             return_value = initialize(obj, self.app)
         except Exception as e:
-            msg = '[ERROR_NOTCL] %s' % _("An internal error has occurred. See shell.\n")
+            msg = "[ERROR_NOTCL] %s" % _("An internal error has occurred. See shell.\n")
             msg += _("Object ({kind}) failed because: {error} \n\n").format(kind=kind, error=str(e))
             msg += traceback.format_exc()
             self.app.inform.emit(msg)
             return "fail"
 
         t2 = time.time()
-        msg = "%s %s. %f seconds executing initialize()." % (_("New object with name:"), name, (t2 - t1))
+        msg = "%s %s. %f seconds executing initialize()." % (
+            _("New object with name:"),
+            name,
+            (t2 - t1),
+        )
         log.debug(msg)
         self.app.inform_shell.emit(msg)
 
-        if return_value == 'fail':
+        if return_value == "fail":
             log.debug("Object (%s) parsing and/or geometry creation failed." % kind)
             return "fail"
 
@@ -181,7 +194,7 @@ class AppObject(QtCore.QObject):
         # This condition CAN be true because initialize() can change obj.units
         # ############################################################################################################
         if self.app.options["units"].upper() != obj.units.upper():
-            self.app.inform.emit('%s: %s' % (_("Converting units to "), self.app.options["units"]))
+            self.app.inform.emit("%s: %s" % (_("Converting units to "), self.app.options["units"]))
             obj.convert_units(self.app.options["units"])
             t3 = time.time()
             log.debug("%f seconds converting units." % (t3 - t2))
@@ -190,21 +203,23 @@ class AppObject(QtCore.QObject):
         # Create the bounding box for the object and then add the results to the obj.options
         # But not for Scripts or for Documents
         # ############################################################################################################
-        if kind != 'document' and kind != 'script':
+        if kind != "document" and kind != "script":
             try:
                 xmin, ymin, xmax, ymax = obj.bounds()
-                obj.options['xmin'] = xmin
-                obj.options['ymin'] = ymin
-                obj.options['xmax'] = xmax
-                obj.options['ymax'] = ymax
+                obj.options["xmin"] = xmin
+                obj.options["ymin"] = ymin
+                obj.options["xmax"] = xmax
+                obj.options["ymax"] = ymax
             except Exception as e:
-                log.warning("AppObject.new_object() -> The object has no bounds properties. %s" % str(e))
+                log.warning(
+                    "AppObject.new_object() -> The object has no bounds properties. %s" % str(e)
+                )
                 return "fail"
 
         # ############################################################################################################
         # update the KeyWords list with the name of the file
         # ############################################################################################################
-        self.app.myKeywords.append(obj.options['name'])
+        self.app.myKeywords.append(obj.options["name"])
 
         log.debug("Moving new object back to main thread.")
 
@@ -226,7 +241,7 @@ class AppObject(QtCore.QObject):
         :return: None
         """
 
-        self.new_object('excellon', 'new_exc', lambda x, y: None, plot=False)
+        self.new_object("excellon", "new_exc", lambda x, y: None, plot=False)
 
     def new_geometry_object(self):
         """
@@ -234,7 +249,7 @@ class AppObject(QtCore.QObject):
 
         :return: None
         """
-        outname = 'new_geo'
+        outname = "new_geo"
 
         def initialize(obj, app):
             obj.multitool = True
@@ -243,28 +258,30 @@ class AppObject(QtCore.QObject):
             default_data = {}
 
             for opt_key, opt_val in app.options.items():
-                if opt_key.find('geometry' + "_") == 0:
-                    oname = opt_key[len('geometry') + 1:]
+                if opt_key.find("geometry" + "_") == 0:
+                    oname = opt_key[len("geometry") + 1 :]
                     default_data[oname] = self.app.options[opt_key]
-                if opt_key.find('tools_mill' + "_") == 0:
-                    oname = opt_key[len('tools_mill') + 1:]
+                if opt_key.find("tools_mill" + "_") == 0:
+                    oname = opt_key[len("tools_mill") + 1 :]
                     default_data[oname] = self.app.options[opt_key]
 
             obj.tools = {}
-            obj.tools.update({
-                1: {
-                    'tooldia': float(app.defaults["geometry_cnctooldia"]),
-                    'offset': 'Path',
-                    'offset_value': 0.0,
-                    'type': 'Rough',
-                    'tool_type': 'C1',
-                    'data': deepcopy(default_data),
-                    'solid_geometry': []
+            obj.tools.update(
+                {
+                    1: {
+                        "tooldia": float(app.defaults["geometry_cnctooldia"]),
+                        "offset": "Path",
+                        "offset_value": 0.0,
+                        "type": "Rough",
+                        "tool_type": "C1",
+                        "data": deepcopy(default_data),
+                        "solid_geometry": [],
+                    }
                 }
-            })
-            obj.tools[1]['data']['name'] = outname
+            )
+            obj.tools[1]["data"]["name"] = outname
 
-        self.new_object('geometry', outname, initialize, plot=False)
+        self.new_object("geometry", outname, initialize, plot=False)
 
     def new_gerber_object(self):
         """
@@ -282,14 +299,14 @@ class AppObject(QtCore.QObject):
             grb_obj.solid_geometry = []
 
             try:
-                grb_obj.options['xmin'] = 0
-                grb_obj.options['ymin'] = 0
-                grb_obj.options['xmax'] = 0
-                grb_obj.options['ymax'] = 0
+                grb_obj.options["xmin"] = 0
+                grb_obj.options["ymin"] = 0
+                grb_obj.options["xmax"] = 0
+                grb_obj.options["ymax"] = 0
             except KeyError:
                 pass
 
-        self.new_object('gerber', 'new_grb', initialize, plot=False)
+        self.new_object("gerber", "new_grb", initialize, plot=False)
 
     def new_script_object(self):
         """
@@ -310,18 +327,23 @@ class AppObject(QtCore.QObject):
         #                 "SaveSys, Scale, SetActive, SetSys, SetOrigin, Skew, SubtractPoly,\n" \
         #                 "# SubtractRectangle, Version, WriteGCode\n"
 
-        new_source_file = '# %s\n' % _('CREATE A NEW FLATCAM TCL SCRIPT') + \
-                          '# %s:\n' % _('TCL Tutorial is here') + \
-                          '# https://www.tcl.tk/man/tcl8.5/tutorial/tcltutorial.html\n' + '\n\n' + \
-                          '# %s:\n' % _("FlatCAM commands list")
-        new_source_file += '# %s\n\n' % _("Type >help< followed by Run Code for a list of FlatCAM Tcl Commands "
-                                          "(displayed in Tcl Shell).")
+        new_source_file = (
+            "# %s\n" % _("CREATE A NEW FLATCAM TCL SCRIPT")
+            + "# %s:\n" % _("TCL Tutorial is here")
+            + "# https://www.tcl.tk/man/tcl8.5/tutorial/tcltutorial.html\n"
+            + "\n\n"
+            + "# %s:\n" % _("FlatCAM commands list")
+        )
+        new_source_file += "# %s\n\n" % _(
+            "Type >help< followed by Run Code for a list of FlatCAM Tcl Commands "
+            "(displayed in Tcl Shell)."
+        )
 
         def initialize(obj, app):
             obj.source_file = deepcopy(new_source_file)
 
-        outname = 'new_script'
-        self.new_object('script', outname, initialize, plot=False)
+        outname = "new_script"
+        self.new_object("script", outname, initialize, plot=False)
 
     def new_document_object(self):
         """
@@ -333,7 +355,7 @@ class AppObject(QtCore.QObject):
         def initialize(obj, app):
             obj.source_file = ""
 
-        self.new_object('document', 'new_document', initialize, plot=False)
+        self.new_object("document", "new_document", initialize, plot=False)
 
     def on_object_created(self, obj, plot, auto_select, callback, callback_params):
         """
@@ -364,53 +386,71 @@ class AppObject(QtCore.QObject):
         # #############################################################################################################
         # ######################  Set colors for the message in the Status Bar  #######################################
         # #############################################################################################################
-        if obj.kind == 'gerber':
-            self.app.inform.emit('[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
-                kind=obj.kind.capitalize(),
-                color='green',
-                name=str(obj.options['name']), tx=_("created/selected"))
+        if obj.kind == "gerber":
+            self.app.inform.emit(
+                '[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
+                    kind=obj.kind.capitalize(),
+                    color="green",
+                    name=str(obj.options["name"]),
+                    tx=_("created/selected"),
+                )
             )
-        elif obj.kind == 'excellon':
-            self.app.inform.emit('[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
-                kind=obj.kind.capitalize(),
-                color='brown',
-                name=str(obj.options['name']), tx=_("created/selected"))
+        elif obj.kind == "excellon":
+            self.app.inform.emit(
+                '[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
+                    kind=obj.kind.capitalize(),
+                    color="brown",
+                    name=str(obj.options["name"]),
+                    tx=_("created/selected"),
+                )
             )
-        elif obj.kind == 'cncjob':
-            self.app.inform.emit('[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
-                kind=obj.kind.capitalize(),
-                color='blue',
-                name=str(obj.options['name']), tx=_("created/selected"))
+        elif obj.kind == "cncjob":
+            self.app.inform.emit(
+                '[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
+                    kind=obj.kind.capitalize(),
+                    color="blue",
+                    name=str(obj.options["name"]),
+                    tx=_("created/selected"),
+                )
             )
-        elif obj.kind == 'geometry':
-            self.app.inform.emit('[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
-                kind=obj.kind.capitalize(),
-                color='red',
-                name=str(obj.options['name']), tx=_("created/selected"))
+        elif obj.kind == "geometry":
+            self.app.inform.emit(
+                '[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
+                    kind=obj.kind.capitalize(),
+                    color="red",
+                    name=str(obj.options["name"]),
+                    tx=_("created/selected"),
+                )
             )
-        elif obj.kind == 'script':
-            self.app.inform.emit('[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
-                kind=obj.kind.capitalize(),
-                color='orange',
-                name=str(obj.options['name']), tx=_("created/selected"))
+        elif obj.kind == "script":
+            self.app.inform.emit(
+                '[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
+                    kind=obj.kind.capitalize(),
+                    color="orange",
+                    name=str(obj.options["name"]),
+                    tx=_("created/selected"),
+                )
             )
-        elif obj.kind == 'document':
-            self.app.inform.emit('[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
-                kind=obj.kind.capitalize(),
-                color='darkCyan',
-                name=str(obj.options['name']), tx=_("created/selected"))
+        elif obj.kind == "document":
+            self.app.inform.emit(
+                '[selected] {kind} {tx}: <span style="color:{color};">{name}</span>'.format(
+                    kind=obj.kind.capitalize(),
+                    color="darkCyan",
+                    name=str(obj.options["name"]),
+                    tx=_("created/selected"),
+                )
             )
 
         # ############################################################################################################
         # Set the colors for the objects that have geometry
         # ############################################################################################################
-        if obj.kind != 'document' and obj.kind != 'script':
+        if obj.kind != "document" and obj.kind != "script":
             try:
-                if obj.kind == 'excellon':
+                if obj.kind == "excellon":
                     obj.fill_color = self.app.defaults["excellon_plot_fill"]
                     obj.outline_color = self.app.defaults["excellon_plot_line"]
 
-                if obj.kind == 'gerber':
+                if obj.kind == "gerber":
                     if self.app.defaults["gerber_store_color_list"] is True:
                         group = self.app.collection.group_items["gerber"]
                         index = group.child_count() - 1
@@ -449,10 +489,10 @@ class AppObject(QtCore.QObject):
 
         # here it is done the object plotting
         def plotting_task(t_obj):
-            with self.app.proc_container.new('%s ...' % _("Plotting")):
-                if t_obj.kind == 'cncjob':
+            with self.app.proc_container.new("%s ..." % _("Plotting")):
+                if t_obj.kind == "cncjob":
                     t_obj.plot(kind=self.app.defaults["cncjob_plot_kind"])
-                if t_obj.kind == 'gerber':
+                if t_obj.kind == "gerber":
                     t_obj.plot(color=t_obj.outline_color, face_color=t_obj.fill_color)
                 else:
                     t_obj.plot()
@@ -462,18 +502,21 @@ class AppObject(QtCore.QObject):
                 log.debug(msg)
                 self.object_plotted.emit(t_obj)
 
-                if t_obj.kind == 'gerber' and self.app.defaults["gerber_buffering"] != 'full' and \
-                        self.app.defaults["gerber_delayed_buffering"]:
+                if (
+                    t_obj.kind == "gerber"
+                    and self.app.defaults["gerber_buffering"] != "full"
+                    and self.app.defaults["gerber_delayed_buffering"]
+                ):
                     t_obj.do_buffer_signal.emit()
 
         # Send to worker
         # self.worker.add_task(worker_task, [self])
         if plot is True:
-            self.app.worker_task.emit({'fcn': plotting_task, 'params': [obj]})
+            self.app.worker_task.emit({"fcn": plotting_task, "params": [obj]})
 
         if callback is not None:
             # callback(*callback_params)
-            self.app.worker_task.emit({'fcn': callback, 'params': callback_params})
+            self.app.worker_task.emit({"fcn": callback, "params": callback_params})
 
     def on_object_changed(self, obj):
         """
@@ -489,10 +532,10 @@ class AppObject(QtCore.QObject):
             xmin, ymin, xmax, ymax = obj.bounds()
         except TypeError:
             return
-        obj.options['xmin'] = xmin
-        obj.options['ymin'] = ymin
-        obj.options['xmax'] = xmax
-        obj.options['ymax'] = ymax
+        obj.options["xmin"] = xmin
+        obj.options["ymin"] = ymin
+        obj.options["xmax"] = xmax
+        obj.options["ymax"] = ymax
 
         log.debug("Object changed, updating the bounding box data on self.options")
         # delete the old selection shape

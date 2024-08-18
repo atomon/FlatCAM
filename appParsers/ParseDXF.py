@@ -7,6 +7,7 @@
 
 from shapely.geometry import LineString, Point
 from shapely.affinity import rotate
+
 # Vector was an older name for Vec3; try both for backward compatibility:
 try:
     from ezdxf.math import Vec3 as ezdxf_vector
@@ -17,7 +18,7 @@ from appParsers.ParseFont import *
 from appParsers.ParseDXF_Spline import *
 import logging
 
-log = logging.getLogger('base2')
+log = logging.getLogger("base2")
 
 
 def distance(pt1, pt2):
@@ -110,12 +111,12 @@ def dxfarc2shapely(arc, n_points=100):
         arc_center = ocs.to_wcs(arc.dxf.center)
         start_angle = arc.dxf.start_angle + 180
         end_angle = arc.dxf.end_angle + 180
-        direction = 'CW'
+        direction = "CW"
     else:
         arc_center = arc.dxf.center
         start_angle = arc.dxf.start_angle
         end_angle = arc.dxf.end_angle
-        direction = 'CCW'
+        direction = "CCW"
 
     center_x = arc_center[0]
     center_y = arc_center[1]
@@ -130,7 +131,7 @@ def dxfarc2shapely(arc, n_points=100):
     step_angle = float(abs(end_angle - start_angle) / n_points)
 
     while angle <= end_angle:
-        if direction == 'CCW':
+        if direction == "CCW":
             x = center_x + radius * math.cos(math.radians(angle))
             y = center_y + radius * math.sin(math.radians(angle))
         else:
@@ -141,12 +142,12 @@ def dxfarc2shapely(arc, n_points=100):
 
     # in case the number of segments do not cover everything until the end of the arc
     if angle != end_angle:
-        if direction == 'CCW':
+        if direction == "CCW":
             x = center_x + radius * math.cos(math.radians(end_angle))
             y = center_y + radius * math.sin(math.radians(end_angle))
         else:
-            x = center_x + radius * math.cos(math.radians(- end_angle))
-            y = center_y + radius * math.sin(math.radians(- end_angle))
+            x = center_x + radius * math.cos(math.radians(-end_angle))
+            y = center_y + radius * math.sin(math.radians(-end_angle))
         point_list.append((x, y))
 
     # log.debug("X = %.4f, Y = %.4f, Radius = %.4f, start_angle = %.1f, stop_angle = %.1f, step_angle = %.4f" %
@@ -167,12 +168,12 @@ def dxfellipse2shapely(ellipse, ellipse_segments=100):
         center = ocs.to_wcs(ellipse.dxf.center)
         start_angle = ocs.to_wcs(ellipse.dxf.start_param)
         end_angle = ocs.to_wcs(ellipse.dxf.end_param)
-        direction = 'CW'
+        direction = "CW"
     else:
         center = ellipse.dxf.center
         start_angle = ellipse.dxf.start_param
         end_angle = ellipse.dxf.end_param
-        direction = 'CCW'
+        direction = "CCW"
 
     # print("Dir = %s" % dir)
     major_axis = ellipse.dxf.major_axis
@@ -192,7 +193,7 @@ def dxfellipse2shapely(ellipse, ellipse_segments=100):
 
     angle = start_angle
     for step in range(line_seg + 1):
-        if direction == 'CW':
+        if direction == "CW":
             major_dim = normalize_2(major_axis)
             minor_dim = normalize_2(Vector([ratio * k for k in major_axis]))
             vx = (major_dim[0] + major_dim[1]) * math.cos(angle)
@@ -202,7 +203,7 @@ def dxfellipse2shapely(ellipse, ellipse_segments=100):
             angle += step_angle
         else:
             major_dim = normalize_2(major_axis)
-            minor_dim = (Vector([ratio * k for k in major_dim]))
+            minor_dim = Vector([ratio * k for k in major_dim])
             vx = (major_dim[0] + major_dim[1]) * math.cos(angle)
             vy = (minor_dim[0] + minor_dim[1]) * math.sin(angle)
             x = center[0] + major_x * vx + major_y * vy
@@ -265,7 +266,9 @@ def dxfspline2shapely(spline):
     is_closed = spline.closed
     degree = spline.dxf.degree
 
-    x_list, y_list, _ = spline2Polyline(ctrl_points, degree=degree, closed=is_closed, segments=20, knots=knot_values)
+    x_list, y_list, _ = spline2Polyline(
+        ctrl_points, degree=degree, closed=is_closed, segments=20, knots=knot_values
+    )
     points_list = zip(x_list, y_list)
 
     geo = LineString(points_list)
@@ -325,16 +328,20 @@ def get_geo_from_insert(dxf_object, insert):
         # support for array block insertions
         if r_count > 1:
             for r in range(r_count):
-                geo_block_transformed.append(translate(geo, (tr[0] + (r * r_spacing) - block_coords[0]), 0))
+                geo_block_transformed.append(
+                    translate(geo, (tr[0] + (r * r_spacing) - block_coords[0]), 0)
+                )
         if c_count > 1:
             for c in range(c_count):
-                geo_block_transformed.append(translate(geo, 0, (tr[1] + (c * c_spacing) - block_coords[1])))
+                geo_block_transformed.append(
+                    translate(geo, 0, (tr[1] + (c * c_spacing) - block_coords[1]))
+                )
 
         if sx != 1 or sy != 1:
             geo = scale(geo, sx, sy)
         if phi != 0:
-            if isinstance(tr, str) and tr.lower() == 'c':
-                tr = 'center'
+            if isinstance(tr, str) and tr.lower() == "c":
+                tr = "center"
             elif isinstance(tr, ezdxf_vector):
                 tr = list(tr)
             geo = rotate(geo, phi, origin=tr)
@@ -350,27 +357,31 @@ def get_geo(dxf_object, container):
     for dxf_entity in container:
         g = []
         # print("Entity", dxf_entity.dxftype())
-        if dxf_entity.dxftype() == 'POINT':
-            g = dxfpoint2shapely(dxf_entity,)
-        elif dxf_entity.dxftype() == 'LINE':
-            g = dxfline2shapely(dxf_entity,)
-        elif dxf_entity.dxftype() == 'CIRCLE':
+        if dxf_entity.dxftype() == "POINT":
+            g = dxfpoint2shapely(
+                dxf_entity,
+            )
+        elif dxf_entity.dxftype() == "LINE":
+            g = dxfline2shapely(
+                dxf_entity,
+            )
+        elif dxf_entity.dxftype() == "CIRCLE":
             g = dxfcircle2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'ARC':
+        elif dxf_entity.dxftype() == "ARC":
             g = dxfarc2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'ELLIPSE':
+        elif dxf_entity.dxftype() == "ELLIPSE":
             g = dxfellipse2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'LWPOLYLINE':
+        elif dxf_entity.dxftype() == "LWPOLYLINE":
             g = dxflwpolyline2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'POLYLINE':
+        elif dxf_entity.dxftype() == "POLYLINE":
             g = dxfpolyline2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'SOLID':
+        elif dxf_entity.dxftype() == "SOLID":
             g = dxfsolid2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'TRACE':
+        elif dxf_entity.dxftype() == "TRACE":
             g = dxftrace2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'SPLINE':
+        elif dxf_entity.dxftype() == "SPLINE":
             g = dxfspline2shapely(dxf_entity)
-        elif dxf_entity.dxftype() == 'INSERT':
+        elif dxf_entity.dxftype() == "INSERT":
             g = get_geo_from_insert(dxf_object, dxf_entity)
         else:
             log.debug(" %s is not supported yet." % dxf_entity.dxftype())
@@ -387,6 +398,7 @@ def get_geo(dxf_object, container):
 
 def getdxftext(exf_object, object_type, units=None):
     pass
+
 
 # def get_geo_from_block(dxf_object):
 #     geo_block_transformed = []

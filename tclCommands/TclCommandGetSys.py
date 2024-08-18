@@ -19,30 +19,28 @@ class TclCommandGetSys(TclCommand):
     """
 
     # List of all command aliases, to be able use old names for backward compatibility (add_poly, add_polygon)
-    aliases = ['get_sys', 'getsys']
+    aliases = ["get_sys", "getsys"]
 
-    description = '%s %s' % ("--", "Returns to TCL the value for the entered system variable.")
+    description = "%s %s" % ("--", "Returns to TCL the value for the entered system variable.")
 
     # Dictionary of types from Tcl command, needs to be ordered
-    arg_names = collections.OrderedDict([
-        ('name', str)
-    ])
+    arg_names = collections.OrderedDict([("name", str)])
 
     # Dictionary of types from Tcl command, needs to be ordered , this  is  for options  like -optionname value
-    option_types = collections.OrderedDict([
-
-    ])
+    option_types = collections.OrderedDict([])
 
     # array of mandatory options for current Tcl command: required = {'name','outname'}
-    required = ['name']
+    required = ["name"]
 
     # structured help for current command, args needs to be ordered
     help = {
-        'main': "Returns to TCL the value for the entered system variable.",
-        'args': collections.OrderedDict([
-            ('name', 'Name of the system variable. Required.'),
-        ]),
-        'examples': ['get_sys excellon_zeros']
+        "main": "Returns to TCL the value for the entered system variable.",
+        "args": collections.OrderedDict(
+            [
+                ("name", "Name of the system variable. Required."),
+            ]
+        ),
+        "examples": ["get_sys excellon_zeros"],
     }
 
     def execute(self, args, unnamed_args):
@@ -53,7 +51,7 @@ class TclCommandGetSys(TclCommand):
         :return:
         """
 
-        name = args['name']
+        name = args["name"]
 
         if name in self.app.defaults:
             return self.app.defaults[name]

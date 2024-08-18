@@ -22,8 +22,8 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 
@@ -43,14 +43,14 @@ class TermWidget(QWidget):
         self._browser = _BrowserTextEdit(version=version, app=app)
         qsettings = QSettings("Open Source", "FlatCAM")
         if qsettings.contains("textbox_font_size"):
-            tb_fsize = qsettings.value('textbox_font_size', type=int)
+            tb_fsize = qsettings.value("textbox_font_size", type=int)
         else:
             tb_fsize = 9
-        self._browser.setStyleSheet("font: {0}pt \"Courier\";".format(tb_fsize))
+        self._browser.setStyleSheet('font: {0}pt "Courier";'.format(tb_fsize))
         self._browser.setReadOnly(True)
         self._browser.document().setDefaultStyleSheet(
-            self._browser.document().defaultStyleSheet() +
-            "span {white-space:pre;}")
+            self._browser.document().defaultStyleSheet() + "span {white-space:pre;}"
+        )
 
         self._edit = _ExpandableTextEdit(self, self)
         self._edit.historyNext.connect(self._on_history_next)
@@ -59,7 +59,7 @@ class TermWidget(QWidget):
         self.setFocusProxy(self._edit)
 
         self._delete_line = FCLabel()
-        self._delete_line.setPixmap(QPixmap(self.app.resource_location + '/clear_line16.png'))
+        self._delete_line.setPixmap(QPixmap(self.app.resource_location + "/clear_line16.png"))
         self._delete_line.setMargin(3)
         self._delete_line.setToolTip(_("Clear the text."))
 
@@ -74,7 +74,7 @@ class TermWidget(QWidget):
         hlay.addWidget(self._edit)
         layout.addLayout(hlay)
 
-        self._history = ['']  # current empty line
+        self._history = [""]  # current empty line
         self._historyIndex = 0
 
         self._delete_line.clicked.connect(self.on_delete_line_clicked)
@@ -98,7 +98,7 @@ class TermWidget(QWidget):
         if detail is None:
             self._edit.setPlainText(_("...processing..."))
         else:
-            self._edit.setPlainText('%s [%s]' % (_("...processing..."),  detail))
+            self._edit.setPlainText("%s [%s]" % (_("...processing..."), detail))
 
         self._edit.setDisabled(True)
         self._edit.setFocus()
@@ -111,7 +111,7 @@ class TermWidget(QWidget):
 
         self._edit.setTextColor(Qt.black)
         self._edit.setTextBackgroundColor(Qt.white)
-        self._edit.setPlainText('')
+        self._edit.setPlainText("")
         self._edit.setDisabled(False)
         self._edit.setFocus()
 
@@ -119,42 +119,45 @@ class TermWidget(QWidget):
         """
         Convert text to HTML for inserting it to browser
         """
-        assert style in ('in', 'out', 'err', 'warning', 'success', 'selected', 'raw')
+        assert style in ("in", "out", "err", "warning", "success", "selected", "raw")
 
-        if style != 'raw':
+        if style != "raw":
             text = html.escape(text)
-            text = text.replace('\n', '<br/>')
+            text = text.replace("\n", "<br/>")
         else:
-            text = text.replace('\n', '<br>')
-            text = text.replace('\t', '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+            text = text.replace("\n", "<br>")
+            text = text.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
 
-        idx = text.find(']')
-        mtype = text[:idx+1].upper()
-        mtype = mtype.replace('_NOTCL', '')
-        body = text[idx+1:]
-        if style.lower() == 'in':
+        idx = text.find("]")
+        mtype = text[: idx + 1].upper()
+        mtype = mtype.replace("_NOTCL", "")
+        body = text[idx + 1 :]
+        if style.lower() == "in":
             text = '<span style="font-weight: bold;">%s</span>' % text
-        elif style.lower() == 'err':
-            text = '<span style="font-weight: bold; color: red;">%s</span>'\
-                   '<span style="font-weight: bold;">%s</span>'\
-                   % (mtype, body)
-        elif style.lower() == 'warning':
+        elif style.lower() == "err":
+            text = (
+                '<span style="font-weight: bold; color: red;">%s</span>'
+                '<span style="font-weight: bold;">%s</span>' % (mtype, body)
+            )
+        elif style.lower() == "warning":
             # text = '<span style="font-weight: bold; color: #f4b642;">%s</span>' % text
-            text = '<span style="font-weight: bold; color: #f4b642;">%s</span>' \
-                   '<span style="font-weight: bold;">%s</span>' \
-                   % (mtype, body)
-        elif style.lower() == 'success':
+            text = (
+                '<span style="font-weight: bold; color: #f4b642;">%s</span>'
+                '<span style="font-weight: bold;">%s</span>' % (mtype, body)
+            )
+        elif style.lower() == "success":
             # text = '<span style="font-weight: bold; color: #15b300;">%s</span>' % text
-            text = '<span style="font-weight: bold; color: #15b300;">%s</span>' \
-                   '<span style="font-weight: bold;">%s</span>' \
-                   % (mtype, body)
-        elif style.lower() == 'selected':
-            text = ''
-        elif style.lower() == 'raw':
+            text = (
+                '<span style="font-weight: bold; color: #15b300;">%s</span>'
+                '<span style="font-weight: bold;">%s</span>' % (mtype, body)
+            )
+        elif style.lower() == "selected":
+            text = ""
+        elif style.lower() == "raw":
             text = text
         else:
             # without span <br/> is ignored!!!
-            text = '<span>%s</span>' % text
+            text = "<span>%s</span>" % text
 
         scrollbar = self._browser.verticalScrollBar()
         old_value = scrollbar.value()
@@ -184,14 +187,14 @@ class TermWidget(QWidget):
 
         # in Windows replace all backslash symbols '\' with '\\' slash because Windows paths are made with backslash
         # and in Python single slash is the escape symbol
-        if sys.platform == 'win32':
-            text = text.replace('\\', '\\\\')
+        if sys.platform == "win32":
+            text = text.replace("\\", "\\\\")
 
-        self._append_to_browser('in', '> ' + text + '\n')
+        self._append_to_browser("in", "> " + text + "\n")
 
         if len(self._history) < 2 or self._history[-2] != text:  # don't insert duplicating items
             try:
-                if text[-1] == '\n':
+                if text[-1] == "\n":
                     self._history.insert(-1, text[:-1])
                 else:
                     self._history.insert(-1, text)
@@ -200,11 +203,11 @@ class TermWidget(QWidget):
 
         self._historyIndex = len(self._history) - 1
 
-        self._history[-1] = ''
+        self._history[-1] = ""
         self._edit.clear()
 
-        if not text[-1] == '\n':
-            text += '\n'
+        if not text[-1] == "\n":
+            text += "\n"
 
         self.child_exec_command(text)
 
@@ -215,39 +218,35 @@ class TermWidget(QWidget):
         pass
 
     def add_line_break_to_input(self):
-        self._edit.textCursor().insertText('\n')
+        self._edit.textCursor().insertText("\n")
 
     def append_output(self, text):
         """
         Append text to output widget
         """
-        self._append_to_browser('out', text)
+        self._append_to_browser("out", text)
 
     def append_raw(self, text):
         """
         Append text to output widget as it is
         """
-        self._append_to_browser('raw', text)
+        self._append_to_browser("raw", text)
 
     def append_success(self, text):
-        """Append text to output widget
-        """
-        self._append_to_browser('success', text)
+        """Append text to output widget"""
+        self._append_to_browser("success", text)
 
     def append_selected(self, text):
-        """Append text to output widget
-        """
-        self._append_to_browser('selected', text)
+        """Append text to output widget"""
+        self._append_to_browser("selected", text)
 
     def append_warning(self, text):
-        """Append text to output widget
-        """
-        self._append_to_browser('warning', text)
+        """Append text to output widget"""
+        self._append_to_browser("warning", text)
 
     def append_error(self, text):
-        """Append error text to output widget. Text is drawn with red background
-        """
-        self._append_to_browser('err', text)
+        """Append error text to output widget. Text is drawn with red background"""
+        self._append_to_browser("err", text)
 
     def is_command_complete(self, text):
         """
@@ -300,14 +299,14 @@ class FCShell(TermWidget):
         self.setWindowIcon(self.app.ui.app_icon)
         self.setWindowTitle(_("FlatCAM Shell"))
         self.resize(*self.app.defaults["global_shell_shape"])
-        self._append_to_browser('in', "FlatCAM %s - " % version)
-        self.append_output('%s\n\n' % _("Type >help< to get started"))
+        self._append_to_browser("in", "FlatCAM %s - " % version)
+        self.append_output("%s\n\n" % _("Type >help< to get started"))
 
         self.app.ui.shell_dock.setWidget(self)
         self.app.log.debug("TCL Shell has been initialized.")
 
     def init_tcl(self):
-        if hasattr(self, 'tcl') and self.tcl is not None:
+        if hasattr(self, "tcl") and self.tcl is not None:
             # self.tcl = None
             # new object cannot be used here as it will not remember values created for next passes,
             # because tcl was executed in old instance of TCL
@@ -323,7 +322,7 @@ class FCShell(TermWidget):
         :return: None
         """
 
-        '''
+        """
             How to implement TCL shell commands:
 
             All parameters passed to command should be possible to set as None and test it afterwards.
@@ -350,7 +349,7 @@ class FCShell(TermWidget):
 
             Kamil's comment: I will rewrite existing TCL commands from time to time to follow this rules.
 
-        '''
+        """
 
         # Import/overwrite tcl commands as objects of TclCommand descendants
         # This modifies the variable 'self.tcl_commands_storage'.
@@ -358,10 +357,11 @@ class FCShell(TermWidget):
 
         # Add commands to the tcl interpreter
         for cmd in self.tcl_commands_storage:
-            self.tcl.createcommand(cmd, self.tcl_commands_storage[cmd]['fcn'])
+            self.tcl.createcommand(cmd, self.tcl_commands_storage[cmd]["fcn"])
 
         # Make the tcl puts function return instead of print to stdout
-        self.tcl.eval('''
+        self.tcl.eval(
+            """
             rename puts original_puts
             proc puts {args} {
                 if {[llength $args] == 1} {
@@ -370,7 +370,8 @@ class FCShell(TermWidget):
                     eval original_puts $args
                 }
             }
-            ''')
+            """
+        )
 
     def is_command_complete(self, text):
 
@@ -406,7 +407,7 @@ class FCShell(TermWidget):
         :return:            output if there was any
         """
 
-        self.app.defaults.report_usage('exec_command')
+        self.app.defaults.report_usage("exec_command")
 
         return self.exec_command_test(text, False, no_echo=no_echo)
 
@@ -429,15 +430,15 @@ class FCShell(TermWidget):
                 self.open_processing()  # Disables input box.
 
             result = self.tcl.eval(str(tcl_command_string))
-            if result != 'None' and no_echo is False:
-                self.append_output(result + '\n')
+            if result != "None" and no_echo is False:
+                self.append_output(result + "\n")
 
         except tk.TclError as e:
             # This will display more precise answer if something in TCL shell fails
             result = self.tcl.eval("set errorInfo")
-            self.app.log.error("Exception on Tcl Command execution: %s" % (result + '\n'))
+            self.app.log.error("Exception on Tcl Command execution: %s" % (result + "\n"))
             if no_echo is False:
-                self.append_error('ERROR Report: ' + result + '\n')
+                self.append_error("ERROR Report: " + result + "\n")
             # Show error in console and just return or in test raise exception
             if reraise:
                 raise e
@@ -476,7 +477,7 @@ class FCShell(TermWidget):
             if not isinstance(error, self.TclErrorException):
                 show_trace = 1
             else:
-                show_trace = int(self.app.defaults['global_verbose_error_level'])
+                show_trace = int(self.app.defaults["global_verbose_error_level"])
 
             if show_trace > 0:
                 trc = traceback.format_list(traceback.extract_tb(exc_traceback))
@@ -484,13 +485,16 @@ class FCShell(TermWidget):
                 for a in reversed(trc):
                     trc_formated.append(a.replace("    ", " > ").replace("\n", ""))
                 text = "%s\nPython traceback: %s\n%s" % (
-                    exc_value, exc_type, "\n".join(trc_formated))
+                    exc_value,
+                    exc_type,
+                    "\n".join(trc_formated),
+                )
             else:
                 text = "%s" % error
         else:
             text = error
 
-        text = text.replace('[', '\\[').replace('"', '\\"')
+        text = text.replace("[", "\\[").replace('"', '\\"')
         self.tcl.eval('return -code error "%s"' % text)
 
     def raise_tcl_error(self, text):
@@ -508,6 +512,7 @@ class FCShell(TermWidget):
         """
         this exception is defined here, to be able catch it if we successfully handle all errors from shell command
         """
+
         pass
 
     # """

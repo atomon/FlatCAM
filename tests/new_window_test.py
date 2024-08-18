@@ -26,6 +26,7 @@ class MyPopup(QWidget):
 
         lay.addWidget(le)
         lay.addLayout(hlay)
+
     # def paintEvent(self, e):
     #     dc = QtGui.QPainter(self)
     #     dc.drawLine(0, 0, 100, 100)

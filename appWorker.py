@@ -35,6 +35,7 @@ class Worker(QtCore.QObject):
         if not self.pydevd_failed:
             try:
                 import pydevd
+
                 pydevd.settrace(suspend=False, trace_only_current_thread=True)
             except ImportError:
                 self.pydevd_failed = True
@@ -54,11 +55,12 @@ class Worker(QtCore.QObject):
 
         self.allow_debug()
 
-        if ('worker_name' in task and task['worker_name'] == self.name) or \
-                ('worker_name' not in task and self.name is None):
+        if ("worker_name" in task and task["worker_name"] == self.name) or (
+            "worker_name" not in task and self.name is None
+        ):
 
             try:
-                task['fcn'](*task['params'])
+                task["fcn"](*task["params"])
             except Exception as e:
                 self.app.thread_exception.emit(e)
                 print(traceback.format_exc())

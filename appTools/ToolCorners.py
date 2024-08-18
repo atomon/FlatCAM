@@ -20,11 +20,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolCorners(AppTool):
@@ -36,7 +36,7 @@ class ToolCorners(AppTool):
         self.canvas = self.app.plotcanvas
 
         self.decimals = self.app.decimals
-        self.units = ''
+        self.units = ""
 
         # here we store the locations of the selected corners
         self.points = {}
@@ -92,10 +92,10 @@ class ToolCorners(AppTool):
         self.app.ui.notebook.setTabText(2, _("Corners Tool"))
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Alt+M', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Alt+M", **kwargs)
 
     def set_tool_ui(self):
-        self.units = self.app.defaults['units']
+        self.units = self.app.defaults["units"]
         self.ui.thick_entry.set_value(self.app.defaults["tools_corners_thickness"])
         self.ui.l_entry.set_value(float(self.app.defaults["tools_corners_length"]))
         self.ui.margin_entry.set_value(float(self.app.defaults["tools_corners_margin"]))
@@ -118,32 +118,34 @@ class ToolCorners(AppTool):
 
         # get the Gerber object on which the corner marker will be inserted
         selection_index = self.ui.object_combo.currentIndex()
-        model_index = self.app.collection.index(selection_index, 0, self.ui.object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.object_combo.rootModelIndex()
+        )
 
         try:
             self.grb_object = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolCorners.add_markers() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no Gerber object loaded ..."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("There is no Gerber object loaded ..."))
             self.app.call_source = "app"
             return
 
         xmin, ymin, xmax, ymax = self.grb_object.bounds()
         self.points = {}
         if tl_state:
-            self.points['tl'] = (xmin, ymax)
+            self.points["tl"] = (xmin, ymax)
         if tr_state:
-            self.points['tr'] = (xmax, ymax)
+            self.points["tr"] = (xmax, ymax)
         if bl_state:
-            self.points['bl'] = (xmin, ymin)
+            self.points["bl"] = (xmin, ymin)
         if br_state:
-            self.points['br'] = (xmax, ymin)
+            self.points["br"] = (xmax, ymin)
 
         ret_val = self.add_corners_geo(self.points, g_obj=self.grb_object)
         self.app.call_source = "app"
-        if ret_val == 'fail':
+        if ret_val == "fail":
             self.app.call_source = "app"
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed."))
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed."))
             return
 
         self.on_exit(ret_val)
@@ -166,87 +168,55 @@ class ToolCorners(AppTool):
 
         if not points_storage:
             self.app.inform.emit("[ERROR_NOTCL] %s." % _("Please select at least a location"))
-            return 'fail'
+            return "fail"
 
         for key in points_storage:
-            if key == 'tl':
+            if key == "tl":
                 pt = points_storage[key]
                 x = pt[0] - margin - line_thickness / 2.0
                 y = pt[1] + margin + line_thickness / 2.0
-                if marker_type == 's':
-                    line_geo_hor = LineString([
-                        (x, y), (x + line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y), (x, y - line_length)
-                    ])
+                if marker_type == "s":
+                    line_geo_hor = LineString([(x, y), (x + line_length, y)])
+                    line_geo_vert = LineString([(x, y), (x, y - line_length)])
                 else:
-                    line_geo_hor = LineString([
-                        (x - line_length, y), (x + line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y + line_length), (x, y - line_length)
-                    ])
+                    line_geo_hor = LineString([(x - line_length, y), (x + line_length, y)])
+                    line_geo_vert = LineString([(x, y + line_length), (x, y - line_length)])
                 geo_list.append(line_geo_hor)
                 geo_list.append(line_geo_vert)
-            if key == 'tr':
+            if key == "tr":
                 pt = points_storage[key]
                 x = pt[0] + margin + line_thickness / 2.0
                 y = pt[1] + margin + line_thickness / 2.0
-                if marker_type == 's':
-                    line_geo_hor = LineString([
-                        (x, y), (x - line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y), (x, y - line_length)
-                    ])
+                if marker_type == "s":
+                    line_geo_hor = LineString([(x, y), (x - line_length, y)])
+                    line_geo_vert = LineString([(x, y), (x, y - line_length)])
                 else:
-                    line_geo_hor = LineString([
-                        (x + line_length, y), (x - line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y + line_length), (x, y - line_length)
-                    ])
+                    line_geo_hor = LineString([(x + line_length, y), (x - line_length, y)])
+                    line_geo_vert = LineString([(x, y + line_length), (x, y - line_length)])
                 geo_list.append(line_geo_hor)
                 geo_list.append(line_geo_vert)
-            if key == 'bl':
+            if key == "bl":
                 pt = points_storage[key]
                 x = pt[0] - margin - line_thickness / 2.0
                 y = pt[1] - margin - line_thickness / 2.0
-                if marker_type == 's':
-                    line_geo_hor = LineString([
-                        (x, y), (x + line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y), (x, y + line_length)
-                    ])
+                if marker_type == "s":
+                    line_geo_hor = LineString([(x, y), (x + line_length, y)])
+                    line_geo_vert = LineString([(x, y), (x, y + line_length)])
                 else:
-                    line_geo_hor = LineString([
-                        (x - line_length, y), (x + line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y - line_length), (x, y + line_length)
-                    ])
+                    line_geo_hor = LineString([(x - line_length, y), (x + line_length, y)])
+                    line_geo_vert = LineString([(x, y - line_length), (x, y + line_length)])
                 geo_list.append(line_geo_hor)
                 geo_list.append(line_geo_vert)
-            if key == 'br':
+            if key == "br":
                 pt = points_storage[key]
                 x = pt[0] + margin + line_thickness / 2.0
                 y = pt[1] - margin - line_thickness / 2.0
-                if marker_type == 's':
-                    line_geo_hor = LineString([
-                        (x, y), (x - line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y), (x, y + line_length)
-                    ])
+                if marker_type == "s":
+                    line_geo_hor = LineString([(x, y), (x - line_length, y)])
+                    line_geo_vert = LineString([(x, y), (x, y + line_length)])
                 else:
-                    line_geo_hor = LineString([
-                        (x + line_length, y), (x - line_length, y)
-                    ])
-                    line_geo_vert = LineString([
-                        (x, y - line_length), (x, y + line_length)
-                    ])
+                    line_geo_hor = LineString([(x + line_length, y), (x - line_length, y)])
+                    line_geo_vert = LineString([(x, y - line_length), (x, y + line_length)])
                 geo_list.append(line_geo_hor)
                 geo_list.append(line_geo_vert)
 
@@ -254,36 +224,40 @@ class ToolCorners(AppTool):
 
         aperture_found = None
         for ap_id, ap_val in new_apertures.items():
-            if ap_val['type'] == 'C' and ap_val['size'] == line_thickness:
+            if ap_val["type"] == "C" and ap_val["size"] == line_thickness:
                 aperture_found = ap_id
                 break
 
         geo_buff_list = []
         if aperture_found:
             for geo in geo_list:
-                geo_buff = geo.buffer(line_thickness / 2.0, resolution=self.grb_steps_per_circle, join_style=2)
+                geo_buff = geo.buffer(
+                    line_thickness / 2.0, resolution=self.grb_steps_per_circle, join_style=2
+                )
                 geo_buff_list.append(geo_buff)
 
-                dict_el = {'follow': geo, 'solid': geo_buff}
-                new_apertures[aperture_found]['geometry'].append(deepcopy(dict_el))
+                dict_el = {"follow": geo, "solid": geo_buff}
+                new_apertures[aperture_found]["geometry"].append(deepcopy(dict_el))
         else:
             ap_keys = list(new_apertures.keys())
             if ap_keys:
                 new_apid = str(int(max(ap_keys)) + 1)
             else:
-                new_apid = '10'
+                new_apid = "10"
 
             new_apertures[new_apid] = {}
-            new_apertures[new_apid]['type'] = 'C'
-            new_apertures[new_apid]['size'] = line_thickness
-            new_apertures[new_apid]['geometry'] = []
+            new_apertures[new_apid]["type"] = "C"
+            new_apertures[new_apid]["size"] = line_thickness
+            new_apertures[new_apid]["geometry"] = []
 
             for geo in geo_list:
-                geo_buff = geo.buffer(line_thickness / 2.0, resolution=self.grb_steps_per_circle, join_style=3)
+                geo_buff = geo.buffer(
+                    line_thickness / 2.0, resolution=self.grb_steps_per_circle, join_style=3
+                )
                 geo_buff_list.append(geo_buff)
 
-                dict_el = {'follow': geo, 'solid': geo_buff}
-                new_apertures[new_apid]['geometry'].append(deepcopy(dict_el))
+                dict_el = {"follow": geo, "solid": geo_buff}
+                new_apertures[new_apid]["geometry"].append(deepcopy(dict_el))
 
         s_list = []
         if g_obj.solid_geometry:
@@ -301,14 +275,14 @@ class ToolCorners(AppTool):
         except TypeError:
             s_list.append(geo_buff_list)
 
-        outname = '%s_%s' % (str(self.grb_object.options['name']), 'corners')
+        outname = "%s_%s" % (str(self.grb_object.options["name"]), "corners")
 
         def initialize(grb_obj, app_obj):
             grb_obj.options = {}
             for opt in g_obj.options:
-                if opt != 'name':
+                if opt != "name":
                     grb_obj.options[opt] = deepcopy(g_obj.options[opt])
-            grb_obj.options['name'] = outname
+            grb_obj.options["name"] = outname
             grb_obj.multitool = False
             grb_obj.multigeo = False
             grb_obj.follow = deepcopy(g_obj.follow)
@@ -316,10 +290,11 @@ class ToolCorners(AppTool):
             grb_obj.solid_geometry = unary_union(s_list)
             grb_obj.follow_geometry = deepcopy(g_obj.follow_geometry) + geo_list
 
-            grb_obj.source_file = app_obj.f_handlers.export_gerber(obj_name=outname, filename=None, local_use=grb_obj,
-                                                                   use_thread=False)
+            grb_obj.source_file = app_obj.f_handlers.export_gerber(
+                obj_name=outname, filename=None, local_use=grb_obj, use_thread=False
+            )
 
-        ret = self.app.app_obj.new_object('gerber', outname, initialize, plot=True)
+        ret = self.app.app_obj.new_object("gerber", outname, initialize, plot=True)
 
         return ret
 
@@ -329,7 +304,9 @@ class ToolCorners(AppTool):
         tooldia = self.ui.drill_dia_entry.get_value()
 
         if tooldia == 0:
-            self.app.inform.emit('[WARNING_NOTCL] %s %s' % (_("Cancelled."), _("The tool diameter is zero.")))
+            self.app.inform.emit(
+                "[WARNING_NOTCL] %s %s" % (_("Cancelled."), _("The tool diameter is zero."))
+            )
             return
 
         line_thickness = self.ui.thick_entry.get_value()
@@ -341,13 +318,15 @@ class ToolCorners(AppTool):
 
         # get the Gerber object on which the corner marker will be inserted
         selection_index = self.ui.object_combo.currentIndex()
-        model_index = self.app.collection.index(selection_index, 0, self.ui.object_combo.rootModelIndex())
+        model_index = self.app.collection.index(
+            selection_index, 0, self.ui.object_combo.rootModelIndex()
+        )
 
         try:
             self.grb_object = model_index.internalPointer().obj
         except Exception as e:
             log.debug("ToolCorners.add_markers() --> %s" % str(e))
-            self.app.inform.emit('[WARNING_NOTCL] %s' % _("There is no Gerber object loaded ..."))
+            self.app.inform.emit("[WARNING_NOTCL] %s" % _("There is no Gerber object loaded ..."))
             self.app.call_source = "app"
             return
 
@@ -364,64 +343,56 @@ class ToolCorners(AppTool):
         if tl_state:
             x = xmin - margin - line_thickness / 2.0
             y = ymax + margin + line_thickness / 2.0
-            drill_list.append(
-                Point((x, y))
-            )
+            drill_list.append(Point((x, y)))
 
         if tr_state:
             x = xmax + margin + line_thickness / 2.0
             y = ymax + margin + line_thickness / 2.0
-            drill_list.append(
-                Point((x, y))
-            )
+            drill_list.append(Point((x, y)))
 
         if bl_state:
             x = xmin - margin - line_thickness / 2.0
             y = ymin - margin - line_thickness / 2.0
-            drill_list.append(
-                Point((x, y))
-            )
+            drill_list.append(Point((x, y)))
 
         if br_state:
             x = xmax + margin + line_thickness / 2.0
             y = ymin - margin - line_thickness / 2.0
-            drill_list.append(
-                Point((x, y))
-            )
+            drill_list.append(Point((x, y)))
 
         tools = {1: {}}
         tools[1]["tooldia"] = tooldia
-        tools[1]['drills'] = drill_list
-        tools[1]['solid_geometry'] = []
+        tools[1]["drills"] = drill_list
+        tools[1]["solid_geometry"] = []
 
         def obj_init(obj_inst, app_inst):
-            obj_inst.options.update({
-                'name': outname
-            })
+            obj_inst.options.update({"name": outname})
             obj_inst.tools = deepcopy(tools)
             obj_inst.create_geometry()
-            obj_inst.source_file = app_inst.f_handlers.export_excellon(obj_name=obj_inst.options['name'],
-                                                                       local_use=obj_inst,
-                                                                       filename=None,
-                                                                       use_thread=False)
+            obj_inst.source_file = app_inst.f_handlers.export_excellon(
+                obj_name=obj_inst.options["name"],
+                local_use=obj_inst,
+                filename=None,
+                use_thread=False,
+            )
 
-        outname = '%s_%s' % (str(self.grb_object.options['name']), 'corner_drills')
+        outname = "%s_%s" % (str(self.grb_object.options["name"]), "corner_drills")
         ret_val = self.app.app_obj.new_object("excellon", outname, obj_init)
 
         self.app.call_source = "app"
-        if ret_val == 'fail':
-            self.app.inform.emit('[ERROR_NOTCL] %s' % _("Failed."))
+        if ret_val == "fail":
+            self.app.inform.emit("[ERROR_NOTCL] %s" % _("Failed."))
         else:
-            self.app.inform.emit('[success] %s' % _("Excellon object with corner drills created."))
+            self.app.inform.emit("[success] %s" % _("Excellon object with corner drills created."))
 
     def replot(self, obj, run_thread=True):
         def worker_task():
-            with self.app.proc_container.new('%s ...' % _("Plotting")):
+            with self.app.proc_container.new("%s ..." % _("Plotting")):
                 obj.plot()
                 self.app.app_obj.object_plotted.emit(obj)
 
         if run_thread:
-            self.app.worker_task.emit({'fcn': worker_task, 'params': []})
+            self.app.worker_task.emit({"fcn": worker_task, "params": []})
         else:
             worker_task()
 
@@ -439,15 +410,15 @@ class ToolCorners(AppTool):
         # update the bounding box values
         try:
             a, b, c, d = self.grb_object.bounds()
-            self.grb_object.options['xmin'] = a
-            self.grb_object.options['ymin'] = b
-            self.grb_object.options['xmax'] = c
-            self.grb_object.options['ymax'] = d
+            self.grb_object.options["xmin"] = a
+            self.grb_object.options["ymin"] = b
+            self.grb_object.options["xmax"] = c
+            self.grb_object.options["ymax"] = d
         except Exception as e:
             log.debug("ToolCorners.on_exit() copper_obj bounds error --> %s" % str(e))
 
         self.app.call_source = "app"
-        self.app.inform.emit('[success] %s' % _("A Gerber object with corner markers was created."))
+        self.app.inform.emit("[success] %s" % _("A Gerber object with corner markers was created."))
 
 
 class CornersUI:
@@ -461,21 +432,21 @@ class CornersUI:
 
         # ## Title
         title_label = FCLabel("%s" % self.toolName)
-        title_label.setStyleSheet("""
+        title_label.setStyleSheet(
+            """
                                 QLabel
                                 {
                                     font-size: 16px;
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(title_label)
         self.layout.addWidget(FCLabel(""))
 
         # Gerber object #
-        self.object_label = FCLabel('<b>%s:</b>' % _("GERBER"))
-        self.object_label.setToolTip(
-            _("The Gerber object to which will be added corner markers.")
-        )
+        self.object_label = FCLabel("<b>%s:</b>" % _("GERBER"))
+        self.object_label.setToolTip(_("The Gerber object to which will be added corner markers."))
         self.object_combo = FCComboBox()
         self.object_combo.setModel(self.app.collection)
         self.object_combo.setRootModelIndex(self.app.collection.index(0, 0, QtCore.QModelIndex()))
@@ -490,10 +461,8 @@ class CornersUI:
         separator_line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.layout.addWidget(separator_line)
 
-        self.points_label = FCLabel('<b>%s:</b>' % _('Locations'))
-        self.points_label.setToolTip(
-            _("Locations where to place corner markers.")
-        )
+        self.points_label = FCLabel("<b>%s:</b>" % _("Locations"))
+        self.points_label.setToolTip(_("Locations where to place corner markers."))
         self.layout.addWidget(self.points_label)
 
         # ## Grid Layout
@@ -536,58 +505,50 @@ class CornersUI:
         grid_lay.setColumnStretch(0, 0)
         grid_lay.setColumnStretch(1, 1)
 
-        self.param_label = FCLabel('<b>%s:</b>' % _('Parameters'))
-        self.param_label.setToolTip(
-            _("Parameters used for this tool.")
-        )
+        self.param_label = FCLabel("<b>%s:</b>" % _("Parameters"))
+        self.param_label.setToolTip(_("Parameters used for this tool."))
         grid_lay.addWidget(self.param_label, 0, 0, 1, 2)
 
         # Type of Marker
-        self.type_label = FCLabel('%s:' % _("Type"))
-        self.type_label.setToolTip(
-            _("Shape of the marker.")
-        )
+        self.type_label = FCLabel("%s:" % _("Type"))
+        self.type_label.setToolTip(_("Shape of the marker."))
 
-        self.type_radio = RadioSet([
-            {"label": _("Semi-Cross"), "value": "s"},
-            {"label": _("Cross"), "value": "c"},
-        ])
+        self.type_radio = RadioSet(
+            [
+                {"label": _("Semi-Cross"), "value": "s"},
+                {"label": _("Cross"), "value": "c"},
+            ]
+        )
 
         grid_lay.addWidget(self.type_label, 2, 0)
         grid_lay.addWidget(self.type_radio, 2, 1)
 
         # Thickness #
-        self.thick_label = FCLabel('%s:' % _("Thickness"))
-        self.thick_label.setToolTip(
-            _("The thickness of the line that makes the corner marker.")
-        )
+        self.thick_label = FCLabel("%s:" % _("Thickness"))
+        self.thick_label.setToolTip(_("The thickness of the line that makes the corner marker."))
         self.thick_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.thick_entry.set_range(0.0000, 10.0000)
         self.thick_entry.set_precision(self.decimals)
         self.thick_entry.setWrapping(True)
-        self.thick_entry.setSingleStep(10 ** -self.decimals)
+        self.thick_entry.setSingleStep(10**-self.decimals)
 
         grid_lay.addWidget(self.thick_label, 4, 0)
         grid_lay.addWidget(self.thick_entry, 4, 1)
 
         # Length #
-        self.l_label = FCLabel('%s:' % _("Length"))
-        self.l_label.setToolTip(
-            _("The length of the line that makes the corner marker.")
-        )
+        self.l_label = FCLabel("%s:" % _("Length"))
+        self.l_label.setToolTip(_("The length of the line that makes the corner marker."))
         self.l_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.l_entry.set_range(-10000.0000, 10000.0000)
         self.l_entry.set_precision(self.decimals)
-        self.l_entry.setSingleStep(10 ** -self.decimals)
+        self.l_entry.setSingleStep(10**-self.decimals)
 
         grid_lay.addWidget(self.l_label, 6, 0)
         grid_lay.addWidget(self.l_entry, 6, 1)
 
         # Margin #
-        self.margin_label = FCLabel('%s:' % _("Margin"))
-        self.margin_label.setToolTip(
-            _("Bounding box margin.")
-        )
+        self.margin_label = FCLabel("%s:" % _("Margin"))
+        self.margin_label.setToolTip(_("Bounding box margin."))
         self.margin_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.margin_entry.set_range(-10000.0000, 10000.0000)
         self.margin_entry.set_precision(self.decimals)
@@ -603,16 +564,16 @@ class CornersUI:
 
         # ## Insert Corner Marker
         self.add_marker_button = FCButton(_("Add Marker"))
-        self.add_marker_button.setIcon(QtGui.QIcon(self.app.resource_location + '/corners_32.png'))
-        self.add_marker_button.setToolTip(
-            _("Will add corner markers to the selected Gerber file.")
-        )
-        self.add_marker_button.setStyleSheet("""
+        self.add_marker_button.setIcon(QtGui.QIcon(self.app.resource_location + "/corners_32.png"))
+        self.add_marker_button.setToolTip(_("Will add corner markers to the selected Gerber file."))
+        self.add_marker_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         grid_lay.addWidget(self.add_marker_button, 12, 0, 1, 2)
 
         separator_line_2 = QtWidgets.QFrame()
@@ -621,14 +582,12 @@ class CornersUI:
         grid_lay.addWidget(separator_line_2, 14, 0, 1, 2)
 
         # Drill is corners
-        self.drills_label = FCLabel('<b>%s:</b>' % _('Drills in Corners'))
+        self.drills_label = FCLabel("<b>%s:</b>" % _("Drills in Corners"))
         grid_lay.addWidget(self.drills_label, 16, 0, 1, 2)
 
         # Drill Tooldia #
-        self.drill_dia_label = FCLabel('%s:' % _("Drill Dia"))
-        self.drill_dia_label.setToolTip(
-            '%s.' % _("Drill Diameter")
-        )
+        self.drill_dia_label = FCLabel("%s:" % _("Drill Dia"))
+        self.drill_dia_label.setToolTip("%s." % _("Drill Diameter"))
         self.drill_dia_entry = FCDoubleSpinner(callback=self.confirmation_message)
         self.drill_dia_entry.set_range(0.0000, 100.0000)
         self.drill_dia_entry.set_precision(self.decimals)
@@ -639,32 +598,32 @@ class CornersUI:
 
         # ## Create an Excellon object
         self.drill_button = FCButton(_("Create Excellon Object"))
-        self.drill_button.setIcon(QtGui.QIcon(self.app.resource_location + '/drill32.png'))
-        self.drill_button.setToolTip(
-            _("Will add drill holes in the center of the markers.")
-        )
-        self.drill_button.setStyleSheet("""
+        self.drill_button.setIcon(QtGui.QIcon(self.app.resource_location + "/drill32.png"))
+        self.drill_button.setToolTip(_("Will add drill holes in the center of the markers."))
+        self.drill_button.setStyleSheet(
+            """
                                         QPushButton
                                         {
                                             font-weight: bold;
                                         }
-                                        """)
+                                        """
+        )
         grid_lay.addWidget(self.drill_button, 20, 0, 1, 2)
 
         self.layout.addStretch()
 
         # ## Reset Tool
         self.reset_button = QtWidgets.QPushButton(_("Reset Tool"))
-        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + '/reset32.png'))
-        self.reset_button.setToolTip(
-            _("Will reset the tool parameters.")
-        )
-        self.reset_button.setStyleSheet("""
+        self.reset_button.setIcon(QtGui.QIcon(self.app.resource_location + "/reset32.png"))
+        self.reset_button.setToolTip(_("Will reset the tool parameters."))
+        self.reset_button.setStyleSheet(
+            """
                                 QPushButton
                                 {
                                     font-weight: bold;
                                 }
-                                """)
+                                """
+        )
         self.layout.addWidget(self.reset_button)
 
         # #################################### FINSIHED GUI ###########################
@@ -672,17 +631,24 @@ class CornersUI:
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )

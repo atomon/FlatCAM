@@ -26,10 +26,10 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
 EDIT_SIZE_HINT = 70
@@ -38,7 +38,7 @@ EDIT_SIZE_HINT = 70
 class RadioSet(QtWidgets.QWidget):
     activated_custom = QtCore.pyqtSignal(str)
 
-    def __init__(self, choices, orientation='horizontal', parent=None, stretch=None):
+    def __init__(self, choices, orientation="horizontal", parent=None, stretch=None):
         """
         The choices are specified as a list of dictionaries containing:
 
@@ -52,7 +52,7 @@ class RadioSet(QtWidgets.QWidget):
         """
         super(RadioSet, self).__init__(parent)
         self.choices = copy(choices)
-        if orientation == 'horizontal':
+        if orientation == "horizontal":
             layout = QtWidgets.QHBoxLayout()
         else:
             layout = QtWidgets.QVBoxLayout()
@@ -60,10 +60,10 @@ class RadioSet(QtWidgets.QWidget):
         group = QtWidgets.QButtonGroup(self)
 
         for choice in self.choices:
-            choice['radio'] = QtWidgets.QRadioButton(choice['label'])
-            group.addButton(choice['radio'])
-            layout.addWidget(choice['radio'], stretch=0)
-            choice['radio'].toggled.connect(self.on_toggle)
+            choice["radio"] = QtWidgets.QRadioButton(choice["label"])
+            group.addButton(choice["radio"])
+            layout.addWidget(choice["radio"], stretch=0)
+            choice["radio"].toggled.connect(self.on_toggle)
 
         layout.setContentsMargins(0, 0, 0, 0)
 
@@ -87,22 +87,22 @@ class RadioSet(QtWidgets.QWidget):
 
     def get_value(self):
         for choice in self.choices:
-            if choice['radio'].isChecked():
-                return choice['value']
+            if choice["radio"].isChecked():
+                return choice["value"]
         log.error("No button was toggled in RadioSet.")
         return None
 
     def set_value(self, val):
         for choice in self.choices:
-            if choice['value'] == val:
-                choice['radio'].setChecked(True)
+            if choice["value"] == val:
+                choice["radio"].setChecked(True)
                 return
         log.error("Value given is not part of this RadioSet: %s" % str(val))
 
     def setOptionsDisabled(self, options: list, val: bool) -> None:
         for option in self.choices:
-            if option['label'] in options:
-                option['radio'].setDisabled(val)
+            if option["label"] in options:
+                option["radio"].setDisabled(val)
 
 
 # class RadioGroupChoice(QtWidgets.QWidget):
@@ -161,7 +161,9 @@ class RadioSet(QtWidgets.QWidget):
 class FCTree(QtWidgets.QTreeWidget):
     resize_sig = QtCore.pyqtSignal()
 
-    def __init__(self, parent=None, columns=2, header_hidden=True, extended_sel=False, protected_column=None):
+    def __init__(
+        self, parent=None, columns=2, header_hidden=True, extended_sel=False, protected_column=None
+    ):
         super(FCTree, self).__init__(parent)
 
         self.setColumnCount(columns)
@@ -170,8 +172,11 @@ class FCTree(QtWidgets.QTreeWidget):
         self.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
 
         palette = QtGui.QPalette()
-        palette.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.Highlight,
-                         palette.color(QtGui.QPalette.Active, QtGui.QPalette.Highlight))
+        palette.setColor(
+            QtGui.QPalette.Inactive,
+            QtGui.QPalette.Highlight,
+            palette.color(QtGui.QPalette.Active, QtGui.QPalette.Highlight),
+        )
 
         # make inactive rows text some color as active; may be useful in the future
         # palette.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.HighlightedText,
@@ -221,7 +226,9 @@ class FCTree(QtWidgets.QTreeWidget):
             item.setFont(0, font)
         return item
 
-    def addParentEditable(self, parent, title, color=None, font=None, font_items=None, editable=False):
+    def addParentEditable(
+        self, parent, title, color=None, font=None, font_items=None, editable=False
+    ):
         item = QtWidgets.QTreeWidgetItem(parent)
         item.setChildIndicatorPolicy(QtWidgets.QTreeWidgetItem.DontShowIndicator)
         if editable:
@@ -262,7 +269,7 @@ class FCTree(QtWidgets.QTreeWidget):
                 item.setFont(font_items, font)
 
     def resizeEvent(self, event):
-        """ Resize all sections to content and user interactive """
+        """Resize all sections to content and user interactive"""
 
         super(FCTree, self).resizeEvent(event)
         self.on_resize()
@@ -287,14 +294,14 @@ class FCLineEdit(QtWidgets.QLineEdit):
         self.menu = QtWidgets.QMenu()
 
         # UNDO
-        undo_action = QAction('%s\t%s' % (_("Undo"), _('Ctrl+Z')), self)
+        undo_action = QAction("%s\t%s" % (_("Undo"), _("Ctrl+Z")), self)
         self.menu.addAction(undo_action)
         undo_action.triggered.connect(self.undo)
         if self.isUndoAvailable() is False:
             undo_action.setDisabled(True)
 
         # REDO
-        redo_action = QAction('%s\t%s' % (_("Redo"), _('Ctrl+Y')), self)
+        redo_action = QAction("%s\t%s" % (_("Redo"), _("Ctrl+Y")), self)
         self.menu.addAction(redo_action)
         redo_action.triggered.connect(self.redo)
         if self.isRedoAvailable() is False:
@@ -303,33 +310,33 @@ class FCLineEdit(QtWidgets.QLineEdit):
         self.menu.addSeparator()
 
         # CUT
-        cut_action = QAction('%s\t%s' % (_("Cut"), _('Ctrl+X')), self)
+        cut_action = QAction("%s\t%s" % (_("Cut"), _("Ctrl+X")), self)
         self.menu.addAction(cut_action)
         cut_action.triggered.connect(self.cut_text)
         if not self.hasSelectedText():
             cut_action.setDisabled(True)
 
         # COPY
-        copy_action = QAction('%s\t%s' % (_("Copy"), _('Ctrl+C')), self)
+        copy_action = QAction("%s\t%s" % (_("Copy"), _("Ctrl+C")), self)
         self.menu.addAction(copy_action)
         copy_action.triggered.connect(self.copy_text)
         if not self.hasSelectedText():
             copy_action.setDisabled(True)
 
         # PASTE
-        paste_action = QAction('%s\t%s' % (_("Paste"), _('Ctrl+V')), self)
+        paste_action = QAction("%s\t%s" % (_("Paste"), _("Ctrl+V")), self)
         self.menu.addAction(paste_action)
         paste_action.triggered.connect(self.paste_text)
 
         # DELETE
-        delete_action = QAction('%s\t%s' % (_("Delete"), _('Del')), self)
+        delete_action = QAction("%s\t%s" % (_("Delete"), _("Del")), self)
         self.menu.addAction(delete_action)
         delete_action.triggered.connect(self.del_)
 
         self.menu.addSeparator()
 
         # SELECT ALL
-        sel_all_action = QAction('%s\t%s' % (_("Select All"), _('Ctrl+A')), self)
+        sel_all_action = QAction("%s\t%s" % (_("Select All"), _("Ctrl+A")), self)
         self.menu.addAction(sel_all_action)
         sel_all_action.triggered.connect(self.selectAll)
 
@@ -359,19 +366,14 @@ class FCLineEdit(QtWidgets.QLineEdit):
 
 
 class LengthEntry(FCLineEdit):
-    def __init__(self, output_units='IN', decimals=None, parent=None):
+    def __init__(self, output_units="IN", decimals=None, parent=None):
         super(LengthEntry, self).__init__(parent)
 
         self.output_units = output_units
         self.format_re = re.compile(r"^([^\s]+)(?:\s([a-zA-Z]+))?$")
 
         # Unit conversion table OUTPUT-INPUT
-        self.scales = {
-            'IN': {'IN': 1.0,
-                   'MM': 1 / 25.4},
-            'MM': {'IN': 25.4,
-                   'MM': 1.0}
-        }
+        self.scales = {"IN": {"IN": 1.0, "MM": 1 / 25.4}, "MM": {"IN": 25.4, "MM": 1.0}}
         self.readyToEdit = True
         self.editingFinished.connect(self.on_edit_finished)
         self.decimals = decimals if decimals is not None else 4
@@ -400,7 +402,7 @@ class LengthEntry(FCLineEdit):
             log.warning("Could not interpret entry: %s" % self.get_text())
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
+        raw = str(self.text()).strip(" ")
         # match = self.format_re.search(raw)
 
         try:
@@ -420,7 +422,7 @@ class LengthEntry(FCLineEdit):
 
     def set_value(self, val, decimals=None):
         dec_digits = decimals if decimals is not None else self.decimals
-        self.setText(str('%.*f' % (dec_digits, val)))
+        self.setText(str("%.*f" % (dec_digits, val)))
 
     def sizeHint(self):
         default_hint_size = super(LengthEntry, self).sizeHint()
@@ -458,13 +460,13 @@ class FloatEntry(FCLineEdit):
             log.warning("Could not interpret entry: %s" % self.text())
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
+        raw = str(self.text()).strip(" ")
 
         try:
             evaled = eval(raw)
             return float(evaled)
         except Exception as e:
-            if raw != '':
+            if raw != "":
                 log.error("Could not evaluate val: %s, error: %s" % (str(raw), str(e)))
             return None
 
@@ -504,13 +506,13 @@ class FloatEntry2(FCLineEdit):
             self.readyToEdit = True
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
+        raw = str(self.text()).strip(" ")
 
         try:
             evaled = eval(raw)
             return float(evaled)
         except Exception as e:
-            if raw != '':
+            if raw != "":
                 log.error("Could not evaluate val: %s, error: %s" % (str(raw), str(e)))
             return None
 
@@ -583,9 +585,9 @@ class FCEntry(FCLineEdit):
             self.setStyleSheet("QLineEdit {border: 1px solid %s;}" % border_color)
 
         if alignment:
-            if alignment == 'center':
+            if alignment == "center":
                 align_val = QtCore.Qt.AlignHCenter
-            elif alignment == 'right':
+            elif alignment == "right":
                 align_val = QtCore.Qt.AlignRight
             else:
                 align_val = QtCore.Qt.AlignLeft
@@ -612,9 +614,9 @@ class FCEntry(FCLineEdit):
     def set_value(self, val, decimals=None):
         decimal_digits = decimals if decimals is not None else self.decimals
         if type(val) is float:
-            self.setText('%.*f' % (decimal_digits, val))
+            self.setText("%.*f" % (decimal_digits, val))
         elif val is None:
-            self.setText('')
+            self.setText("")
         else:
             self.setText(str(val))
 
@@ -632,7 +634,7 @@ class FCEntry2(FCEntry):
             fval = float(val)
         except ValueError:
             return
-        self.setText('%.*f' % (decimals, fval))
+        self.setText("%.*f" % (decimals, fval))
 
 
 class FCEntry3(FCEntry):
@@ -644,10 +646,10 @@ class FCEntry3(FCEntry):
             fval = float(val)
         except ValueError:
             return
-        self.setText('%.*f' % (decimals, fval))
+        self.setText("%.*f" % (decimals, fval))
 
     def get_value(self):
-        value = str(self.text()).strip(' ')
+        value = str(self.text()).strip(" ")
 
         try:
             return float(eval(value))
@@ -689,11 +691,11 @@ class EvalEntry(FCLineEdit):
             log.warning("Could not interpret entry: %s" % self.get_text())
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
+        raw = str(self.text()).strip(" ")
         try:
             evaled = eval(raw)
         except Exception as e:
-            if raw != '':
+            if raw != "":
                 log.error("Could not evaluate val: %s, error: %s" % (str(raw), str(e)))
             return None
         return evaled
@@ -728,12 +730,12 @@ class EvalEntry2(FCLineEdit):
             self.readyToEdit = True
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
+        raw = str(self.text()).strip(" ")
 
         try:
             evaled = eval(raw)
         except Exception as e:
-            if raw != '':
+            if raw != "":
                 log.error("Could not evaluate val: %s, error: %s" % (str(raw), str(e)))
             return None
         return evaled
@@ -759,12 +761,12 @@ class NumericalEvalEntry(FCEntry):
         self.setValidator(validator)
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
-        raw = raw.replace(',', '.')
+        raw = str(self.text()).strip(" ")
+        raw = raw.replace(",", ".")
         try:
             evaled = eval(raw)
         except Exception as e:
-            if raw != '':
+            if raw != "":
                 log.error("Could not evaluate val: %s, error: %s" % (str(raw), str(e)))
             return None
         return evaled
@@ -783,11 +785,11 @@ class NumericalEvalTupleEntry(EvalEntry):
         self.setValidator(validator)
 
     def get_value(self):
-        raw = str(self.text()).strip(' ')
+        raw = str(self.text()).strip(" ")
         try:
             evaled = eval(raw)
         except Exception as e:
-            if raw != '':
+            if raw != "":
                 log.error("Could not evaluate val: %s, error: %s" % (str(raw), str(e)))
             return None
         return evaled
@@ -835,7 +837,9 @@ class FCColorEntry(QtWidgets.QFrame):
         current_color = QtGui.QColor(self._extract_color(value))
 
         color_dialog = QtWidgets.QColorDialog()
-        selected_color = color_dialog.getColor(initial=current_color, options=QtWidgets.QColorDialog.ShowAlphaChannel)
+        selected_color = color_dialog.getColor(
+            initial=current_color, options=QtWidgets.QColorDialog.ShowAlphaChannel
+        )
 
         if selected_color.isValid() is False:
             return
@@ -865,7 +869,9 @@ class FCSliderWithSpinner(QtWidgets.QFrame):
         self.spinner.set_step(step)
         self.spinner.setMinimumWidth(70)
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
         self.spinner.setSizePolicy(sizePolicy)
 
         self.layout = QtWidgets.QHBoxLayout()
@@ -910,12 +916,12 @@ class FCSpinner(QtWidgets.QSpinBox):
         self.lineEdit().installEventFilter(self)
 
         if suffix:
-            self.setSuffix(' %s' % str(suffix))
+            self.setSuffix(" %s" % str(suffix))
 
         if alignment:
-            if alignment == 'center':
+            if alignment == "center":
                 align_val = QtCore.Qt.AlignHCenter
-            elif alignment == 'right':
+            elif alignment == "right":
                 align_val = QtCore.Qt.AlignRight
             else:
                 align_val = QtCore.Qt.AlignLeft
@@ -925,7 +931,9 @@ class FCSpinner(QtWidgets.QSpinBox):
         self.menu = None
 
         if policy:
-            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+            sizePolicy = QtWidgets.QSizePolicy(
+                QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred
+            )
             self.setSizePolicy(sizePolicy)
 
     def eventFilter(self, object, event):
@@ -975,14 +983,14 @@ class FCSpinner(QtWidgets.QSpinBox):
         line_edit = self.lineEdit()
 
         # UNDO
-        undo_action = QAction('%s\t%s' % (_("Undo"), _('Ctrl+Z')), self)
+        undo_action = QAction("%s\t%s" % (_("Undo"), _("Ctrl+Z")), self)
         self.menu.addAction(undo_action)
         undo_action.triggered.connect(line_edit.undo)
         if line_edit.isUndoAvailable() is False:
             undo_action.setDisabled(True)
 
         # REDO
-        redo_action = QAction('%s\t%s' % (_("Redo"), _('Ctrl+Y')), self)
+        redo_action = QAction("%s\t%s" % (_("Redo"), _("Ctrl+Y")), self)
         self.menu.addAction(redo_action)
         redo_action.triggered.connect(line_edit.redo)
         if line_edit.isRedoAvailable() is False:
@@ -991,45 +999,45 @@ class FCSpinner(QtWidgets.QSpinBox):
         self.menu.addSeparator()
 
         # CUT
-        cut_action = QAction('%s\t%s' % (_("Cut"), _('Ctrl+X')), self)
+        cut_action = QAction("%s\t%s" % (_("Cut"), _("Ctrl+X")), self)
         self.menu.addAction(cut_action)
         cut_action.triggered.connect(self.cut_text)
         if not line_edit.hasSelectedText():
             cut_action.setDisabled(True)
 
         # COPY
-        copy_action = QAction('%s\t%s' % (_("Copy"), _('Ctrl+C')), self)
+        copy_action = QAction("%s\t%s" % (_("Copy"), _("Ctrl+C")), self)
         self.menu.addAction(copy_action)
         copy_action.triggered.connect(self.copy_text)
         if not line_edit.hasSelectedText():
             copy_action.setDisabled(True)
 
         # PASTE
-        paste_action = QAction('%s\t%s' % (_("Paste"), _('Ctrl+V')), self)
+        paste_action = QAction("%s\t%s" % (_("Paste"), _("Ctrl+V")), self)
         self.menu.addAction(paste_action)
         paste_action.triggered.connect(self.paste_text)
 
         # DELETE
-        delete_action = QAction('%s\t%s' % (_("Delete"), _('Del')), self)
+        delete_action = QAction("%s\t%s" % (_("Delete"), _("Del")), self)
         self.menu.addAction(delete_action)
         delete_action.triggered.connect(line_edit.del_)
 
         self.menu.addSeparator()
 
         # SELECT ALL
-        sel_all_action = QAction('%s\t%s' % (_("Select All"), _('Ctrl+A')), self)
+        sel_all_action = QAction("%s\t%s" % (_("Select All"), _("Ctrl+A")), self)
         self.menu.addAction(sel_all_action)
         sel_all_action.triggered.connect(line_edit.selectAll)
 
         self.menu.addSeparator()
 
         # STEP UP
-        step_up_action = QAction('%s\t%s' % (_("Step Up"), ''), self)
+        step_up_action = QAction("%s\t%s" % (_("Step Up"), ""), self)
         self.menu.addAction(step_up_action)
         step_up_action.triggered.connect(self.stepUp)
 
         # STEP DOWN
-        step_down_action = QAction('%s\t%s' % (_("Step Down"), ''), self)
+        step_down_action = QAction("%s\t%s" % (_("Step Down"), ""), self)
         self.menu.addAction(step_down_action)
         step_down_action.triggered.connect(self.stepDown)
 
@@ -1061,7 +1069,7 @@ class FCSpinner(QtWidgets.QSpinBox):
         line_edit.insert(txt)
 
     def valueFromText(self, text):
-        txt = text.strip('%%')
+        txt = text.strip("%%")
         try:
             ret_val = int(txt)
         except ValueError:
@@ -1115,13 +1123,13 @@ class FCDoubleSlider(QtWidgets.QSlider):
     # create our our signal that we can connect to if necessary
     doubleValueChanged = pyqtSignal(float)
 
-    def __init__(self, decimals=3, orientation='horizontal', *args, **kargs):
-        if orientation == 'horizontal':
+    def __init__(self, decimals=3, orientation="horizontal", *args, **kargs):
+        if orientation == "horizontal":
             super(FCDoubleSlider, self).__init__(QtCore.Qt.Horizontal, *args, **kargs)
         else:
             super(FCDoubleSlider, self).__init__(QtCore.Qt.Vertical, *args, **kargs)
 
-        self._multi = 10 ** decimals
+        self._multi = 10**decimals
 
         self.valueChanged.connect(self.emitDoubleValueChanged)
 
@@ -1151,7 +1159,7 @@ class FCDoubleSlider(QtWidgets.QSlider):
         super(FCDoubleSlider, self).setValue(int(value * self._multi))
 
     def set_precision(self, decimals):
-        self._multi = 10 ** decimals
+        self._multi = 10**decimals
 
     def set_range(self, min, max):
         self.blockSignals(True)
@@ -1161,7 +1169,9 @@ class FCDoubleSlider(QtWidgets.QSlider):
 
 class FCSliderWithDoubleSpinner(QtWidgets.QFrame):
 
-    def __init__(self, min=0, max=10000.0000, step=1, precision=4, orientation='horizontal', **kwargs):
+    def __init__(
+        self, min=0, max=10000.0000, step=1, precision=4, orientation="horizontal", **kwargs
+    ):
         super().__init__(**kwargs)
 
         self.slider = FCDoubleSlider(orientation=orientation)
@@ -1177,7 +1187,9 @@ class FCSliderWithDoubleSpinner(QtWidgets.QFrame):
         self.spinner.set_step(step)
         self.spinner.setMinimumWidth(70)
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
         self.spinner.setSizePolicy(sizePolicy)
 
         self.layout = QtWidgets.QHBoxLayout()
@@ -1227,11 +1239,21 @@ class FCSliderWithDoubleSpinner(QtWidgets.QFrame):
 
 class FCButtonWithDoubleSpinner(QtWidgets.QFrame):
 
-    def __init__(self, min=0, max=100, step=1, decimals=4, button_text='', button_icon=None, callback=None, **kwargs):
+    def __init__(
+        self,
+        min=0,
+        max=100,
+        step=1,
+        decimals=4,
+        button_text="",
+        button_icon=None,
+        callback=None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
         self.button = QtWidgets.QToolButton()
-        if button_text != '':
+        if button_text != "":
             self.button.setText(button_text)
         if button_icon:
             self.button.setIcon(button_icon)
@@ -1242,7 +1264,9 @@ class FCButtonWithDoubleSpinner(QtWidgets.QFrame):
         self.spinner.set_precision(decimals)
         self.spinner.setMinimumWidth(70)
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred
+        )
         self.spinner.setSizePolicy(sizePolicy)
 
         self.layout = QtWidgets.QHBoxLayout()
@@ -1298,15 +1322,18 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         # by default don't allow the minus sign to be entered as the default for QDoubleSpinBox is the positive range
         # between 0.00 and 99.00 (2 decimals)
         self.lineEdit().setValidator(
-            QtGui.QRegExpValidator(QtCore.QRegExp("\+?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self))
+            QtGui.QRegExpValidator(
+                QtCore.QRegExp("\+?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self
+            )
+        )
 
         if suffix:
-            self.setSuffix(' %s' % str(suffix))
+            self.setSuffix(" %s" % str(suffix))
 
         if alignment:
-            if alignment == 'center':
+            if alignment == "center":
                 align_val = QtCore.Qt.AlignHCenter
-            elif alignment == 'right':
+            elif alignment == "right":
                 align_val = QtCore.Qt.AlignRight
             else:
                 align_val = QtCore.Qt.AlignLeft
@@ -1316,7 +1343,9 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         self.menu = None
 
         if policy:
-            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+            sizePolicy = QtWidgets.QSizePolicy(
+                QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred
+            )
             self.setSizePolicy(sizePolicy)
 
     def on_edit_finished(self):
@@ -1361,14 +1390,14 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         line_edit = self.lineEdit()
 
         # UNDO
-        undo_action = QAction('%s\t%s' % (_("Undo"), _('Ctrl+Z')), self)
+        undo_action = QAction("%s\t%s" % (_("Undo"), _("Ctrl+Z")), self)
         self.menu.addAction(undo_action)
         undo_action.triggered.connect(line_edit.undo)
         if line_edit.isUndoAvailable() is False:
             undo_action.setDisabled(True)
 
         # REDO
-        redo_action = QAction('%s\t%s' % (_("Redo"), _('Ctrl+Y')), self)
+        redo_action = QAction("%s\t%s" % (_("Redo"), _("Ctrl+Y")), self)
         self.menu.addAction(redo_action)
         redo_action.triggered.connect(line_edit.redo)
         if line_edit.isRedoAvailable() is False:
@@ -1377,45 +1406,45 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         self.menu.addSeparator()
 
         # CUT
-        cut_action = QAction('%s\t%s' % (_("Cut"), _('Ctrl+X')), self)
+        cut_action = QAction("%s\t%s" % (_("Cut"), _("Ctrl+X")), self)
         self.menu.addAction(cut_action)
         cut_action.triggered.connect(self.cut_text)
         if not line_edit.hasSelectedText():
             cut_action.setDisabled(True)
 
         # COPY
-        copy_action = QAction('%s\t%s' % (_("Copy"), _('Ctrl+C')), self)
+        copy_action = QAction("%s\t%s" % (_("Copy"), _("Ctrl+C")), self)
         self.menu.addAction(copy_action)
         copy_action.triggered.connect(self.copy_text)
         if not line_edit.hasSelectedText():
             copy_action.setDisabled(True)
 
         # PASTE
-        paste_action = QAction('%s\t%s' % (_("Paste"), _('Ctrl+V')), self)
+        paste_action = QAction("%s\t%s" % (_("Paste"), _("Ctrl+V")), self)
         self.menu.addAction(paste_action)
         paste_action.triggered.connect(self.paste_text)
 
         # DELETE
-        delete_action = QAction('%s\t%s' % (_("Delete"), _('Del')), self)
+        delete_action = QAction("%s\t%s" % (_("Delete"), _("Del")), self)
         self.menu.addAction(delete_action)
         delete_action.triggered.connect(line_edit.del_)
 
         self.menu.addSeparator()
 
         # SELECT ALL
-        sel_all_action = QAction('%s\t%s' % (_("Select All"), _('Ctrl+A')), self)
+        sel_all_action = QAction("%s\t%s" % (_("Select All"), _("Ctrl+A")), self)
         self.menu.addAction(sel_all_action)
         sel_all_action.triggered.connect(line_edit.selectAll)
 
         self.menu.addSeparator()
 
         # STEP UP
-        step_up_action = QAction('%s\t%s' % (_("Step Up"), ''), self)
+        step_up_action = QAction("%s\t%s" % (_("Step Up"), ""), self)
         self.menu.addAction(step_up_action)
         step_up_action.triggered.connect(self.stepUp)
 
         # STEP DOWN
-        step_down_action = QAction('%s\t%s' % (_("Step Down"), ''), self)
+        step_down_action = QAction("%s\t%s" % (_("Step Down"), ""), self)
         self.menu.addAction(step_down_action)
         step_down_action.triggered.connect(self.stepDown)
 
@@ -1447,8 +1476,8 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         line_edit.insert(txt)
 
     def valueFromText(self, p_str):
-        text = p_str.replace(',', '.')
-        text = text.strip('%%')
+        text = p_str.replace(",", ".")
+        text = text.strip("%%")
         try:
             ret_val = float(text)
         except ValueError:
@@ -1456,7 +1485,7 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         return ret_val
 
     def validate(self, p_str, p_int):
-        text = p_str.replace(',', '.')
+        text = p_str.replace(",", ".")
 
         min_val = self.minimum()
         max_val = self.maximum()
@@ -1487,15 +1516,24 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
         # make sure that the user can't type more decimals than the set precision
         if self.minimum() < 0 or self.maximum() <= 0:
             self.lineEdit().setValidator(
-                QtGui.QRegExpValidator(QtCore.QRegExp("-?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self))
+                QtGui.QRegExpValidator(
+                    QtCore.QRegExp("-?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self
+                )
+            )
         else:
             self.lineEdit().setValidator(
-                QtGui.QRegExpValidator(QtCore.QRegExp("\+?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self))
+                QtGui.QRegExpValidator(
+                    QtCore.QRegExp("\+?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self
+                )
+            )
 
     def set_range(self, min_val, max_val):
         if min_val < 0 or max_val <= 0:
             self.lineEdit().setValidator(
-                QtGui.QRegExpValidator(QtCore.QRegExp("-?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self))
+                QtGui.QRegExpValidator(
+                    QtCore.QRegExp("-?[0-9]*[.,]?[0-9]{%d}" % self.decimals()), self
+                )
+            )
 
         self.setRange(min_val, max_val)
 
@@ -1510,7 +1548,7 @@ class FCDoubleSpinner(QtWidgets.QDoubleSpinBox):
 
 
 class FCCheckBox(QtWidgets.QCheckBox):
-    def __init__(self, label='', parent=None):
+    def __init__(self, label="", parent=None):
         super(FCCheckBox, self).__init__(str(label), parent)
 
     def get_value(self):
@@ -1566,14 +1604,14 @@ class FCTextEdit(QtWidgets.QTextEdit):
         txt = tcursor.selectedText()
 
         # UNDO
-        undo_action = QAction('%s\t%s' % (_("Undo"), _('Ctrl+Z')), self)
+        undo_action = QAction("%s\t%s" % (_("Undo"), _("Ctrl+Z")), self)
         self.menu.addAction(undo_action)
         undo_action.triggered.connect(self.undo)
         if self.undo_flag is False:
             undo_action.setDisabled(True)
 
         # REDO
-        redo_action = QAction('%s\t%s' % (_("Redo"), _('Ctrl+Y')), self)
+        redo_action = QAction("%s\t%s" % (_("Redo"), _("Ctrl+Y")), self)
         self.menu.addAction(redo_action)
         redo_action.triggered.connect(self.redo)
         if self.redo_flag is False:
@@ -1582,33 +1620,33 @@ class FCTextEdit(QtWidgets.QTextEdit):
         self.menu.addSeparator()
 
         # CUT
-        cut_action = QAction('%s\t%s' % (_("Cut"), _('Ctrl+X')), self)
+        cut_action = QAction("%s\t%s" % (_("Cut"), _("Ctrl+X")), self)
         self.menu.addAction(cut_action)
         cut_action.triggered.connect(self.cut_text)
-        if txt == '':
+        if txt == "":
             cut_action.setDisabled(True)
 
         # COPY
-        copy_action = QAction('%s\t%s' % (_("Copy"), _('Ctrl+C')), self)
+        copy_action = QAction("%s\t%s" % (_("Copy"), _("Ctrl+C")), self)
         self.menu.addAction(copy_action)
         copy_action.triggered.connect(self.copy_text)
-        if txt == '':
+        if txt == "":
             copy_action.setDisabled(True)
 
         # PASTE
-        paste_action = QAction('%s\t%s' % (_("Paste"), _('Ctrl+V')), self)
+        paste_action = QAction("%s\t%s" % (_("Paste"), _("Ctrl+V")), self)
         self.menu.addAction(paste_action)
         paste_action.triggered.connect(self.paste_text)
 
         # DELETE
-        delete_action = QAction('%s\t%s' % (_("Delete"), _('Del')), self)
+        delete_action = QAction("%s\t%s" % (_("Delete"), _("Del")), self)
         self.menu.addAction(delete_action)
         delete_action.triggered.connect(self.delete_text)
 
         self.menu.addSeparator()
 
         # SELECT ALL
-        sel_all_action = QAction('%s\t%s' % (_("Select All"), _('Ctrl+A')), self)
+        sel_all_action = QAction("%s\t%s" % (_("Select All"), _("Ctrl+A")), self)
         self.menu.addAction(sel_all_action)
         sel_all_action.triggered.connect(self.selectAll)
 
@@ -1682,11 +1720,11 @@ class FCTextAreaExtended(FCTextEdit):
 
     def insertCompletion(self, completion):
         tc = self.textCursor()
-        extra = (len(completion) - len(self.completer.completionPrefix()))
+        extra = len(completion) - len(self.completer.completionPrefix())
 
         # don't insert if the word is finished but add a space instead
         if extra == 0:
-            tc.insertText(' ')
+            tc.insertText(" ")
             self.completer.popup().hide()
             return
 
@@ -1694,7 +1732,7 @@ class FCTextAreaExtended(FCTextEdit):
         tc.movePosition(QTextCursor.EndOfWord)
         tc.insertText(completion[-extra:])
         # add a space after inserting the word
-        tc.insertText(' ')
+        tc.insertText(" ")
         self.setTextCursor(tc)
         self.completer.popup().hide()
 
@@ -1719,7 +1757,7 @@ class FCTextAreaExtended(FCTextEdit):
         modifier = QtWidgets.QApplication.keyboardModifiers()
         if modifier == Qt.ShiftModifier:
             text = data.text()
-            text = text.replace('\\', '/')
+            text = text.replace("\\", "/")
             self.insertPlainText(text)
         else:
             self.insertPlainText(data.text())
@@ -1737,51 +1775,53 @@ class FCTextAreaExtended(FCTextEdit):
             if key == QtCore.Qt.Key_V:
                 clipboard = QtWidgets.QApplication.clipboard()
                 clip_text = clipboard.text()
-                clip_text = clip_text.replace('\\', '/')
+                clip_text = clip_text.replace("\\", "/")
                 self.insertPlainText(clip_text)
         elif modifier & Qt.ControlModifier:
             if key == Qt.Key_Slash:
                 self.comment()
 
         tc = self.textCursor()
-        if (key == Qt.Key_Tab or key == Qt.Key_Enter or key == Qt.Key_Return) and self.completer.popup().isVisible():
+        if (
+            key == Qt.Key_Tab or key == Qt.Key_Enter or key == Qt.Key_Return
+        ) and self.completer.popup().isVisible():
             self.completer.insertText.emit(self.completer.getSelected())
             self.completer.setCompletionMode(QCompleter.PopupCompletion)
             return
         elif key == Qt.Key_BraceLeft:
-            tc.insertText('{}')
+            tc.insertText("{}")
             self.moveCursor(QtGui.QTextCursor.Left)
         elif key == Qt.Key_BracketLeft:
-            tc.insertText('[]')
+            tc.insertText("[]")
             self.moveCursor(QtGui.QTextCursor.Left)
         elif key == Qt.Key_ParenLeft:
-            tc.insertText('()')
+            tc.insertText("()")
             self.moveCursor(QtGui.QTextCursor.Left)
 
         elif key == Qt.Key_BraceRight:
             tc.select(QtGui.QTextCursor.WordUnderCursor)
-            if tc.selectedText() == '}':
+            if tc.selectedText() == "}":
                 tc.movePosition(QTextCursor.Right)
                 self.setTextCursor(tc)
             else:
                 tc.clearSelection()
-                self.textCursor().insertText('}')
+                self.textCursor().insertText("}")
         elif key == Qt.Key_BracketRight:
             tc.select(QtGui.QTextCursor.WordUnderCursor)
-            if tc.selectedText() == ']':
+            if tc.selectedText() == "]":
                 tc.movePosition(QTextCursor.Right)
                 self.setTextCursor(tc)
             else:
                 tc.clearSelection()
-                self.textCursor().insertText(']')
+                self.textCursor().insertText("]")
         elif key == Qt.Key_ParenRight:
             tc.select(QtGui.QTextCursor.WordUnderCursor)
-            if tc.selectedText() == ')':
+            if tc.selectedText() == ")":
                 tc.movePosition(QTextCursor.Right)
                 self.setTextCursor(tc)
             else:
                 tc.clearSelection()
-                self.textCursor().insertText(')')
+                self.textCursor().insertText(")")
         else:
             super(FCTextAreaExtended, self).keyPressEvent(event)
 
@@ -1794,8 +1834,10 @@ class FCTextAreaExtended(FCTextEdit):
                 popup = self.completer.popup()
                 popup.setCurrentIndex(self.completer.completionModel().index(0, 0))
 
-                cr.setWidth(self.completer.popup().sizeHintForColumn(0)
-                            + self.completer.popup().verticalScrollBar().sizeHint().width())
+                cr.setWidth(
+                    self.completer.popup().sizeHintForColumn(0)
+                    + self.completer.popup().verticalScrollBar().sizeHint().width()
+                )
                 self.completer.complete(cr)
             else:
                 self.completer.popup().hide()
@@ -1817,7 +1859,7 @@ class FCTextAreaExtended(FCTextEdit):
         if character == "#":
             # delete #
             self.textCursor().deletePreviousChar()
-            # delete white space 
+            # delete white space
             self.moveCursor(QtGui.QTextCursor.NextWord, QtGui.QTextCursor.KeepAnchor)
             self.textCursor().removeSelectedText()
         else:
@@ -1872,11 +1914,11 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
 
     def insertCompletion(self, completion):
         tc = self.textCursor()
-        extra = (len(completion) - len(self.completer.completionPrefix()))
+        extra = len(completion) - len(self.completer.completionPrefix())
 
         # don't insert if the word is finished but add a space instead
         if extra == 0:
-            tc.insertText(' ')
+            tc.insertText(" ")
             self.completer.popup().hide()
             return
 
@@ -1884,7 +1926,7 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
         tc.movePosition(QTextCursor.EndOfWord)
         tc.insertText(completion[-extra:])
         # add a space after inserting the word
-        tc.insertText(' ')
+        tc.insertText(" ")
         self.setTextCursor(tc)
         self.completer.popup().hide()
 
@@ -1899,14 +1941,14 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
         txt = tcursor.selectedText()
 
         # UNDO
-        undo_action = QAction('%s\t%s' % (_("Undo"), _('Ctrl+Z')), self)
+        undo_action = QAction("%s\t%s" % (_("Undo"), _("Ctrl+Z")), self)
         self.menu.addAction(undo_action)
         undo_action.triggered.connect(self.undo)
         if self.undo_flag is False:
             undo_action.setDisabled(True)
 
         # REDO
-        redo_action = QAction('%s\t%s' % (_("Redo"), _('Ctrl+Y')), self)
+        redo_action = QAction("%s\t%s" % (_("Redo"), _("Ctrl+Y")), self)
         self.menu.addAction(redo_action)
         redo_action.triggered.connect(self.redo)
         if self.redo_flag is False:
@@ -1915,33 +1957,33 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
         self.menu.addSeparator()
 
         # CUT
-        cut_action = QAction('%s\t%s' % (_("Cut"), _('Ctrl+X')), self)
+        cut_action = QAction("%s\t%s" % (_("Cut"), _("Ctrl+X")), self)
         self.menu.addAction(cut_action)
         cut_action.triggered.connect(self.cut_text)
-        if txt == '':
+        if txt == "":
             cut_action.setDisabled(True)
 
         # COPY
-        copy_action = QAction('%s\t%s' % (_("Copy"), _('Ctrl+C')), self)
+        copy_action = QAction("%s\t%s" % (_("Copy"), _("Ctrl+C")), self)
         self.menu.addAction(copy_action)
         copy_action.triggered.connect(self.copy_text)
-        if txt == '':
+        if txt == "":
             copy_action.setDisabled(True)
 
         # PASTE
-        paste_action = QAction('%s\t%s' % (_("Paste"), _('Ctrl+V')), self)
+        paste_action = QAction("%s\t%s" % (_("Paste"), _("Ctrl+V")), self)
         self.menu.addAction(paste_action)
         paste_action.triggered.connect(self.paste_text)
 
         # DELETE
-        delete_action = QAction('%s\t%s' % (_("Delete"), _('Del')), self)
+        delete_action = QAction("%s\t%s" % (_("Delete"), _("Del")), self)
         self.menu.addAction(delete_action)
         delete_action.triggered.connect(self.delete_text)
 
         self.menu.addSeparator()
 
         # SELECT ALL
-        sel_all_action = QAction('%s\t%s' % (_("Select All"), _('Ctrl+A')), self)
+        sel_all_action = QAction("%s\t%s" % (_("Select All"), _("Ctrl+A")), self)
         self.menu.addAction(sel_all_action)
         sel_all_action.triggered.connect(self.selectAll)
 
@@ -1992,7 +2034,7 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
         modifier = QtWidgets.QApplication.keyboardModifiers()
         if modifier == Qt.ShiftModifier:
             text = data.text()
-            text = text.replace('\\', '/')
+            text = text.replace("\\", "/")
             self.insertPlainText(text)
         else:
             self.insertPlainText(data.text())
@@ -2010,51 +2052,53 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
             if key == QtCore.Qt.Key_V:
                 clipboard = QtWidgets.QApplication.clipboard()
                 clip_text = clipboard.text()
-                clip_text = clip_text.replace('\\', '/')
+                clip_text = clip_text.replace("\\", "/")
                 self.insertPlainText(clip_text)
 
         if modifier & Qt.ControlModifier and key == Qt.Key_Slash:
             self.comment()
 
         tc = self.textCursor()
-        if (key == Qt.Key_Tab or key == Qt.Key_Enter or key == Qt.Key_Return) and self.completer.popup().isVisible():
+        if (
+            key == Qt.Key_Tab or key == Qt.Key_Enter or key == Qt.Key_Return
+        ) and self.completer.popup().isVisible():
             self.completer.insertText.emit(self.completer.getSelected())
             self.completer.setCompletionMode(QCompleter.PopupCompletion)
             return
         elif key == Qt.Key_BraceLeft:
-            tc.insertText('{}')
+            tc.insertText("{}")
             self.moveCursor(QtGui.QTextCursor.Left)
         elif key == Qt.Key_BracketLeft:
-            tc.insertText('[]')
+            tc.insertText("[]")
             self.moveCursor(QtGui.QTextCursor.Left)
         elif key == Qt.Key_ParenLeft:
-            tc.insertText('()')
+            tc.insertText("()")
             self.moveCursor(QtGui.QTextCursor.Left)
 
         elif key == Qt.Key_BraceRight:
             tc.select(QtGui.QTextCursor.WordUnderCursor)
-            if tc.selectedText() == '}':
+            if tc.selectedText() == "}":
                 tc.movePosition(QTextCursor.Right)
                 self.setTextCursor(tc)
             else:
                 tc.clearSelection()
-                self.textCursor().insertText('}')
+                self.textCursor().insertText("}")
         elif key == Qt.Key_BracketRight:
             tc.select(QtGui.QTextCursor.WordUnderCursor)
-            if tc.selectedText() == ']':
+            if tc.selectedText() == "]":
                 tc.movePosition(QTextCursor.Right)
                 self.setTextCursor(tc)
             else:
                 tc.clearSelection()
-                self.textCursor().insertText(']')
+                self.textCursor().insertText("]")
         elif key == Qt.Key_ParenRight:
             tc.select(QtGui.QTextCursor.WordUnderCursor)
-            if tc.selectedText() == ')':
+            if tc.selectedText() == ")":
                 tc.movePosition(QTextCursor.Right)
                 self.setTextCursor(tc)
             else:
                 tc.clearSelection()
-                self.textCursor().insertText(')')
+                self.textCursor().insertText(")")
         else:
             super(FCPlainTextAreaExtended, self).keyPressEvent(event)
 
@@ -2067,8 +2111,10 @@ class FCPlainTextAreaExtended(QtWidgets.QPlainTextEdit):
                 popup = self.completer.popup()
                 popup.setCurrentIndex(self.completer.completionModel().index(0, 0))
 
-                cr.setWidth(self.completer.popup().sizeHintForColumn(0)
-                            + self.completer.popup().verticalScrollBar().sizeHint().width())
+                cr.setWidth(
+                    self.completer.popup().sizeHintForColumn(0)
+                    + self.completer.popup().verticalScrollBar().sizeHint().width()
+                )
                 self.completer.complete(cr)
             else:
                 self.completer.popup().hide()
@@ -2114,7 +2160,9 @@ class FCComboBox(QtWidgets.QComboBox):
         self._obj_type = None
 
         if policy is True:
-            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+            sizePolicy = QtWidgets.QSizePolicy(
+                QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred
+            )
             self.setSizePolicy(sizePolicy)
 
         # the callback() will be called on customcontextmenu event and will be be passed 2 parameters:
@@ -2178,24 +2226,34 @@ class FCComboBox2(FCComboBox):
 
 
 class FCInputDialog(QtWidgets.QInputDialog):
-    def __init__(self, parent=None, ok=False, val=None, title=None, text=None, min=None, max=None, decimals=None,
-                 init_val=None):
+    def __init__(
+        self,
+        parent=None,
+        ok=False,
+        val=None,
+        title=None,
+        text=None,
+        min=None,
+        max=None,
+        decimals=None,
+        init_val=None,
+    ):
         super(FCInputDialog, self).__init__(parent)
 
         self.allow_empty = ok
         self.empty_val = val
 
         self.val = 0.0
-        self.ok = ''
+        self.ok = ""
 
         self.init_value = init_val if init_val else 0.0
 
         if title is None:
-            self.title = 'title'
+            self.title = "title"
         else:
             self.title = title
         if text is None:
-            self.text = 'text'
+            self.text = "text"
         else:
             self.text = text
         if min is None:
@@ -2212,8 +2270,15 @@ class FCInputDialog(QtWidgets.QInputDialog):
             self.decimals = decimals
 
     def get_value(self):
-        self.val, self.ok = self.getDouble(self, self.title, self.text, min=self.min,
-                                           max=self.max, decimals=self.decimals, value=self.init_value)
+        self.val, self.ok = self.getDouble(
+            self,
+            self.title,
+            self.text,
+            min=self.min,
+            max=self.max,
+            decimals=self.decimals,
+            value=self.init_value,
+        )
         return [self.val, self.ok]
 
     # "Transform", "Enter the Angle value:"
@@ -2222,16 +2287,25 @@ class FCInputDialog(QtWidgets.QInputDialog):
 
 
 class FCInputDoubleSpinner(QtWidgets.QDialog):
-    def __init__(self, parent=None, title=None, text=None,
-                 min=0.0, max=100.0000, step=1, decimals=4, init_val=None):
+    def __init__(
+        self,
+        parent=None,
+        title=None,
+        text=None,
+        min=0.0,
+        max=100.0000,
+        step=1,
+        decimals=4,
+        init_val=None,
+    ):
         super(FCInputDoubleSpinner, self).__init__(parent)
 
         self.val = 0.0
 
         self.init_value = init_val if init_val else 0.0
 
-        self.setWindowTitle(title) if title else self.setWindowTitle('title')
-        self.text = text if text else 'text'
+        self.setWindowTitle(title) if title else self.setWindowTitle("title")
+        self.text = text if text else "text"
 
         self.min = min
         self.max = max
@@ -2241,11 +2315,11 @@ class FCInputDoubleSpinner(QtWidgets.QDialog):
         self.lbl = FCLabel(self.text)
 
         if title is None:
-            self.title = 'title'
+            self.title = "title"
         else:
             self.title = title
         if text is None:
-            self.text = 'text'
+            self.text = "text"
         else:
             self.text = text
 
@@ -2303,16 +2377,26 @@ class FCInputDoubleSpinner(QtWidgets.QDialog):
 
 
 class FCInputSpinner(QtWidgets.QDialog):
-    def __init__(self, parent=None, title=None, text=None, min=None, max=None, decimals=4, step=1, init_val=None):
+    def __init__(
+        self,
+        parent=None,
+        title=None,
+        text=None,
+        min=None,
+        max=None,
+        decimals=4,
+        step=1,
+        init_val=None,
+    ):
         super().__init__(parent)
 
         self.val = 0.0
-        self.ok = ''
+        self.ok = ""
 
         self.init_value = init_val if init_val else 0.0
 
-        self.setWindowTitle(title) if title else self.setWindowTitle('title')
-        self.text = text if text else 'text'
+        self.setWindowTitle(title) if title else self.setWindowTitle("title")
+        self.text = text if text else "text"
 
         self.min = min if min else 0
         self.max = max if max else 255
@@ -2326,7 +2410,9 @@ class FCInputSpinner(QtWidgets.QDialog):
         self.wdg.set_step(self.step)
         self.wdg.set_precision(decimals)
 
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+        )
         self.wdg.setSizePolicy(sizePolicy)
 
         QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
@@ -2371,15 +2457,17 @@ class FCInputSpinner(QtWidgets.QDialog):
 
 class FCInputDialogSlider(QtWidgets.QDialog):
 
-    def __init__(self, parent=None, title=None, text=None, min=None, max=None, step=1, init_val=None):
+    def __init__(
+        self, parent=None, title=None, text=None, min=None, max=None, step=1, init_val=None
+    ):
         super().__init__(parent)
 
         self.val = 0.0
 
         self.init_value = init_val if init_val else 0.0
 
-        self.setWindowTitle(title) if title else self.setWindowTitle('title')
-        self.text = text if text else 'text'
+        self.setWindowTitle(title) if title else self.setWindowTitle("title")
+        self.text = text if text else "text"
 
         self.min = min if min else 0
         self.max = max if max else 255
@@ -2432,16 +2520,28 @@ class FCInputDialogSlider(QtWidgets.QDialog):
 
 class FCInputDialogSpinnerButton(QtWidgets.QDialog):
 
-    def __init__(self, parent=None, title=None, text=None, min=None, max=None, step=1, decimals=4, init_val=None,
-                 button_text='', button_icon=None, callback=None):
+    def __init__(
+        self,
+        parent=None,
+        title=None,
+        text=None,
+        min=None,
+        max=None,
+        step=1,
+        decimals=4,
+        init_val=None,
+        button_text="",
+        button_icon=None,
+        callback=None,
+    ):
         super().__init__(parent)
 
         self.val = 0.0
 
         self.init_value = init_val if init_val else 0.0
 
-        self.setWindowTitle(title) if title else self.setWindowTitle('title')
-        self.text = text if text else 'text'
+        self.setWindowTitle(title) if title else self.setWindowTitle("title")
+        self.text = text if text else "text"
 
         self.min = min if min else 0
         self.max = max if max else 255
@@ -2450,8 +2550,15 @@ class FCInputDialogSpinnerButton(QtWidgets.QDialog):
 
         self.lbl = FCLabel(self.text)
 
-        self.wdg = FCButtonWithDoubleSpinner(min=self.min, max=self.max, step=self.step, decimals=decimals,
-                                             button_text=button_text, button_icon=button_icon, callback=callback)
+        self.wdg = FCButtonWithDoubleSpinner(
+            min=self.min,
+            max=self.max,
+            step=self.step,
+            decimals=decimals,
+            button_text=button_text,
+            button_icon=button_icon,
+            callback=callback,
+        )
         self.wdg.set_value(self.init_value)
 
         QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
@@ -2590,6 +2697,7 @@ class FCDetachableTab(QtWidgets.QTabWidget):
     From here:
     https://stackoverflow.com/questions/47267195/in-pyqt4-is-it-possible-to-detach-tabs-from-a-qtabwidget
     """
+
     tab_detached = QtCore.pyqtSignal(str)
     tab_attached = QtCore.pyqtSignal(str)
 
@@ -2659,8 +2767,9 @@ class FCDetachableTab(QtWidgets.QTabWidget):
         action.setCheckable(True)
         action.setText(action_name)
         if icon:
-            assert isinstance(icon, QtGui.QIcon), \
-                "Expected the argument to be QtGui.QIcon. Instead it is %s" % type(icon)
+            assert isinstance(
+                icon, QtGui.QIcon
+            ), "Expected the argument to be QtGui.QIcon. Instead it is %s" % type(icon)
             action.setIcon(icon)
         action.setChecked(initial_checked)
         self.addAction(action)
@@ -2788,7 +2897,7 @@ class FCDetachableTab(QtWidgets.QTabWidget):
         contentWidget.setParent(self)
 
         # make sure that we strip the 'FlatCAM' part of the detached name otherwise the tab name will be too long
-        name = name.partition(' ')[2]
+        name = name.partition(" ")[2]
 
         # helps in restoring the tab to the same index that it was before was detached
         insert_index = self.old_index if self.use_old_index is True else insertAt
@@ -2842,11 +2951,15 @@ class FCDetachableTab(QtWidgets.QTabWidget):
 
             # Make this tab the current tab
             if index > -1:
-                self.setCurrentIndex(insert_index) if self.use_old_index else self.setCurrentIndex(index)
+                (
+                    self.setCurrentIndex(insert_index)
+                    if self.use_old_index
+                    else self.setCurrentIndex(index)
+                )
 
         # Remove the reference
         # Unix-like OS's crash with segmentation fault after this. FOr whatever reason, they loose reference
-        if sys.platform == 'win32':
+        if sys.platform == "win32":
             try:
                 del self.detachedTabs[old_name]
             except KeyError:
@@ -2881,14 +2994,14 @@ class FCDetachableTab(QtWidgets.QTabWidget):
     @QtCore.pyqtSlot(str, int, QtCore.QPoint)
     def detachedTabDrop(self, name, index, dropPos):
         """
-        Handle dropping of a detached tab inside the DetachableTabWidget
+            Handle dropping of a detached tab inside the DetachableTabWidget
 
-        :param name:        the name of the detached tab
-        :param index:       the index of an existing tab (if the tab bar
-    #                       determined that the drop occurred on an
-    #                       existing tab)
-        :param dropPos:     the mouse cursor position when the drop occurred
-        :return:
+            :param name:        the name of the detached tab
+            :param index:       the index of an existing tab (if the tab bar
+        #                       determined that the drop occurred on an
+        #                       existing tab)
+            :param dropPos:     the mouse cursor position when the drop occurred
+            :return:
         """
 
         # If the drop occurred on an existing tab, insert the detached
@@ -3082,7 +3195,9 @@ class FCDetachableTab(QtWidgets.QTabWidget):
             :param event:   a mouse press event
             :return:
             """
-            if event.button() == QtCore.Qt.RightButton and self.prev_index == self.tabAt(event.pos()):
+            if event.button() == QtCore.Qt.RightButton and self.prev_index == self.tabAt(
+                event.pos()
+            ):
                 self.right_click.emit(self.prev_index)
 
             if event.button() == QtCore.Qt.MiddleButton:
@@ -3102,16 +3217,26 @@ class FCDetachableTab(QtWidgets.QTabWidget):
             :return:
             """
             # Determine if the current movement is detected as a drag
-            if not self.dragStartPos.isNull() and \
-                    ((event.pos() - self.dragStartPos).manhattanLength() < QtWidgets.QApplication.startDragDistance()):
+            if not self.dragStartPos.isNull() and (
+                (event.pos() - self.dragStartPos).manhattanLength()
+                < QtWidgets.QApplication.startDragDistance()
+            ):
                 self.dragInitiated = True
 
             # If the current movement is a drag initiated by the left button
-            if (event.buttons() & QtCore.Qt.LeftButton) and self.dragInitiated and self.can_be_dragged:
+            if (
+                (event.buttons() & QtCore.Qt.LeftButton)
+                and self.dragInitiated
+                and self.can_be_dragged
+            ):
 
                 # Stop the move event
                 finishMoveEvent = QtGui.QMouseEvent(
-                    QtCore.QEvent.MouseMove, event.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton, QtCore.Qt.NoModifier
+                    QtCore.QEvent.MouseMove,
+                    event.pos(),
+                    QtCore.Qt.NoButton,
+                    QtCore.Qt.NoButton,
+                    QtCore.Qt.NoModifier,
                 )
                 QtWidgets.QTabBar.mouseMoveEvent(self, finishMoveEvent)
 
@@ -3148,13 +3273,17 @@ class FCDetachableTab(QtWidgets.QTabWidget):
                 # the content to the current cursor position
                 if dropAction == QtCore.Qt.IgnoreAction:
                     event.accept()
-                    self.onDetachTabSignal.emit(self.tabAt(self.dragStartPos), self.mouseCursor.pos())
+                    self.onDetachTabSignal.emit(
+                        self.tabAt(self.dragStartPos), self.mouseCursor.pos()
+                    )
 
                 # Else if the drag completed inside the tab bar, move the selected tab to the new position
                 elif dropAction == QtCore.Qt.MoveAction:
                     if not self.dragDropedPos.isNull():
                         event.accept()
-                        self.onMoveTabSignal.emit(self.tabAt(self.dragStartPos), self.tabAt(self.dragDropedPos))
+                        self.onMoveTabSignal.emit(
+                            self.tabAt(self.dragStartPos), self.tabAt(self.dragDropedPos)
+                        )
             else:
                 QtWidgets.QTabBar.mouseMoveEvent(self, event)
 
@@ -3203,7 +3332,9 @@ class FCDetachableTab2(FCDetachableTab):
     tab_closed_signal = QtCore.pyqtSignal(object, int)
 
     def __init__(self, protect=None, protect_by_name=None, parent=None):
-        super(FCDetachableTab2, self).__init__(protect=protect, protect_by_name=protect_by_name, parent=parent)
+        super(FCDetachableTab2, self).__init__(
+            protect=protect, protect_by_name=protect_by_name, parent=parent
+        )
 
         try:
             self.tabBar.onCloseTabSignal.disconnect()
@@ -3264,8 +3395,9 @@ class VerticalScrollArea(QtWidgets.QScrollArea):
             # log.debug(" minimumSizeHint().width() = %d" % self.widget().minimumSizeHint().width())
             # log.debug(" verticalScrollBar().width() = %d" % self.verticalScrollBar().width())
 
-            self.setMinimumWidth(self.widget().sizeHint().width() +
-                                 self.verticalScrollBar().sizeHint().width())
+            self.setMinimumWidth(
+                self.widget().sizeHint().width() + self.verticalScrollBar().sizeHint().width()
+            )
 
             # if self.verticalScrollBar().isVisible():
             #     log.debug(" Scroll bar visible")
@@ -3290,8 +3422,7 @@ class OptionalInputSection:
         for logic=False, when the checkbox is checked the widgets are Disabled
         :return:
         """
-        assert isinstance(cb, FCCheckBox), \
-            "Expected an FCCheckBox, got %s" % type(cb)
+        assert isinstance(cb, FCCheckBox), "Expected an FCCheckBox, got %s" % type(cb)
 
         self.cb = cb
         self.optinputs = optinputs
@@ -3332,8 +3463,7 @@ class OptionalHideInputSection:
         :type logic:        bool
         :return:
         """
-        assert isinstance(cb, FCCheckBox), \
-            "Expected an FCCheckBox, got %s" % type(cb)
+        assert isinstance(cb, FCCheckBox), "Expected an FCCheckBox, got %s" % type(cb)
 
         self.cb = cb
         self.optinputs = optinputs
@@ -3366,12 +3496,18 @@ class FCTable(QtWidgets.QTableWidget):
         super(FCTable, self).__init__(parent)
 
         palette = QtGui.QPalette()
-        palette.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.Highlight,
-                         palette.color(QtGui.QPalette.Active, QtGui.QPalette.Highlight))
+        palette.setColor(
+            QtGui.QPalette.Inactive,
+            QtGui.QPalette.Highlight,
+            palette.color(QtGui.QPalette.Active, QtGui.QPalette.Highlight),
+        )
 
         # make inactive rows text some color as active; may be useful in the future
-        palette.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.HighlightedText,
-                         palette.color(QtGui.QPalette.Active, QtGui.QPalette.HighlightedText))
+        palette.setColor(
+            QtGui.QPalette.Inactive,
+            QtGui.QPalette.HighlightedText,
+            palette.color(QtGui.QPalette.Active, QtGui.QPalette.HighlightedText),
+        )
         self.setPalette(palette)
 
         if drag_drop:
@@ -3439,8 +3575,9 @@ class FCTable(QtWidgets.QTableWidget):
         action = QtWidgets.QAction(self)
         action.setText(action_name)
         if icon:
-            assert isinstance(icon, QtGui.QIcon), \
-                "Expected the argument to be QtGui.QIcon. Instead it is %s" % type(icon)
+            assert isinstance(
+                icon, QtGui.QIcon
+            ), "Expected the argument to be QtGui.QIcon. Instead it is %s" % type(icon)
             action.setIcon(icon)
         self.addAction(action)
         action.triggered.connect(call_function)
@@ -3663,8 +3800,11 @@ class FCTable(QtWidgets.QTableWidget):
         elif rect.bottom() - pos.y() < margin:
             return True
         # noinspection PyTypeChecker
-        return rect.contains(pos, True) and not (int(self.model().flags(index)) & Qt.ItemIsDropEnabled) and \
-               pos.y() >= rect.center().y()
+        return (
+            rect.contains(pos, True)
+            and not (int(self.model().flags(index)) & Qt.ItemIsDropEnabled)
+            and pos.y() >= rect.center().y()
+        )
 
 
 class SpinBoxDelegate(QtWidgets.QItemDelegate):
@@ -3679,7 +3819,7 @@ class SpinBoxDelegate(QtWidgets.QItemDelegate):
         editor.setMinimum(-999.9999)
         editor.setMaximum(999.9999)
 
-        if self.units == 'MM':
+        if self.units == "MM":
             editor.setDecimals(2)
         else:
             editor.setDecimals(3)
@@ -3729,8 +3869,9 @@ class Dialog_box(QtWidgets.QWidget):
         self.dialog_box.setMinimumWidth(290)
         self.setWindowIcon(icon)
 
-        self.location, self.ok = self.dialog_box.getText(self, title, label,
-                                                         text=str(self.location).replace('(', '').replace(')', ''))
+        self.location, self.ok = self.dialog_box.getText(
+            self, title, label, text=str(self.location).replace("(", "").replace(")", "")
+        )
         self.readyToEdit = True
 
     def mousePressEvent(self, e, parent=None):
@@ -3748,7 +3889,9 @@ class Dialog_box(QtWidgets.QWidget):
 
 
 class DialogBoxRadio(QtWidgets.QDialog):
-    def __init__(self, title=None, label=None, icon=None, initial_text=None, reference='abs', parent=None):
+    def __init__(
+        self, title=None, label=None, icon=None, initial_text=None, reference="abs", parent=None
+    ):
         """
 
         :param title: string with the window title
@@ -3767,39 +3910,47 @@ class DialogBoxRadio(QtWidgets.QDialog):
 
         self.form = QtWidgets.QFormLayout(self)
 
-        self.ref_label = QtWidgets.QLabel('%s:' % _("Reference"))
+        self.ref_label = QtWidgets.QLabel("%s:" % _("Reference"))
         self.ref_label.setToolTip(
-            _("The reference can be:\n"
-              "- Absolute -> the reference point is point (0,0)\n"
-              "- Relative -> the reference point is the mouse position before Jump")
+            _(
+                "The reference can be:\n"
+                "- Absolute -> the reference point is point (0,0)\n"
+                "- Relative -> the reference point is the mouse position before Jump"
+            )
         )
-        self.ref_radio = RadioSet([
-            {"label": _("Abs"), "value": "abs"},
-            {"label": _("Relative"), "value": "rel"}
-        ], orientation='horizontal', stretch=False)
+        self.ref_radio = RadioSet(
+            [{"label": _("Abs"), "value": "abs"}, {"label": _("Relative"), "value": "rel"}],
+            orientation="horizontal",
+            stretch=False,
+        )
         self.ref_radio.set_value(reference)
         self.form.addRow(self.ref_label, self.ref_radio)
 
-        self.form.addRow(QtWidgets.QLabel(''))
+        self.form.addRow(QtWidgets.QLabel(""))
 
-        self.wdg_label = QtWidgets.QLabel('<b>%s</b>' % str(label))
+        self.wdg_label = QtWidgets.QLabel("<b>%s</b>" % str(label))
         self.form.addRow(self.wdg_label)
 
-        self.loc_label = QtWidgets.QLabel('%s:' % _("Location"))
+        self.loc_label = QtWidgets.QLabel("%s:" % _("Location"))
         self.loc_label.setToolTip(
-            _("The Location value is a tuple (x,y).\n"
-              "If the reference is Absolute then the Jump will be at the position (x,y).\n"
-              "If the reference is Relative then the Jump will be at the (x,y) distance\n"
-              "from the current mouse location point.")
+            _(
+                "The Location value is a tuple (x,y).\n"
+                "If the reference is Absolute then the Jump will be at the position (x,y).\n"
+                "If the reference is Relative then the Jump will be at the (x,y) distance\n"
+                "from the current mouse location point."
+            )
         )
         self.lineEdit = EvalEntry(parent=self)
-        self.lineEdit.setText(str(self.location).replace('(', '').replace(')', ''))
+        self.lineEdit.setText(str(self.location).replace("(", "").replace(")", ""))
         self.lineEdit.selectAll()
         self.lineEdit.setFocus()
         self.form.addRow(self.loc_label, self.lineEdit)
 
-        self.button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
-                                                     orientation=Qt.Horizontal, parent=self)
+        self.button_box = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
+            orientation=Qt.Horizontal,
+            parent=self,
+        )
         self.form.addRow(self.button_box)
 
         self.button_box.button(QtWidgets.QDialogButtonBox.Ok).setText(_("Ok"))
@@ -3832,25 +3983,25 @@ class _BrowserTextEdit(QTextEdit):
         tcursor = self.textCursor()
         txt = tcursor.selectedText()
 
-        copy_action = QAction('%s\t%s' % (_("Copy"), _('Ctrl+C')), self)
+        copy_action = QAction("%s\t%s" % (_("Copy"), _("Ctrl+C")), self)
         self.menu.addAction(copy_action)
         copy_action.triggered.connect(self.copy_text)
-        if txt == '':
+        if txt == "":
             copy_action.setDisabled(True)
 
         self.menu.addSeparator()
 
-        sel_all_action = QAction('%s\t%s' % (_("Select All"), _('Ctrl+A')), self)
+        sel_all_action = QAction("%s\t%s" % (_("Select All"), _("Ctrl+A")), self)
         self.menu.addAction(sel_all_action)
         sel_all_action.triggered.connect(self.selectAll)
 
         if self.app:
-            save_action = QAction('%s\t%s' % (_("Save Log"), _('Ctrl+S')), self)
+            save_action = QAction("%s\t%s" % (_("Save Log"), _("Ctrl+S")), self)
             # save_action.setShortcut(QKeySequence(Qt.Key_S))
             self.menu.addAction(save_action)
             save_action.triggered.connect(lambda: self.save_log(app=self.app))
 
-        clear_action = QAction('%s\t%s' % (_("Clear All"), _('Del')), self)
+        clear_action = QAction("%s\t%s" % (_("Clear All"), _("Del")), self)
         # clear_action.setShortcut(QKeySequence(Qt.Key_Delete))
         self.menu.addAction(clear_action)
         clear_action.triggered.connect(self.clear)
@@ -3900,9 +4051,9 @@ class _BrowserTextEdit(QTextEdit):
         text = "!FlatCAM %s? - %s" % (self.version, _("Type >help< to get started"))
         text = html.escape(text)
         # hack so I can make text bold because the escape method will replace the '<' and '>' signs with html code
-        text = text.replace('!', '<b>')
-        text = text.replace('?', '</b>')
-        text += '<br><br>'
+        text = text.replace("!", "<b>")
+        text = text.replace("?", "</b>")
+        text += "<br><br>"
         self.moveCursor(QTextCursor.End)
         self.insertHtml(text)
 
@@ -3922,7 +4073,7 @@ class _ExpandableTextEdit(FCTextEdit):
 
     def __init__(self, termwidget, *args):
         FCTextEdit.__init__(self, *args)
-        self.setStyleSheet("font: 9pt \"Courier\";")
+        self.setStyleSheet('font: 9pt "Courier";')
         self._fittedHeight = 1
         self.textChanged.connect(self._fit_to_document)
         self._fit_to_document()
@@ -3945,11 +4096,11 @@ class _ExpandableTextEdit(FCTextEdit):
 
     def insertCompletion(self, completion):
         tc = self.textCursor()
-        extra = (len(completion) - len(self.completer.completionPrefix()))
+        extra = len(completion) - len(self.completer.completionPrefix())
 
         # don't insert if the word is finished but add a space instead
         if extra == 0:
-            tc.insertText(' ')
+            tc.insertText(" ")
             self.completer.popup().hide()
             return
 
@@ -3957,7 +4108,7 @@ class _ExpandableTextEdit(FCTextEdit):
         tc.movePosition(QTextCursor.EndOfWord)
         tc.insertText(completion[-extra:])
         # add a space after inserting the word
-        tc.insertText(' ')
+        tc.insertText(" ")
         self.setTextCursor(tc)
         self.completer.popup().hide()
 
@@ -3972,7 +4123,9 @@ class _ExpandableTextEdit(FCTextEdit):
         """
 
         key = event.key()
-        if (key == Qt.Key_Tab or key == Qt.Key_Return or key == Qt.Key_Enter) and self.completer.popup().isVisible():
+        if (
+            key == Qt.Key_Tab or key == Qt.Key_Return or key == Qt.Key_Enter
+        ) and self.completer.popup().isVisible():
             self.completer.insertText.emit(self.completer.getSelected())
             self.completer.setCompletionMode(QCompleter.PopupCompletion)
             return
@@ -3987,7 +4140,7 @@ class _ExpandableTextEdit(FCTextEdit):
             cursor_pos = self.textCursor().position()
             textBeforeEnd = text[cursor_pos:]
 
-            if len(textBeforeEnd.split('\n')) <= 1:
+            if len(textBeforeEnd.split("\n")) <= 1:
                 self.historyNext.emit()
                 return
         elif event.matches(QKeySequence.MoveToPreviousLine):
@@ -3995,14 +4148,17 @@ class _ExpandableTextEdit(FCTextEdit):
             cursor_pos = self.textCursor().position()
             text_before_start = text[:cursor_pos]
             # lineCount = len(textBeforeStart.splitlines())
-            line_count = len(text_before_start.split('\n'))
-            if len(text_before_start) > 0 and \
-                    (text_before_start[-1] == '\n' or text_before_start[-1] == '\r'):
+            line_count = len(text_before_start.split("\n"))
+            if len(text_before_start) > 0 and (
+                text_before_start[-1] == "\n" or text_before_start[-1] == "\r"
+            ):
                 line_count += 1
             if line_count <= 1:
                 self.historyPrev.emit()
                 return
-        elif event.matches(QKeySequence.MoveToNextPage) or event.matches(QKeySequence.MoveToPreviousPage):
+        elif event.matches(QKeySequence.MoveToNextPage) or event.matches(
+            QKeySequence.MoveToPreviousPage
+        ):
             return self._termWidget.browser().keyPressEvent(event)
 
         tc = self.textCursor()
@@ -4016,8 +4172,10 @@ class _ExpandableTextEdit(FCTextEdit):
             popup = self.completer.popup()
             popup.setCurrentIndex(self.completer.completionModel().index(0, 0))
 
-            cr.setWidth(self.completer.popup().sizeHintForColumn(0)
-                        + self.completer.popup().verticalScrollBar().sizeHint().width())
+            cr.setWidth(
+                self.completer.popup().sizeHintForColumn(0)
+                + self.completer.popup().verticalScrollBar().sizeHint().width()
+            )
             self.completer.complete(cr)
         else:
             self.completer.popup().hide()
@@ -4052,7 +4210,7 @@ class MyCompleter(QCompleter):
         self.setCompletionMode(QCompleter.PopupCompletion)
         self.highlighted.connect(self.setHighlighted)
 
-        self.lastSelected = ''
+        self.lastSelected = ""
 
         # self.popup().installEventFilter(self)
 
@@ -4085,7 +4243,7 @@ class FCTextAreaLineNumber(QtWidgets.QFrame):
 
         def adjustWidth(self, count):
             # three spaces added to the width to make up for the space added in the line number
-            width = self.fontMetrics().width(str(count) + '   ')
+            width = self.fontMetrics().width(str(count) + "   ")
             if self.width() != width:
                 self.setFixedWidth(width)
 
@@ -4135,7 +4293,9 @@ class FCTextAreaLineNumber(QtWidgets.QFrame):
 
             block = self.firstVisibleBlock()
             line_count = int(block.blockNumber())
-            block_top = int(self.blockBoundingGeometry(block).translated(self.contentOffset()).top())
+            block_top = int(
+                self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
+            )
             block_bottom = block_top + int(self.blockBoundingRect(block).height())
 
             # Iterate over all visible text blocks in the document.
@@ -4159,10 +4319,12 @@ class FCTextAreaLineNumber(QtWidgets.QFrame):
                         painter.setFont(font)
 
                     # Draw the line number right justified at the position of the line.
-                    paint_rect = QtCore.QRect(0, block_top, number_bar.width(), font_metrics.height())
+                    paint_rect = QtCore.QRect(
+                        0, block_top, number_bar.width(), font_metrics.height()
+                    )
                     # I add some spaces to the line_count to prettify; make sure to remember adjust the width in the
                     # NumberBar() class above
-                    painter.drawText(paint_rect, Qt.AlignRight, ' ' + str(line_count) + '  ')
+                    painter.drawText(paint_rect, Qt.AlignRight, " " + str(line_count) + "  ")
 
                 block = block.next()
                 block_top = block_bottom
@@ -4209,18 +4371,22 @@ class FCFileSaveDialog(QtWidgets.QFileDialog):
         super(FCFileSaveDialog, self).__init__(*args)
 
     @staticmethod
-    def get_saved_filename(parent=None, caption='', directory='', ext_filter='', initialFilter=''):
-        filename, _filter = QtWidgets.QFileDialog.getSaveFileName(parent=parent, caption=caption,
-                                                                  directory=directory, filter=ext_filter,
-                                                                  initialFilter=initialFilter)
+    def get_saved_filename(parent=None, caption="", directory="", ext_filter="", initialFilter=""):
+        filename, _filter = QtWidgets.QFileDialog.getSaveFileName(
+            parent=parent,
+            caption=caption,
+            directory=directory,
+            filter=ext_filter,
+            initialFilter=initialFilter,
+        )
 
         filename = str(filename)
-        if filename == '':
+        if filename == "":
             return filename, _filter
 
-        extension = '.' + _filter.strip(')').rpartition('.')[2]
+        extension = "." + _filter.strip(")").rpartition(".")[2]
 
-        if filename.endswith(extension) or extension == '.*':
+        if filename.endswith(extension) or extension == ".*":
             return filename, _filter
         else:
             filename += extension
@@ -4262,63 +4428,53 @@ class FCJog(QtWidgets.QFrame):
 
         # JOG Y Up
         self.jog_up_button = QtWidgets.QToolButton()
-        self.jog_up_button.setIcon(QtGui.QIcon(self.app.resource_location + '/up-arrow32.png'))
-        self.jog_up_button.setToolTip(
-            _("Jog the Y axis.")
-        )
+        self.jog_up_button.setIcon(QtGui.QIcon(self.app.resource_location + "/up-arrow32.png"))
+        self.jog_up_button.setToolTip(_("Jog the Y axis."))
         grbl_jog_grid.addWidget(self.jog_up_button, 2, 1)
 
         # Origin
         self.jog_origin_button = QtWidgets.QToolButton()
-        self.jog_origin_button.setIcon(QtGui.QIcon(self.app.resource_location + '/origin2_32.png'))
-        self.jog_origin_button.setToolTip(
-            '%s' % _("Move to Origin")
-        )
+        self.jog_origin_button.setIcon(QtGui.QIcon(self.app.resource_location + "/origin2_32.png"))
+        self.jog_origin_button.setToolTip("%s" % _("Move to Origin"))
 
         grbl_jog_grid.addWidget(self.jog_origin_button, 3, 1)
 
         # JOG Y Down
         self.jog_down_button = QtWidgets.QToolButton()
-        self.jog_down_button.setIcon(QtGui.QIcon(self.app.resource_location + '/down-arrow32.png'))
-        self.jog_down_button.setToolTip(
-            _("Jog the Y axis.")
-        )
+        self.jog_down_button.setIcon(QtGui.QIcon(self.app.resource_location + "/down-arrow32.png"))
+        self.jog_down_button.setToolTip(_("Jog the Y axis."))
         grbl_jog_grid.addWidget(self.jog_down_button, 4, 1)
 
         # JOG X Left
         self.jog_left_button = QtWidgets.QToolButton()
-        self.jog_left_button.setIcon(QtGui.QIcon(self.app.resource_location + '/left_arrow32.png'))
-        self.jog_left_button.setToolTip(
-            _("Jog the X axis.")
-        )
+        self.jog_left_button.setIcon(QtGui.QIcon(self.app.resource_location + "/left_arrow32.png"))
+        self.jog_left_button.setToolTip(_("Jog the X axis."))
         grbl_jog_grid.addWidget(self.jog_left_button, 3, 0)
 
         # JOG X Right
         self.jog_right_button = QtWidgets.QToolButton()
-        self.jog_right_button.setIcon(QtGui.QIcon(self.app.resource_location + '/right_arrow32.png'))
-        self.jog_right_button.setToolTip(
-            _("Jog the X axis.")
+        self.jog_right_button.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/right_arrow32.png")
         )
+        self.jog_right_button.setToolTip(_("Jog the X axis."))
         grbl_jog_grid.addWidget(self.jog_right_button, 3, 2)
 
         # JOG Z Up
         self.jog_z_up_button = QtWidgets.QToolButton()
-        self.jog_z_up_button.setIcon(QtGui.QIcon(self.app.resource_location + '/up-arrow32.png'))
-        self.jog_z_up_button.setText('Z')
+        self.jog_z_up_button.setIcon(QtGui.QIcon(self.app.resource_location + "/up-arrow32.png"))
+        self.jog_z_up_button.setText("Z")
         self.jog_z_up_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.jog_z_up_button.setToolTip(
-            _("Jog the Z axis.")
-        )
+        self.jog_z_up_button.setToolTip(_("Jog the Z axis."))
         grbl_jog_grid.addWidget(self.jog_z_up_button, 2, 3)
 
         # JOG Z Down
         self.jog_z_down_button = QtWidgets.QToolButton()
-        self.jog_z_down_button.setIcon(QtGui.QIcon(self.app.resource_location + '/down-arrow32.png'))
-        self.jog_z_down_button.setText('Z')
-        self.jog_z_down_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.jog_z_down_button.setToolTip(
-            _("Jog the Z axis.")
+        self.jog_z_down_button.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/down-arrow32.png")
         )
+        self.jog_z_down_button.setText("Z")
+        self.jog_z_down_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        self.jog_z_down_button.setToolTip(_("Jog the Z axis."))
         grbl_jog_grid.addWidget(self.jog_z_down_button, 4, 3)
 
 
@@ -4342,39 +4498,32 @@ class FCZeroAxes(QtWidgets.QFrame):
         # Zero X axis
         self.grbl_zerox_button = QtWidgets.QToolButton()
         self.grbl_zerox_button.setText(_("X"))
-        self.grbl_zerox_button.setToolTip(
-            _("Zero the CNC X axes at current position.")
-        )
+        self.grbl_zerox_button.setToolTip(_("Zero the CNC X axes at current position."))
         grbl_zero_grid.addWidget(self.grbl_zerox_button, 1, 0)
         # Zero Y axis
         self.grbl_zeroy_button = QtWidgets.QToolButton()
         self.grbl_zeroy_button.setText(_("Y"))
 
-        self.grbl_zeroy_button.setToolTip(
-            _("Zero the CNC Y axes at current position.")
-        )
+        self.grbl_zeroy_button.setToolTip(_("Zero the CNC Y axes at current position."))
         grbl_zero_grid.addWidget(self.grbl_zeroy_button, 2, 0)
         # Zero Z axis
         self.grbl_zeroz_button = QtWidgets.QToolButton()
         self.grbl_zeroz_button.setText(_("Z"))
 
-        self.grbl_zeroz_button.setToolTip(
-            _("Zero the CNC Z axes at current position.")
-        )
+        self.grbl_zeroz_button.setToolTip(_("Zero the CNC Z axes at current position."))
         grbl_zero_grid.addWidget(self.grbl_zeroz_button, 3, 0)
         self.grbl_homing_button = QtWidgets.QToolButton()
         self.grbl_homing_button.setText(_("Do Home"))
-        self.grbl_homing_button.setToolTip(
-            _("Perform a homing cycle on all axis."))
+        self.grbl_homing_button.setToolTip(_("Perform a homing cycle on all axis."))
         grbl_zero_grid.addWidget(self.grbl_homing_button, 4, 0, 1, 2)
         # Zeroo all axes
         self.grbl_zero_all_button = QtWidgets.QToolButton()
         self.grbl_zero_all_button.setText(_("All"))
-        self.grbl_zero_all_button.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-
-        self.grbl_zero_all_button.setToolTip(
-            _("Zero all CNC axes at current position.")
+        self.grbl_zero_all_button.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
         )
+
+        self.grbl_zero_all_button.setToolTip(_("Zero all CNC axes at current position."))
         grbl_zero_grid.addWidget(self.grbl_zero_all_button, 1, 1, 3, 1)
 
 
@@ -4495,19 +4644,19 @@ class FlatCAMActivityView(QtWidgets.QWidget):
         self.app = app
 
         if self.app.defaults["global_activity_icon"] == "Ball green":
-            icon = self.app.resource_location + '/active_2_static.png'
+            icon = self.app.resource_location + "/active_2_static.png"
             movie = self.app.resource_location + "/active_2.gif"
         elif self.app.defaults["global_activity_icon"] == "Ball black":
-            icon = self.app.resource_location + '/active_static.png'
+            icon = self.app.resource_location + "/active_static.png"
             movie = self.app.resource_location + "/active.gif"
         elif self.app.defaults["global_activity_icon"] == "Arrow green":
-            icon = self.app.resource_location + '/active_3_static.png'
+            icon = self.app.resource_location + "/active_3_static.png"
             movie = self.app.resource_location + "/active_3.gif"
         elif self.app.defaults["global_activity_icon"] == "Eclipse green":
-            icon = self.app.resource_location + '/active_4_static.png'
+            icon = self.app.resource_location + "/active_4_static.png"
             movie = self.app.resource_location + "/active_4.gif"
         else:
-            icon = self.app.resource_location + '/active_static.png'
+            icon = self.app.resource_location + "/active_static.png"
             movie = self.app.resource_location + "/active.gif"
 
         self.setMinimumWidth(200)
@@ -4558,7 +4707,7 @@ class FlatCAMInfoBar(QtWidgets.QWidget):
 
         self.icon = QtWidgets.QLabel(self)
         self.icon.setGeometry(0, 0, 12, 12)
-        self.pmap = QtGui.QPixmap(self.app.resource_location + '/graylight12.png')
+        self.pmap = QtGui.QPixmap(self.app.resource_location + "/graylight12.png")
         self.icon.setPixmap(self.pmap)
 
         self.lock_pmaps = False
@@ -4580,7 +4729,7 @@ class FlatCAMInfoBar(QtWidgets.QWidget):
         self.text.setText(text)
         self.text.setToolTip(text)
         if color:
-            self.text.setStyleSheet('color: %s' % str(color))
+            self.text.setStyleSheet("color: %s" % str(color))
 
     def set_status(self, text, level="info"):
         level = str(level)
@@ -4588,15 +4737,15 @@ class FlatCAMInfoBar(QtWidgets.QWidget):
         if self.lock_pmaps is not True:
             self.pmap.fill()
             if level == "ERROR" or level == "ERROR_NOTCL":
-                self.pmap = QtGui.QPixmap(self.app.resource_location + '/redlight12.png')
+                self.pmap = QtGui.QPixmap(self.app.resource_location + "/redlight12.png")
             elif level.lower() == "success":
-                self.pmap = QtGui.QPixmap(self.app.resource_location + '/greenlight12.png')
+                self.pmap = QtGui.QPixmap(self.app.resource_location + "/greenlight12.png")
             elif level == "WARNING" or level == "WARNING_NOTCL":
-                self.pmap = QtGui.QPixmap(self.app.resource_location + '/yellowlight12.png')
+                self.pmap = QtGui.QPixmap(self.app.resource_location + "/yellowlight12.png")
             elif level.lower() == "selected":
-                self.pmap = QtGui.QPixmap(self.app.resource_location + '/bluelight12.png')
+                self.pmap = QtGui.QPixmap(self.app.resource_location + "/bluelight12.png")
             else:
-                self.pmap = QtGui.QPixmap(self.app.resource_location + '/graylight12.png')
+                self.pmap = QtGui.QPixmap(self.app.resource_location + "/graylight12.png")
 
         try:
             self.set_text_(text)
@@ -4617,39 +4766,58 @@ class FlatCAMSystemTray(QtWidgets.QSystemTrayIcon):
 
         menu = QtWidgets.QMenu(parent)
 
-        menu_runscript = QtWidgets.QAction(QtGui.QIcon(self.app.resource_location + '/script14.png'),
-                                           '%s' % _('Run Script ...'), self)
+        menu_runscript = QtWidgets.QAction(
+            QtGui.QIcon(self.app.resource_location + "/script14.png"),
+            "%s" % _("Run Script ..."),
+            self,
+        )
         menu_runscript.setToolTip(
-            _("Will run the opened Tcl Script thus\n"
-              "enabling the automation of certain\n"
-              "functions of FlatCAM.")
+            _(
+                "Will run the opened Tcl Script thus\n"
+                "enabling the automation of certain\n"
+                "functions of FlatCAM."
+            )
         )
         menu.addAction(menu_runscript)
 
         menu.addSeparator()
 
         if headless is None:
-            self.menu_open = menu.addMenu(QtGui.QIcon(self.app.resource_location + '/folder32_bis.png'), _('Open'))
+            self.menu_open = menu.addMenu(
+                QtGui.QIcon(self.app.resource_location + "/folder32_bis.png"), _("Open")
+            )
 
             # Open Project ...
-            menu_openproject = QtWidgets.QAction(QtGui.QIcon(self.app.resource_location + '/folder16.png'),
-                                                 '%s ...' % _('Open Project'), self)
+            menu_openproject = QtWidgets.QAction(
+                QtGui.QIcon(self.app.resource_location + "/folder16.png"),
+                "%s ..." % _("Open Project"),
+                self,
+            )
             self.menu_open.addAction(menu_openproject)
             self.menu_open.addSeparator()
 
             # Open Gerber ...
-            menu_opengerber = QtWidgets.QAction(QtGui.QIcon(self.app.resource_location + '/flatcam_icon24.png'),
-                                                '%s ...\t%s' % (_('Open Gerber'), _('Ctrl+G')), self)
+            menu_opengerber = QtWidgets.QAction(
+                QtGui.QIcon(self.app.resource_location + "/flatcam_icon24.png"),
+                "%s ...\t%s" % (_("Open Gerber"), _("Ctrl+G")),
+                self,
+            )
             self.menu_open.addAction(menu_opengerber)
 
             # Open Excellon ...
-            menu_openexcellon = QtWidgets.QAction(QtGui.QIcon(self.app.resource_location + '/open_excellon32.png'),
-                                                  '%s ...\t%s' % (_('Open Excellon'), _('Ctrl+E')), self)
+            menu_openexcellon = QtWidgets.QAction(
+                QtGui.QIcon(self.app.resource_location + "/open_excellon32.png"),
+                "%s ...\t%s" % (_("Open Excellon"), _("Ctrl+E")),
+                self,
+            )
             self.menu_open.addAction(menu_openexcellon)
 
             # Open G-Code ...
-            menu_opengcode = QtWidgets.QAction(QtGui.QIcon(self.app.resource_location + '/code.png'),
-                                               '%s ...' % _('Open G-Code'), self)
+            menu_opengcode = QtWidgets.QAction(
+                QtGui.QIcon(self.app.resource_location + "/code.png"),
+                "%s ..." % _("Open G-Code"),
+                self,
+            )
             self.menu_open.addAction(menu_opengcode)
 
             self.menu_open.addSeparator()
@@ -4660,10 +4828,13 @@ class FlatCAMSystemTray(QtWidgets.QSystemTrayIcon):
             menu_opengcode.triggered.connect(self.app.f_handlers.on_fileopengcode)
 
         exitAction = menu.addAction(_("Exit"))
-        exitAction.setIcon(QtGui.QIcon(self.app.resource_location + '/power16.png'))
+        exitAction.setIcon(QtGui.QIcon(self.app.resource_location + "/power16.png"))
         self.setContextMenu(menu)
-        menu_runscript.triggered.connect(lambda: self.app.f_handlers.on_filerunscript(
-            silent=True if self.app.cmd_line_headless == 1 else False))
+        menu_runscript.triggered.connect(
+            lambda: self.app.f_handlers.on_filerunscript(
+                silent=True if self.app.cmd_line_headless == 1 else False
+            )
+        )
 
         exitAction.triggered.connect(self.app.final_save)
 
@@ -4678,9 +4849,11 @@ def message_dialog(title, message, kind="info", parent=None):
     :param parent:      parent
     :return:            None
     """
-    icon = {"info": QtWidgets.QMessageBox.Information,
-            "warning": QtWidgets.QMessageBox.Warning,
-            "error": QtWidgets.QMessageBox.Critical}[str(kind)]
+    icon = {
+        "info": QtWidgets.QMessageBox.Information,
+        "warning": QtWidgets.QMessageBox.Warning,
+        "error": QtWidgets.QMessageBox.Critical,
+    }[str(kind)]
     dlg = QtWidgets.QMessageBox(icon, title, message, parent=parent)
     dlg.setText(message)
     dlg.exec_()

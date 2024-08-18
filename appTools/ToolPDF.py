@@ -25,11 +25,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class ToolPDF(AppTool):
@@ -38,6 +38,7 @@ class ToolPDF(AppTool):
     Reference here: https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/pdf_reference_archives/PDFReference.pdf
     Return a list of geometries
     """
+
     toolName = _("PDF Import Tool")
 
     def __init__(self, app):
@@ -45,7 +46,7 @@ class ToolPDF(AppTool):
         self.app = app
         self.decimals = self.app.decimals
 
-        self.stream_re = re.compile(b'.*?FlateDecode.*?stream(.*?)endstream', re.S)
+        self.stream_re = re.compile(b".*?FlateDecode.*?stream(.*?)endstream", re.S)
 
         self.pdf_decompressed = {}
 
@@ -69,7 +70,7 @@ class ToolPDF(AppTool):
         self.on_open_pdf_click()
 
     def install(self, icon=None, separator=None, **kwargs):
-        AppTool.install(self, icon, separator, shortcut='Ctrl+Q', **kwargs)
+        AppTool.install(self, icon, separator, shortcut="Ctrl+Q", **kwargs)
 
     def set_tool_ui(self):
         pass
@@ -84,37 +85,34 @@ class ToolPDF(AppTool):
         self.app.defaults.report_usage("ToolPDF.on_open_pdf_click()")
         self.app.log.debug("ToolPDF.on_open_pdf_click()")
 
-        _filter_ = "Adobe PDF Files (*.pdf);;" \
-                   "All Files (*.*)"
+        _filter_ = "Adobe PDF Files (*.pdf);;" "All Files (*.*)"
 
         try:
-            filenames, _f = QtWidgets.QFileDialog.getOpenFileNames(caption=_("Open PDF"),
-                                                                   directory=self.app.get_last_folder(),
-                                                                   filter=_filter_)
+            filenames, _f = QtWidgets.QFileDialog.getOpenFileNames(
+                caption=_("Open PDF"), directory=self.app.get_last_folder(), filter=_filter_
+            )
         except TypeError:
-            filenames, _f = QtWidgets.QFileDialog.getOpenFileNames(caption=_("Open PDF"), filter=_filter_)
+            filenames, _f = QtWidgets.QFileDialog.getOpenFileNames(
+                caption=_("Open PDF"), filter=_filter_
+            )
 
         if len(filenames) == 0:
-            self.app.inform.emit('[WARNING_NOTCL] %s.' % _("Open PDF cancelled"))
+            self.app.inform.emit("[WARNING_NOTCL] %s." % _("Open PDF cancelled"))
         else:
             # start the parsing timer with a period of 1 second
             self.periodic_check(1000)
 
             for filename in filenames:
-                if filename != '':
-                    self.app.worker_task.emit({'fcn': self.open_pdf,
-                                               'params': [filename]})
+                if filename != "":
+                    self.app.worker_task.emit({"fcn": self.open_pdf, "params": [filename]})
 
     def open_pdf(self, filename):
-        short_name = filename.split('/')[-1].split('\\')[-1]
+        short_name = filename.split("/")[-1].split("\\")[-1]
         self.parsing_promises.append(short_name)
 
-        self.pdf_parsed[short_name] = {
-            'pdf': {},
-            'filename': filename
-        }
+        self.pdf_parsed[short_name] = {"pdf": {}, "filename": filename}
 
-        self.pdf_decompressed[short_name] = ''
+        self.pdf_decompressed[short_name] = ""
 
         if self.app.abort_flag:
             # graceful abort requested by the user
@@ -132,17 +130,21 @@ class ToolPDF(AppTool):
 
                 stream_nr += 1
                 log.debug("PDF STREAM: %d\n" % stream_nr)
-                s = s.strip(b'\r\n')
+                s = s.strip(b"\r\n")
                 try:
-                    self.pdf_decompressed[short_name] += (zlib.decompress(s).decode('UTF-8') + '\r\n')
+                    self.pdf_decompressed[short_name] += zlib.decompress(s).decode("UTF-8") + "\r\n"
                 except Exception as e:
-                    self.app.inform.emit('[ERROR_NOTCL] %s: %s\n%s' % (_("Failed to open"), str(filename), str(e)))
+                    self.app.inform.emit(
+                        "[ERROR_NOTCL] %s: %s\n%s" % (_("Failed to open"), str(filename), str(e))
+                    )
                     log.debug("ToolPDF.open_pdf().obj_init() --> %s" % str(e))
                     return
 
-            self.pdf_parsed[short_name]['pdf'] = self.parser.parse_pdf(pdf_content=self.pdf_decompressed[short_name])
+            self.pdf_parsed[short_name]["pdf"] = self.parser.parse_pdf(
+                pdf_content=self.pdf_decompressed[short_name]
+            )
             # we used it, now we delete it
-            self.pdf_decompressed[short_name] = ''
+            self.pdf_decompressed[short_name] = ""
 
         # removal from list is done in a multithreaded way therefore not always the removal can be done
         # try to remove until it's done
@@ -152,17 +154,17 @@ class ToolPDF(AppTool):
                 time.sleep(0.1)
         except Exception as e:
             log.debug("ToolPDF.open_pdf() --> %s" % str(e))
-        self.app.inform.emit('[success] %s: %s' % (_("Opened"),  str(filename)))
+        self.app.inform.emit("[success] %s: %s" % (_("Opened"), str(filename)))
 
     def layer_rendering_as_excellon(self, filename, ap_dict, layer_nr):
-        outname = filename.split('/')[-1].split('\\')[-1] + "_%s" % str(layer_nr)
+        outname = filename.split("/")[-1].split("\\")[-1] + "_%s" % str(layer_nr)
 
         # store the points here until reconstitution:
         # keys are diameters and values are list of (x,y) coords
         points = {}
 
         def obj_init(exc_obj, app_obj):
-            clear_geo = [geo_el['clear'] for geo_el in ap_dict['0']['geometry']]
+            clear_geo = [geo_el["clear"] for geo_el in ap_dict["0"]["geometry"]]
 
             for geo in clear_geo:
                 xmin, ymin, xmax, ymax = geo.bounds
@@ -184,43 +186,39 @@ class ToolPDF(AppTool):
                 name_tool += 1
                 tool = str(name_tool)
 
-                exc_obj.tools[tool] = {
-                    'tooldia': dia,
-                    'drills': [],
-                    'solid_geometry': []
-                }
+                exc_obj.tools[tool] = {"tooldia": dia, "drills": [], "solid_geometry": []}
 
                 # update the drill list
                 for dia_points in points:
                     if dia == dia_points:
                         for pt in points[dia_points]:
-                            exc_obj.tools[tool]['drills'].append(Point(pt))
+                            exc_obj.tools[tool]["drills"].append(Point(pt))
                         break
 
             ret = exc_obj.create_geometry()
-            if ret == 'fail':
+            if ret == "fail":
                 log.debug("Could not create geometry for Excellon object.")
                 return "fail"
 
             for tool in exc_obj.tools:
-                if exc_obj.tools[tool]['solid_geometry']:
+                if exc_obj.tools[tool]["solid_geometry"]:
                     return
-            app_obj.inform.emit('[ERROR_NOTCL] %s: %s' % (_("No geometry found in file"), outname))
+            app_obj.inform.emit("[ERROR_NOTCL] %s: %s" % (_("No geometry found in file"), outname))
             return "fail"
 
         with self.app.proc_container.new(_("Rendering PDF layer #%d ...") % int(layer_nr)):
 
             ret_val = self.app.app_obj.new_object("excellon", outname, obj_init, autoselected=False)
-            if ret_val == 'fail':
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _('Open PDF file failed.'))
+            if ret_val == "fail":
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Open PDF file failed."))
                 return
             # Register recent file
             self.app.file_opened.emit("excellon", filename)
             # GUI feedback
-            self.app.inform.emit('[success] %s: %s' % (_("Rendered"),  outname))
+            self.app.inform.emit("[success] %s: %s" % (_("Rendered"), outname))
 
     def layer_rendering_as_gerber(self, filename, ap_dict, layer_nr):
-        outname = filename.split('/')[-1].split('\\')[-1] + "_%s" % str(layer_nr)
+        outname = filename.split("/")[-1].split("\\")[-1] + "_%s" % str(layer_nr)
 
         def obj_init(grb_obj, app_obj):
 
@@ -230,28 +228,28 @@ class ToolPDF(AppTool):
             follow_buf = []
             for ap in grb_obj.apertures:
                 for k in grb_obj.apertures[ap]:
-                    if k == 'geometry':
+                    if k == "geometry":
                         for geo_el in ap_dict[ap][k]:
-                            if 'solid' in geo_el:
-                                poly_buff.append(geo_el['solid'])
-                            if 'follow' in geo_el:
-                                follow_buf.append(geo_el['follow'])
+                            if "solid" in geo_el:
+                                poly_buff.append(geo_el["solid"])
+                            if "follow" in geo_el:
+                                follow_buf.append(geo_el["follow"])
             poly_buff = unary_union(poly_buff)
 
-            if '0' in grb_obj.apertures:
+            if "0" in grb_obj.apertures:
                 global_clear_geo = []
-                if 'geometry' in grb_obj.apertures['0']:
-                    for geo_el in ap_dict['0']['geometry']:
-                        if 'clear' in geo_el:
-                            global_clear_geo.append(geo_el['clear'])
+                if "geometry" in grb_obj.apertures["0"]:
+                    for geo_el in ap_dict["0"]["geometry"]:
+                        if "clear" in geo_el:
+                            global_clear_geo.append(geo_el["clear"])
 
                 if global_clear_geo:
                     solid = []
                     for apid in grb_obj.apertures:
-                        if 'geometry' in grb_obj.apertures[apid]:
-                            for elem in grb_obj.apertures[apid]['geometry']:
-                                if 'solid' in elem:
-                                    solid_geo = deepcopy(elem['solid'])
+                        if "geometry" in grb_obj.apertures[apid]:
+                            for elem in grb_obj.apertures[apid]["geometry"]:
+                                if "solid" in elem:
+                                    solid_geo = deepcopy(elem["solid"])
                                     for clear_geo in global_clear_geo:
                                         # Make sure that the clear_geo is within the solid_geo otherwise we loose
                                         # the solid_geometry. We want for clear_geometry just to cut into solid_geometry
@@ -259,7 +257,7 @@ class ToolPDF(AppTool):
                                         if clear_geo.within(solid_geo):
                                             solid_geo = solid_geo.difference(clear_geo)
                                         if solid_geo.is_empty:
-                                            solid_geo = elem['solid']
+                                            solid_geo = elem["solid"]
                                     try:
                                         for poly in solid_geo:
                                             solid.append(poly)
@@ -283,14 +281,14 @@ class ToolPDF(AppTool):
 
         with self.app.proc_container.new(_("Rendering PDF layer #%d ...") % int(layer_nr)):
 
-            ret = self.app.app_obj.new_object('gerber', outname, obj_init, autoselected=False)
-            if ret == 'fail':
-                self.app.inform.emit('[ERROR_NOTCL] %s' % _('Open PDF file failed.'))
+            ret = self.app.app_obj.new_object("gerber", outname, obj_init, autoselected=False)
+            if ret == "fail":
+                self.app.inform.emit("[ERROR_NOTCL] %s" % _("Open PDF file failed."))
                 return
             # Register recent file
-            self.app.file_opened.emit('gerber', filename)
+            self.app.file_opened.emit("gerber", filename)
             # GUI feedback
-            self.app.inform.emit('[success] %s: %s' % (_("Rendered"), outname))
+            self.app.inform.emit("[success] %s: %s" % (_("Rendered"), outname))
 
     def periodic_check(self, check_period):
         """
@@ -337,8 +335,8 @@ class ToolPDF(AppTool):
                             # graceful abort requested by the user
                             raise grace
 
-                        filename = deepcopy(self.pdf_parsed[object_name]['filename'])
-                        pdf_content = deepcopy(self.pdf_parsed[object_name]['pdf'])
+                        filename = deepcopy(self.pdf_parsed[object_name]["filename"])
+                        pdf_content = deepcopy(self.pdf_parsed[object_name]["pdf"])
                         obj_to_delete.append(object_name)
                         for k in pdf_content:
                             if self.app.abort_flag:
@@ -350,11 +348,19 @@ class ToolPDF(AppTool):
                             if ap_dict:
                                 layer_nr = k
                                 if k == 0:
-                                    self.app.worker_task.emit({'fcn': self.layer_rendering_as_excellon,
-                                                               'params': [filename, ap_dict, layer_nr]})
+                                    self.app.worker_task.emit(
+                                        {
+                                            "fcn": self.layer_rendering_as_excellon,
+                                            "params": [filename, ap_dict, layer_nr],
+                                        }
+                                    )
                                 else:
-                                    self.app.worker_task.emit({'fcn': self.layer_rendering_as_gerber,
-                                                               'params': [filename, ap_dict, layer_nr]})
+                                    self.app.worker_task.emit(
+                                        {
+                                            "fcn": self.layer_rendering_as_gerber,
+                                            "params": [filename, ap_dict, layer_nr],
+                                        }
+                                    )
                     # delete the object already processed so it will not be processed again for other objects
                     # that were opened at the same time; like in drag & drop on appGUI
                     for obj_name in obj_to_delete:

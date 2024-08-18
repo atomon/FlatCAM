@@ -21,6 +21,7 @@
 
 # import xml.etree.ElementTree as ET
 from svg.path import Line, Arc, CubicBezier, QuadraticBezier, parse_path
+
 # from svg.path.path import Move
 # from svg.path.path import Close
 import svg.path
@@ -30,7 +31,7 @@ import numpy as np
 
 from appParsers.ParseFont import *
 
-log = logging.getLogger('base2')
+log = logging.getLogger("base2")
 
 
 def svgparselength(lengthstr):
@@ -43,10 +44,19 @@ def svgparselength(lengthstr):
     :rtype:             tuple(float, str|None)
     """
 
-    integer_re_str = r'[+-]?[0-9]+'
-    number_re_str = r'(?:[+-]?[0-9]*\.[0-9]+(?:[Ee]' + integer_re_str + ')?' + r')|' + \
-                    r'(?:' + integer_re_str + r'(?:[Ee]' + integer_re_str + r')?)'
-    length_re_str = r'(' + number_re_str + r')(em|ex|px|in|cm|mm|pt|pc|%)?'
+    integer_re_str = r"[+-]?[0-9]+"
+    number_re_str = (
+        r"(?:[+-]?[0-9]*\.[0-9]+(?:[Ee]"
+        + integer_re_str
+        + ")?"
+        + r")|"
+        + r"(?:"
+        + integer_re_str
+        + r"(?:[Ee]"
+        + integer_re_str
+        + r")?)"
+    )
+    length_re_str = r"(" + number_re_str + r")(em|ex|px|in|cm|mm|pt|pc|%)?"
 
     if lengthstr:
         match = re.search(length_re_str, lengthstr)
@@ -59,12 +69,12 @@ def svgparselength(lengthstr):
 
 
 def svgparse_viewbox(root):
-    val = root.get('viewBox')
+    val = root.get("viewBox")
     if val is None:
         return 1.0
 
-    res = [float(x) for x in val.split()] or [float(x) for x in val.split(',')]
-    w = svgparselength(root.get('width'))[0]
+    res = [float(x) for x in val.split()] or [float(x) for x in val.split(",")]
+    w = svgparselength(root.get("width"))[0]
     # h = svgparselength(root.get('height'))[0]
 
     v_w = res[2]
@@ -73,7 +83,7 @@ def svgparse_viewbox(root):
     return w / v_w
 
 
-def path2shapely(path, object_type, res=1.0, units='MM', factor=1.0):
+def path2shapely(path, object_type, res=1.0, units="MM", factor=1.0):
     """
     Converts an svg.path.Path into a Shapely
     Polygon or LinearString.
@@ -108,16 +118,18 @@ def path2shapely(path, object_type, res=1.0, units='MM', factor=1.0):
             continue
 
         # Arc, CubicBezier or QuadraticBezier
-        if isinstance(component, Arc) or \
-           isinstance(component, CubicBezier) or \
-           isinstance(component, QuadraticBezier):
+        if (
+            isinstance(component, Arc)
+            or isinstance(component, CubicBezier)
+            or isinstance(component, QuadraticBezier)
+        ):
 
             # How many points to use in the discrete representation.
             length = component.length(res / 10.0)
             # steps = int(length / res + 0.5)
             steps = int(length) * 2
 
-            if units == 'IN':
+            if units == "IN":
                 steps *= 25
 
             # solve error when step is below 1,
@@ -213,30 +225,28 @@ def svgrect2shapely(rect, n_points=32, factor=1.0):
     :type factor:       float
     :return:            shapely.geometry.polygon.LinearRing
     """
-    w = svgparselength(rect.get('width'))[0]
-    h = svgparselength(rect.get('height'))[0]
+    w = svgparselength(rect.get("width"))[0]
+    h = svgparselength(rect.get("height"))[0]
 
-    x_obj = rect.get('x')
+    x_obj = rect.get("x")
     if x_obj is not None:
         x = svgparselength(x_obj)[0] * factor
     else:
         x = 0
 
-    y_obj = rect.get('y')
+    y_obj = rect.get("y")
     if y_obj is not None:
         y = svgparselength(y_obj)[0] * factor
     else:
         y = 0
 
-    rxstr = rect.get('rx')
+    rxstr = rect.get("rx")
     rxstr = rxstr * factor if rxstr else rxstr
-    rystr = rect.get('ry')
+    rystr = rect.get("ry")
     rystr = rystr * factor if rystr else rystr
 
     if rxstr is None and rystr is None:  # Sharp corners
-        pts = [
-            (x, y), (x + w, y), (x + w, y + h), (x, y + h), (x, y)
-        ]
+        pts = [(x, y), (x + w, y), (x + w, y + h), (x, y + h), (x, y)]
 
     else:  # Rounded corners
         rx = 0.0 if rxstr is None else svgparselength(rxstr)[0]
@@ -265,14 +275,16 @@ def svgrect2shapely(rect, n_points=32, factor=1.0):
 
         lower_left = [(x_[i], y_[i]) for i in range(n_points)]
 
-        pts = [(x + rx, y), (x - rx + w, y)] + \
-            lower_right + \
-            [(x + w, y + ry), (x + w, y + h - ry)] + \
-            upper_right + \
-            [(x + w - rx, y + h), (x + rx, y + h)] + \
-            upper_left + \
-            [(x, y + h - ry), (x, y + ry)] + \
-            lower_left
+        pts = (
+            [(x + rx, y), (x - rx + w, y)]
+            + lower_right
+            + [(x + w, y + ry), (x + w, y + h - ry)]
+            + upper_right
+            + [(x + w - rx, y + h), (x + rx, y + h)]
+            + upper_left
+            + [(x, y + h - ry), (x, y + ry)]
+            + lower_left
+        )
 
     return Polygon(pts).buffer(0)
     # return LinearRing(pts)
@@ -294,11 +306,11 @@ def svgcircle2shapely(circle, n_points=64, factor=1.0):
     # cx = float(circle.get('cx'))
     # cy = float(circle.get('cy'))
     # r = float(circle.get('r'))
-    cx = svgparselength(circle.get('cx'))[0]  # TODO: No units support yet
+    cx = svgparselength(circle.get("cx"))[0]  # TODO: No units support yet
     cx = cx * factor if cx else cx
-    cy = svgparselength(circle.get('cy'))[0]  # TODO: No units support yet
+    cy = svgparselength(circle.get("cy"))[0]  # TODO: No units support yet
     cy = cy * factor if cy else cy
-    r = svgparselength(circle.get('r'))[0]  # TODO: No units support yet
+    r = svgparselength(circle.get("r"))[0]  # TODO: No units support yet
     r = r * factor if r else r
 
     return Point(cx, cy).buffer(r, resolution=n_points)
@@ -318,14 +330,14 @@ def svgellipse2shapely(ellipse, n_points=64, factor=1.0):
     :rtype:             shapely.geometry.polygon.LinearRing
     """
 
-    cx = svgparselength(ellipse.get('cx'))[0]   # TODO: No units support yet
+    cx = svgparselength(ellipse.get("cx"))[0]  # TODO: No units support yet
     cx = cx * factor if cx else cx
-    cy = svgparselength(ellipse.get('cy'))[0]   # TODO: No units support yet
+    cy = svgparselength(ellipse.get("cy"))[0]  # TODO: No units support yet
     cy = cy * factor if cy else cy
 
-    rx = svgparselength(ellipse.get('rx'))[0]   # TODO: No units support yet
+    rx = svgparselength(ellipse.get("rx"))[0]  # TODO: No units support yet
     rx = rx * factor if rx else rx
-    ry = svgparselength(ellipse.get('ry'))[0]   # TODO: No units support yet
+    ry = svgparselength(ellipse.get("ry"))[0]  # TODO: No units support yet
     ry = ry * factor if ry else ry
 
     t = np.arange(n_points, dtype=float) / n_points
@@ -348,10 +360,10 @@ def svgline2shapely(line, factor=1.0):
     :rtype:             shapely.geometry.polygon.LineString
     """
 
-    x1 = svgparselength(line.get('x1'))[0] * factor
-    y1 = svgparselength(line.get('y1'))[0] * factor
-    x2 = svgparselength(line.get('x2'))[0] * factor
-    y2 = svgparselength(line.get('y2'))[0] * factor
+    x1 = svgparselength(line.get("x1"))[0] * factor
+    y1 = svgparselength(line.get("y1"))[0] * factor
+    x2 = svgparselength(line.get("x2"))[0] * factor
+    y2 = svgparselength(line.get("y2"))[0] * factor
 
     return LineString([(x1, y1), (x2, y2)])
 
@@ -367,7 +379,7 @@ def svgpolyline2shapely(polyline, factor=1.0):
     :rtype:             shapely.geometry.polygon.LineString
     """
 
-    ptliststr = polyline.get('points')
+    ptliststr = polyline.get("points")
     points = parse_svg_point_list(ptliststr, factor)
 
     return LineString(points)
@@ -386,14 +398,14 @@ def svgpolygon2shapely(polygon, n_points=64, factor=1.0):
     :return:            Shapely Polygon
     """
 
-    ptliststr = polygon.get('points')
+    ptliststr = polygon.get("points")
     points = parse_svg_point_list(ptliststr, factor)
 
     return Polygon(points).buffer(0, resolution=n_points)
     # return LinearRing(points)
 
 
-def getsvggeo(node, object_type, root=None, units='MM', res=64, factor=1.0):
+def getsvggeo(node, object_type, root=None, units="MM", res=64, factor=1.0):
     """
     Extracts and flattens all geometry from an SVG node
     into a list of Shapely geometry.
@@ -411,7 +423,7 @@ def getsvggeo(node, object_type, root=None, units='MM', res=64, factor=1.0):
     if root is None:
         root = node
 
-    kind = re.search('(?:\{.*\})?(.*)$', node.tag).group(1)
+    kind = re.search("(?:\{.*\})?(.*)$", node.tag).group(1)
     geo = []
 
     # Recurse
@@ -421,49 +433,53 @@ def getsvggeo(node, object_type, root=None, units='MM', res=64, factor=1.0):
             if subgeo is not None:
                 geo += subgeo
     # Parse
-    elif kind == 'path':
+    elif kind == "path":
         log.debug("***PATH***")
-        P = parse_path(node.get('d'))
+        P = parse_path(node.get("d"))
         P = path2shapely(P, object_type, units=units, factor=factor)
         # for path, the resulting geometry is already a list so no need to create a new one
         geo = P
 
-    elif kind == 'rect':
+    elif kind == "rect":
         log.debug("***RECT***")
         R = svgrect2shapely(node, n_points=res, factor=factor)
         geo = [R]
 
-    elif kind == 'circle':
+    elif kind == "circle":
         log.debug("***CIRCLE***")
         C = svgcircle2shapely(node, n_points=res, factor=factor)
         geo = [C]
 
-    elif kind == 'ellipse':
+    elif kind == "ellipse":
         log.debug("***ELLIPSE***")
         E = svgellipse2shapely(node, n_points=res, factor=factor)
         geo = [E]
 
-    elif kind == 'polygon':
+    elif kind == "polygon":
         log.debug("***POLYGON***")
         poly = svgpolygon2shapely(node, n_points=res, factor=factor)
         geo = [poly]
 
-    elif kind == 'line':
+    elif kind == "line":
         log.debug("***LINE***")
         line = svgline2shapely(node, factor=factor)
         geo = [line]
 
-    elif kind == 'polyline':
+    elif kind == "polyline":
         log.debug("***POLYLINE***")
         pline = svgpolyline2shapely(node, factor=factor)
         geo = [pline]
 
-    elif kind == 'use':
-        log.debug('***USE***')
+    elif kind == "use":
+        log.debug("***USE***")
         # href= is the preferred name for this[1], but inkscape still generates xlink:href=.
         # [1] https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use#Attributes
-        href = node.attrib['href'] if 'href' in node.attrib else node.attrib['{http://www.w3.org/1999/xlink}href']
-        ref = root.find(".//*[@id='%s']" % href.replace('#', ''))
+        href = (
+            node.attrib["href"]
+            if "href" in node.attrib
+            else node.attrib["{http://www.w3.org/1999/xlink}href"]
+        )
+        ref = root.find(".//*[@id='%s']" % href.replace("#", ""))
         if ref is not None:
             geo = getsvggeo(ref, object_type, root=root, units=units, res=res, factor=factor)
 
@@ -474,33 +490,30 @@ def getsvggeo(node, object_type, root=None, units='MM', res=64, factor=1.0):
     # ignore transformation for unknown kind
     if geo is not None:
         # Transformations
-        if 'transform' in node.attrib:
-            trstr = node.get('transform')
+        if "transform" in node.attrib:
+            trstr = node.get("transform")
             trlist = parse_svg_transform(trstr)
             # log.debug(trlist)
 
             # Transformations are applied in reverse order
             for tr in trlist[::-1]:
-                if tr[0] == 'translate':
+                if tr[0] == "translate":
                     geo = [translate(geoi, tr[1], tr[2]) for geoi in geo]
-                elif tr[0] == 'scale':
-                    geo = [scale(geoi, tr[1], tr[2], origin=(0, 0))
-                           for geoi in geo]
-                elif tr[0] == 'rotate':
-                    geo = [rotate(geoi, tr[1], origin=(tr[2], tr[3]))
-                           for geoi in geo]
-                elif tr[0] == 'skew':
-                    geo = [skew(geoi, tr[1], tr[2], origin=(0, 0))
-                           for geoi in geo]
-                elif tr[0] == 'matrix':
+                elif tr[0] == "scale":
+                    geo = [scale(geoi, tr[1], tr[2], origin=(0, 0)) for geoi in geo]
+                elif tr[0] == "rotate":
+                    geo = [rotate(geoi, tr[1], origin=(tr[2], tr[3])) for geoi in geo]
+                elif tr[0] == "skew":
+                    geo = [skew(geoi, tr[1], tr[2], origin=(0, 0)) for geoi in geo]
+                elif tr[0] == "matrix":
                     geo = [affine_transform(geoi, tr[1:]) for geoi in geo]
                 else:
-                    raise Exception('Unknown transformation: %s', tr)
+                    raise Exception("Unknown transformation: %s", tr)
 
     return geo
 
 
-def getsvgtext(node, object_type, units='MM'):
+def getsvgtext(node, object_type, units="MM"):
     """
     Extracts and flattens all geometry from an SVG node
     into a list of Shapely geometry.
@@ -511,7 +524,7 @@ def getsvgtext(node, object_type, units='MM'):
     :return:            List of Shapely geometry
     :rtype:             list
     """
-    kind = re.search('(?:\{.*\})?(.*)$', node.tag).group(1)
+    kind = re.search("(?:\{.*\})?(.*)$", node.tag).group(1)
     geo = []
 
     # Recurse
@@ -522,47 +535,50 @@ def getsvgtext(node, object_type, units='MM'):
                 geo += subgeo
 
     # Parse
-    elif kind == 'tspan':
+    elif kind == "tspan":
         current_attrib = node.attrib
         txt = node.text
         style_dict = {}
         parrent_attrib = node.getparent().attrib
-        style = parrent_attrib['style']
+        style = parrent_attrib["style"]
 
         try:
-            style_list = style.split(';')
+            style_list = style.split(";")
             for css in style_list:
-                style_dict[css.rpartition(':')[0]] = css.rpartition(':')[-1]
+                style_dict[css.rpartition(":")[0]] = css.rpartition(":")[-1]
 
-            pos_x = float(current_attrib['x'])
-            pos_y = float(current_attrib['y'])
+            pos_x = float(current_attrib["x"])
+            pos_y = float(current_attrib["y"])
 
             # should have used the instance from FlatCAMApp.App but how? without reworking everything ...
             pf = ParseFont()
             pf.get_fonts_by_types()
-            font_name = style_dict['font-family'].replace("'", '')
+            font_name = style_dict["font-family"].replace("'", "")
 
-            if style_dict['font-style'] == 'italic' and style_dict['font-weight'] == 'bold':
-                font_type = 'bi'
-            elif style_dict['font-weight'] == 'bold':
-                font_type = 'bold'
-            elif style_dict['font-style'] == 'italic':
-                font_type = 'italic'
+            if style_dict["font-style"] == "italic" and style_dict["font-weight"] == "bold":
+                font_type = "bi"
+            elif style_dict["font-weight"] == "bold":
+                font_type = "bold"
+            elif style_dict["font-style"] == "italic":
+                font_type = "italic"
             else:
-                font_type = 'regular'
+                font_type = "regular"
 
             # value of 2.2 should have been 2.83 (conversion value from pixels to points)
             # but the dimensions from Inkscape did not corelate with the ones after importing in FlatCAM
             # so I adjusted this
-            font_size = svgparselength(style_dict['font-size'])[0] * 2.2
-            geo = [pf.font_to_geometry(txt,
-                                       font_name=font_name,
-                                       font_size=font_size,
-                                       font_type=font_type,
-                                       units=units,
-                                       coordx=pos_x,
-                                       coordy=pos_y)
-                   ]
+            font_size = svgparselength(style_dict["font-size"])[0] * 2.2
+            geo = [
+                pf.font_to_geometry(
+                    txt,
+                    font_name=font_name,
+                    font_size=font_size,
+                    font_type=font_type,
+                    units=units,
+                    coordx=pos_x,
+                    coordy=pos_y,
+                )
+            ]
 
             geo = [(scale(g, 1.0, -1.0)) for g in geo]
         except Exception as e:
@@ -573,28 +589,25 @@ def getsvgtext(node, object_type, units='MM'):
     # ignore transformation for unknown kind
     if geo is not None:
         # Transformations
-        if 'transform' in node.attrib:
-            trstr = node.get('transform')
+        if "transform" in node.attrib:
+            trstr = node.get("transform")
             trlist = parse_svg_transform(trstr)
             # log.debug(trlist)
 
             # Transformations are applied in reverse order
             for tr in trlist[::-1]:
-                if tr[0] == 'translate':
+                if tr[0] == "translate":
                     geo = [translate(geoi, tr[1], tr[2]) for geoi in geo]
-                elif tr[0] == 'scale':
-                    geo = [scale(geoi, tr[1], tr[2], origin=(0, 0))
-                           for geoi in geo]
-                elif tr[0] == 'rotate':
-                    geo = [rotate(geoi, tr[1], origin=(tr[2], tr[3]))
-                           for geoi in geo]
-                elif tr[0] == 'skew':
-                    geo = [skew(geoi, tr[1], tr[2], origin=(0, 0))
-                           for geoi in geo]
-                elif tr[0] == 'matrix':
+                elif tr[0] == "scale":
+                    geo = [scale(geoi, tr[1], tr[2], origin=(0, 0)) for geoi in geo]
+                elif tr[0] == "rotate":
+                    geo = [rotate(geoi, tr[1], origin=(tr[2], tr[3])) for geoi in geo]
+                elif tr[0] == "skew":
+                    geo = [skew(geoi, tr[1], tr[2], origin=(0, 0)) for geoi in geo]
+                elif tr[0] == "matrix":
                     geo = [affine_transform(geoi, tr[1:]) for geoi in geo]
                 else:
-                    raise Exception('Unknown transformation: %s', tr)
+                    raise Exception("Unknown transformation: %s", tr)
 
     return geo
 
@@ -615,9 +628,9 @@ def parse_svg_point_list(ptliststr, factor):
     pos = 0
     i = 0
 
-    for match in re.finditer(r'(\s*,\s*)|(\s+)', ptliststr.strip(' ')):
+    for match in re.finditer(r"(\s*,\s*)|(\s+)", ptliststr.strip(" ")):
 
-        val = float(ptliststr[pos:match.start()])
+        val = float(ptliststr[pos : match.start()])
 
         if i % 2 == 1:
             pairs.append((factor * last, factor * val))
@@ -681,90 +694,149 @@ def parse_svg_transform(trstr):
     trlist = []
 
     assert isinstance(trstr, str)
-    trstr = trstr.strip(' ')
+    trstr = trstr.strip(" ")
 
-    integer_re_str = r'[+-]?[0-9]+'
-    number_re_str = r'(?:[+-]?[0-9]*\.[0-9]+(?:[Ee]' + integer_re_str + ')?' + r')|' + \
-                    r'(?:' + integer_re_str + r'(?:[Ee]' + integer_re_str + r')?)'
+    integer_re_str = r"[+-]?[0-9]+"
+    number_re_str = (
+        r"(?:[+-]?[0-9]*\.[0-9]+(?:[Ee]"
+        + integer_re_str
+        + ")?"
+        + r")|"
+        + r"(?:"
+        + integer_re_str
+        + r"(?:[Ee]"
+        + integer_re_str
+        + r")?)"
+    )
 
     # num_re_str = r'[\+\-]?[0-9\.e]+'  # TODO: Negative exponents missing
-    comma_or_space_re_str = r'(?:(?:\s+)|(?:\s*,\s*))'
-    translate_re_str = r'translate\s*\(\s*(' + \
-                       number_re_str + r')(?:' + \
-                       comma_or_space_re_str + \
-                       r'(' + number_re_str + r'))?\s*\)'
-    scale_re_str = r'scale\s*\(\s*(' + \
-                   number_re_str + r')' + \
-                   r'(?:' + comma_or_space_re_str + \
-                   r'(' + number_re_str + r'))?\s*\)'
-    skew_re_str = r'skew([XY])\s*\(\s*(' + \
-                  number_re_str + r')\s*\)'
-    rotate_re_str = r'rotate\s*\(\s*(' + \
-                    number_re_str + r')' + \
-                    r'(?:' + comma_or_space_re_str + \
-                    r'(' + number_re_str + r')' + \
-                    comma_or_space_re_str + \
-                    r'(' + number_re_str + r'))?\s*\)'
-    matrix_re_str = r'matrix\s*\(\s*' + \
-                    r'(' + number_re_str + r')' + comma_or_space_re_str + \
-                    r'(' + number_re_str + r')' + comma_or_space_re_str + \
-                    r'(' + number_re_str + r')' + comma_or_space_re_str + \
-                    r'(' + number_re_str + r')' + comma_or_space_re_str + \
-                    r'(' + number_re_str + r')' + comma_or_space_re_str + \
-                    r'(' + number_re_str + r')\s*\)'
+    comma_or_space_re_str = r"(?:(?:\s+)|(?:\s*,\s*))"
+    translate_re_str = (
+        r"translate\s*\(\s*("
+        + number_re_str
+        + r")(?:"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r"))?\s*\)"
+    )
+    scale_re_str = (
+        r"scale\s*\(\s*("
+        + number_re_str
+        + r")"
+        + r"(?:"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r"))?\s*\)"
+    )
+    skew_re_str = r"skew([XY])\s*\(\s*(" + number_re_str + r")\s*\)"
+    rotate_re_str = (
+        r"rotate\s*\(\s*("
+        + number_re_str
+        + r")"
+        + r"(?:"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r")"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r"))?\s*\)"
+    )
+    matrix_re_str = (
+        r"matrix\s*\(\s*"
+        + r"("
+        + number_re_str
+        + r")"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r")"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r")"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r")"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r")"
+        + comma_or_space_re_str
+        + r"("
+        + number_re_str
+        + r")\s*\)"
+    )
 
     while len(trstr) > 0:
-        match = re.search(r'^' + translate_re_str, trstr)
+        match = re.search(r"^" + translate_re_str, trstr)
         if match:
-            trlist.append([
-                'translate',
-                float(match.group(1)),
-                float(match.group(2)) if (match.group(2) is not None) else 0.0
-            ])
-            trstr = trstr[len(match.group(0)):].strip(' ')
+            trlist.append(
+                [
+                    "translate",
+                    float(match.group(1)),
+                    float(match.group(2)) if (match.group(2) is not None) else 0.0,
+                ]
+            )
+            trstr = trstr[len(match.group(0)) :].strip(" ")
             continue
 
-        match = re.search(r'^' + scale_re_str, trstr)
+        match = re.search(r"^" + scale_re_str, trstr)
         if match:
-            trlist.append([
-                'scale',
-                float(match.group(1)),
-                float(match.group(2)) if (match.group(2) is not None) else float(match.group(1))
-            ])
-            trstr = trstr[len(match.group(0)):].strip(' ')
+            trlist.append(
+                [
+                    "scale",
+                    float(match.group(1)),
+                    (
+                        float(match.group(2))
+                        if (match.group(2) is not None)
+                        else float(match.group(1))
+                    ),
+                ]
+            )
+            trstr = trstr[len(match.group(0)) :].strip(" ")
             continue
 
-        match = re.search(r'^' + skew_re_str, trstr)
+        match = re.search(r"^" + skew_re_str, trstr)
         if match:
-            trlist.append([
-                'skew',
-                float(match.group(2)) if match.group(1) == 'X' else 0.0,
-                float(match.group(2)) if match.group(1) == 'Y' else 0.0
-            ])
-            trstr = trstr[len(match.group(0)):].strip(' ')
+            trlist.append(
+                [
+                    "skew",
+                    float(match.group(2)) if match.group(1) == "X" else 0.0,
+                    float(match.group(2)) if match.group(1) == "Y" else 0.0,
+                ]
+            )
+            trstr = trstr[len(match.group(0)) :].strip(" ")
             continue
 
-        match = re.search(r'^' + rotate_re_str, trstr)
+        match = re.search(r"^" + rotate_re_str, trstr)
         if match:
-            trlist.append([
-                'rotate',
-                float(match.group(1)),
-                float(match.group(2)) if match.group(2) else 0.0,
-                float(match.group(3)) if match.group(3) else 0.0
-            ])
-            trstr = trstr[len(match.group(0)):].strip(' ')
+            trlist.append(
+                [
+                    "rotate",
+                    float(match.group(1)),
+                    float(match.group(2)) if match.group(2) else 0.0,
+                    float(match.group(3)) if match.group(3) else 0.0,
+                ]
+            )
+            trstr = trstr[len(match.group(0)) :].strip(" ")
             continue
 
-        match = re.search(r'^' + matrix_re_str, trstr)
+        match = re.search(r"^" + matrix_re_str, trstr)
         if match:
-            trlist.append(['matrix'] + [float(x) for x in match.groups()])
-            trstr = trstr[len(match.group(0)):].strip(' ')
+            trlist.append(["matrix"] + [float(x) for x in match.groups()])
+            trstr = trstr[len(match.group(0)) :].strip(" ")
             continue
 
         # raise Exception("Don't know how to parse: %s" % trstr)
         log.error("[ERROR] Don't know how to parse: %s" % trstr)
 
     return trlist
+
 
 # if __name__ == "__main__":
 #     tree = ET.parse('tests/svg/drawing.svg')

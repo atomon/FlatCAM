@@ -13,6 +13,7 @@ import numpy as np
 
 import vispy.scene as scene
 from vispy.scene.cameras.base_camera import BaseCamera
+
 # from vispy.scene.widgets import Widget as VisPyWidget
 from vispy.color import Color
 
@@ -32,23 +33,23 @@ class VisPyCanvas(scene.SceneCanvas):
 
         settings = QSettings("Open Source", "FlatCAM")
         if settings.contains("axis_font_size"):
-            a_fsize = settings.value('axis_font_size', type=int)
+            a_fsize = settings.value("axis_font_size", type=int)
         else:
             a_fsize = 8
 
         if settings.contains("theme"):
-            theme = settings.value('theme', type=str)
+            theme = settings.value("theme", type=str)
         else:
-            theme = 'white'
+            theme = "white"
 
-        if theme == 'white':
-            theme_color = Color('#FFFFFF')
-            tick_color = Color('#000000')
+        if theme == "white":
+            theme_color = Color("#FFFFFF")
+            tick_color = Color("#000000")
             back_color = str(QPalette().color(QPalette.Window).name())
         else:
-            theme_color = Color('#000000')
-            tick_color = Color('gray')
-            back_color = Color('#000000')
+            theme_color = Color("#000000")
+            tick_color = Color("gray")
+            back_color = Color("#000000")
             # back_color = Color('#272822') # darker
             # back_color = Color('#3c3f41') # lighter
 
@@ -62,14 +63,22 @@ class VisPyCanvas(scene.SceneCanvas):
         top_padding.height_max = 0
 
         self.yaxis = scene.AxisWidget(
-            orientation='left', axis_color=tick_color, text_color=tick_color, font_size=a_fsize, axis_width=1
+            orientation="left",
+            axis_color=tick_color,
+            text_color=tick_color,
+            font_size=a_fsize,
+            axis_width=1,
         )
         self.yaxis.width_max = 55
         self.grid_widget.add_widget(self.yaxis, row=1, col=0)
 
         self.xaxis = scene.AxisWidget(
-            orientation='bottom', axis_color=tick_color, text_color=tick_color, font_size=a_fsize, axis_width=1,
-            anchors=['center', 'bottom']
+            orientation="bottom",
+            axis_color=tick_color,
+            text_color=tick_color,
+            font_size=a_fsize,
+            axis_width=1,
+            anchors=["center", "bottom"],
         )
         self.xaxis.height_max = 30
         self.grid_widget.add_widget(self.xaxis, row=2, col=1)
@@ -93,15 +102,15 @@ class VisPyCanvas(scene.SceneCanvas):
 
         settings = QSettings("Open Source", "FlatCAM")
         if settings.contains("theme"):
-            theme = settings.value('theme', type=str)
+            theme = settings.value("theme", type=str)
         else:
-            theme = 'white'
+            theme = "white"
 
         self.view = view
-        if theme == 'white':
-            self.grid = scene.GridLines(parent=self.view.scene, color='dimgray')
+        if theme == "white":
+            self.grid = scene.GridLines(parent=self.view.scene, color="dimgray")
         else:
-            self.grid = scene.GridLines(parent=self.view.scene, color='#dededeff')
+            self.grid = scene.GridLines(parent=self.view.scene, color="#dededeff")
 
         self.grid.set_gl_state(depth_test=False)
 
@@ -114,14 +123,14 @@ class VisPyCanvas(scene.SceneCanvas):
         Translate pixels to FlatCAM units.
 
         """
-        tr = self.grid.get_transform('canvas', 'visual')
+        tr = self.grid.get_transform("canvas", "visual")
         return tr.map(pos)
 
     def translate_coords_2(self, pos):
         """
         Translate FlatCAM units to pixels.
         """
-        tr = self.grid.get_transform('visual', 'document')
+        tr = self.grid.get_transform("visual", "document")
         return tr.map(pos)
 
 
@@ -176,14 +185,14 @@ class Camera(scene.PanZoomCamera):
         # ################### Scrolling ##########################
         BaseCamera.viewbox_mouse_event(self, event)
 
-        if event.type == 'mouse_wheel':
+        if event.type == "mouse_wheel":
             if not modifiers:
                 center = self._scene_transform.imap(event.pos)
                 scale = (1 + self.zoom_factor) ** (-event.delta[1] * 30)
                 self.limited_zoom(scale, center)
             event.handled = True
 
-        elif event.type == 'mouse_move':
+        elif event.type == "mouse_move":
             if event.press_event is None:
                 return
 
@@ -195,20 +204,19 @@ class Camera(scene.PanZoomCamera):
                 p2 = np.array(event.pos)[:2]
                 p1s = self._transform.imap(p1)
                 p2s = self._transform.imap(p2)
-                self.pan(p1s-p2s)
+                self.pan(p1s - p2s)
                 event.handled = True
-            elif event.button in [2, 3] and 'Shift' in modifiers:
+            elif event.button in [2, 3] and "Shift" in modifiers:
                 # Zoom
                 p1c = np.array(last_event.pos)[:2]
                 p2c = np.array(event.pos)[:2]
-                scale = ((1 + self.zoom_factor) **
-                         ((p1c-p2c) * np.array([1, -1])))
+                scale = (1 + self.zoom_factor) ** ((p1c - p2c) * np.array([1, -1]))
                 center = self._transform.imap(event.press_event.pos[:2])
                 self.limited_zoom(scale, center)
                 event.handled = True
             else:
                 event.handled = False
-        elif event.type == 'mouse_press':
+        elif event.type == "mouse_press":
             # accept the event if it is button 1 or 2.
             # This is required in order to receive future events
             event.handled = event.button in [1, 2, 3]
@@ -222,6 +230,7 @@ class Camera(scene.PanZoomCamera):
         except IndexError:
             zoom_in = scale < 1
 
-        if (not zoom_in and self.rect.width < self.maximum_scene_size) \
-                or (zoom_in and self.rect.width > self.minimum_scene_size):
+        if (not zoom_in and self.rect.width < self.maximum_scene_size) or (
+            zoom_in and self.rect.width > self.minimum_scene_size
+        ):
             self.zoom(scale, center)

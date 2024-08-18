@@ -18,11 +18,11 @@ import gettext
 import appTranslation as fcTranslate
 import builtins
 
-fcTranslate.apply_language('strings')
-if '_' not in builtins.__dict__:
+fcTranslate.apply_language("strings")
+if "_" not in builtins.__dict__:
     _ = gettext.gettext
 
-log = logging.getLogger('base')
+log = logging.getLogger("base")
 
 
 class AppGCodeEditor(QtCore.QObject):
@@ -32,7 +32,7 @@ class AppGCodeEditor(QtCore.QObject):
 
         self.app = app
         self.decimals = self.app.decimals
-        self.plain_text = ''
+        self.plain_text = ""
         self.callback = lambda x: None
 
         self.ui = AppGCodeEditorUI(app=self.app)
@@ -41,7 +41,7 @@ class AppGCodeEditor(QtCore.QObject):
         self.edit_area = None
 
         self.gcode_obj = None
-        self.code_edited = ''
+        self.code_edited = ""
 
         # #################################################################################
         # ################### SIGNALS #####################################################
@@ -68,11 +68,14 @@ class AppGCodeEditor(QtCore.QObject):
         self.edit_area = self.ui.gcode_editor_tab.code_editor
 
         # add the tab if it was closed
-        self.app.ui.plot_tab_area.addTab(self.ui.gcode_editor_tab, '%s' % _("Code Editor"))
-        self.ui.gcode_editor_tab.setObjectName('gcode_editor_tab')
+        self.app.ui.plot_tab_area.addTab(self.ui.gcode_editor_tab, "%s" % _("Code Editor"))
+        self.ui.gcode_editor_tab.setObjectName("gcode_editor_tab")
         # protect the tab that was just added
         for idx in range(self.app.ui.plot_tab_area.count()):
-            if self.app.ui.plot_tab_area.widget(idx).objectName() == self.ui.gcode_editor_tab.objectName():
+            if (
+                self.app.ui.plot_tab_area.widget(idx).objectName()
+                == self.ui.gcode_editor_tab.objectName()
+            ):
                 self.app.ui.plot_tab_area.protectTab(idx)
 
         # delete the absolute and relative position and messages in the infobar
@@ -103,7 +106,7 @@ class AppGCodeEditor(QtCore.QObject):
         self.app.ui.notebook.setCurrentWidget(self.app.ui.properties_tab)
 
         # make a new name for the new Excellon object (the one with edited content)
-        self.edited_obj_name = self.gcode_obj.options['name']
+        self.edited_obj_name = self.gcode_obj.options["name"]
         self.ui.name_entry.set_value(self.edited_obj_name)
 
         self.activate()
@@ -138,19 +141,19 @@ class AppGCodeEditor(QtCore.QObject):
         self.ui.cnc_tools_table.setRowCount(n)
 
         # add the All Gcode selection
-        allgcode_item = QtWidgets.QTableWidgetItem('%s' % _("All GCode"))
+        allgcode_item = QtWidgets.QTableWidgetItem("%s" % _("All GCode"))
         allgcode_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         self.ui.cnc_tools_table.setItem(row_no, 1, allgcode_item)
         row_no += 1
 
         # add the Header Gcode selection
-        header_item = QtWidgets.QTableWidgetItem('%s' % _("Header GCode"))
+        header_item = QtWidgets.QTableWidgetItem("%s" % _("Header GCode"))
         header_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         self.ui.cnc_tools_table.setItem(row_no, 1, header_item)
         row_no += 1
 
         # add the Start Gcode selection
-        start_item = QtWidgets.QTableWidgetItem('%s' % _("Start GCode"))
+        start_item = QtWidgets.QTableWidgetItem("%s" % _("Start GCode"))
         start_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         self.ui.cnc_tools_table.setItem(row_no, 1, start_item)
 
@@ -159,17 +162,19 @@ class AppGCodeEditor(QtCore.QObject):
             tool_idx += 1
             row_no += 1
 
-            t_id = QtWidgets.QTableWidgetItem('%d' % int(tool_idx))
+            t_id = QtWidgets.QTableWidgetItem("%d" % int(tool_idx))
             # id.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.cnc_tools_table.setItem(row_no, 0, t_id)  # Tool name/id
 
-            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, float(dia_value['tooldia'])))
+            dia_item = QtWidgets.QTableWidgetItem(
+                "%.*f" % (self.decimals, float(dia_value["tooldia"]))
+            )
 
-            offset_txt = list(str(dia_value['offset']))
+            offset_txt = list(str(dia_value["offset"]))
             offset_txt[0] = offset_txt[0].upper()
-            offset_item = QtWidgets.QTableWidgetItem(''.join(offset_txt))
-            type_item = QtWidgets.QTableWidgetItem(str(dia_value['type']))
-            tool_type_item = QtWidgets.QTableWidgetItem(str(dia_value['tool_type']))
+            offset_item = QtWidgets.QTableWidgetItem("".join(offset_txt))
+            type_item = QtWidgets.QTableWidgetItem(str(dia_value["type"]))
+            tool_type_item = QtWidgets.QTableWidgetItem(str(dia_value["tool_type"]))
 
             t_id.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             dia_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
@@ -230,19 +235,19 @@ class AppGCodeEditor(QtCore.QObject):
         self.ui.exc_cnc_tools_table.setRowCount(n)
 
         # add the All Gcode selection
-        allgcode_item = QtWidgets.QTableWidgetItem('%s' % _("All GCode"))
+        allgcode_item = QtWidgets.QTableWidgetItem("%s" % _("All GCode"))
         allgcode_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         self.ui.exc_cnc_tools_table.setItem(row_no, 1, allgcode_item)
         row_no += 1
 
         # add the Header Gcode selection
-        header_item = QtWidgets.QTableWidgetItem('%s' % _("Header GCode"))
+        header_item = QtWidgets.QTableWidgetItem("%s" % _("Header GCode"))
         header_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         self.ui.exc_cnc_tools_table.setItem(row_no, 1, header_item)
         row_no += 1
 
         # add the Start Gcode selection
-        start_item = QtWidgets.QTableWidgetItem('%s' % _("Start GCode"))
+        start_item = QtWidgets.QTableWidgetItem("%s" % _("Start GCode"))
         start_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         self.ui.exc_cnc_tools_table.setItem(row_no, 1, start_item)
 
@@ -251,12 +256,17 @@ class AppGCodeEditor(QtCore.QObject):
             tool_idx += 1
             row_no += 1
 
-            t_id = QtWidgets.QTableWidgetItem('%d' % int(tool_idx))
-            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, float(tooldia_key)))
-            nr_drills_item = QtWidgets.QTableWidgetItem('%d' % int(dia_value['nr_drills']))
-            nr_slots_item = QtWidgets.QTableWidgetItem('%d' % int(dia_value['nr_slots']))
-            cutz_item = QtWidgets.QTableWidgetItem('%.*f' % (
-                self.decimals, float(dia_value['offset']) + float(dia_value['data']['tools_drill_cutz'])))
+            t_id = QtWidgets.QTableWidgetItem("%d" % int(tool_idx))
+            dia_item = QtWidgets.QTableWidgetItem("%.*f" % (self.decimals, float(tooldia_key)))
+            nr_drills_item = QtWidgets.QTableWidgetItem("%d" % int(dia_value["nr_drills"]))
+            nr_slots_item = QtWidgets.QTableWidgetItem("%d" % int(dia_value["nr_slots"]))
+            cutz_item = QtWidgets.QTableWidgetItem(
+                "%.*f"
+                % (
+                    self.decimals,
+                    float(dia_value["offset"]) + float(dia_value["data"]["tools_drill_cutz"]),
+                )
+            )
 
             t_id.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             dia_item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
@@ -269,7 +279,7 @@ class AppGCodeEditor(QtCore.QObject):
             self.ui.exc_cnc_tools_table.setItem(row_no, 2, nr_drills_item)  # Nr of drills
             self.ui.exc_cnc_tools_table.setItem(row_no, 3, nr_slots_item)  # Nr of slots
 
-            tool_uid_item = QtWidgets.QTableWidgetItem(str(dia_value['tool']))
+            tool_uid_item = QtWidgets.QTableWidgetItem(str(dia_value["tool"]))
             # ## REMEMBER: THIS COLUMN IS HIDDEN IN OBJECTUI.PY # ##
             self.ui.exc_cnc_tools_table.setItem(row_no, 4, tool_uid_item)  # Tool unique ID)
             self.ui.exc_cnc_tools_table.setItem(row_no, 5, cutz_item)
@@ -309,10 +319,14 @@ class AppGCodeEditor(QtCore.QObject):
         # rows selected
         if self.gcode_obj.cnc_tools:
             self.ui.cnc_tools_table.clicked.connect(self.on_row_selection_change)
-            self.ui.cnc_tools_table.horizontalHeader().sectionClicked.connect(self.on_toggle_all_rows)
+            self.ui.cnc_tools_table.horizontalHeader().sectionClicked.connect(
+                self.on_toggle_all_rows
+            )
         if self.gcode_obj.exc_cnc_tools:
             self.ui.exc_cnc_tools_table.clicked.connect(self.on_row_selection_change)
-            self.ui.exc_cnc_tools_table.horizontalHeader().sectionClicked.connect(self.on_toggle_all_rows)
+            self.ui.exc_cnc_tools_table.horizontalHeader().sectionClicked.connect(
+                self.on_toggle_all_rows
+            )
 
     def ui_disconnect(self):
         """
@@ -327,7 +341,9 @@ class AppGCodeEditor(QtCore.QObject):
             except (TypeError, AttributeError):
                 pass
             try:
-                self.ui.cnc_tools_table.horizontalHeader().sectionClicked.disconnect(self.on_toggle_all_rows)
+                self.ui.cnc_tools_table.horizontalHeader().sectionClicked.disconnect(
+                    self.on_toggle_all_rows
+                )
             except (TypeError, AttributeError):
                 pass
 
@@ -337,7 +353,9 @@ class AppGCodeEditor(QtCore.QObject):
             except (TypeError, AttributeError):
                 pass
             try:
-                self.ui.exc_cnc_tools_table.horizontalHeader().sectionClicked.disconnect(self.on_toggle_all_rows)
+                self.ui.exc_cnc_tools_table.horizontalHeader().sectionClicked.disconnect(
+                    self.on_toggle_all_rows
+                )
             except (TypeError, AttributeError):
                 pass
 
@@ -371,7 +389,7 @@ class AppGCodeEditor(QtCore.QObject):
 
         if 1 in sel_rows:
             text_to_be_found = self.gcode_obj.gc_header
-            text_list = [x for x in text_to_be_found.split("\n") if x != '']
+            text_list = [x for x in text_to_be_found.split("\n") if x != ""]
 
             self.edit_area.find(str(text_list[0]), flags)
             my_text_cursor = self.edit_area.textCursor()
@@ -391,7 +409,7 @@ class AppGCodeEditor(QtCore.QObject):
 
         if 2 in sel_rows:
             text_to_be_found = self.gcode_obj.gc_start
-            text_list = [x for x in text_to_be_found.split("\n") if x != '']
+            text_list = [x for x in text_to_be_found.split("\n") if x != ""]
 
             self.edit_area.find(str(text_list[0]), flags)
             my_text_cursor = self.edit_area.textCursor()
@@ -417,25 +435,27 @@ class AppGCodeEditor(QtCore.QObject):
 
                 text_to_be_found = None
                 if self.gcode_obj.cnc_tools:
-                    text_to_be_found = self.gcode_obj.cnc_tools[tool_no]['gcode']
+                    text_to_be_found = self.gcode_obj.cnc_tools[tool_no]["gcode"]
                 elif self.gcode_obj.exc_cnc_tools:
-                    tool_dia = self.app.dec_format(float(t_table.item(row, 1).text()), dec=self.decimals)
+                    tool_dia = self.app.dec_format(
+                        float(t_table.item(row, 1).text()), dec=self.decimals
+                    )
                     for tool_d in self.gcode_obj.exc_cnc_tools:
                         if self.app.dec_format(tool_d, dec=self.decimals) == tool_dia:
-                            text_to_be_found = self.gcode_obj.exc_cnc_tools[tool_d]['gcode']
+                            text_to_be_found = self.gcode_obj.exc_cnc_tools[tool_d]["gcode"]
                     if text_to_be_found is None:
                         continue
                 else:
                     continue
 
-                text_list = [x for x in text_to_be_found.split("\n") if x != '']
+                text_list = [x for x in text_to_be_found.split("\n") if x != ""]
 
                 # self.edit_area.find(str(text_list[0]), flags)
                 # my_text_cursor = self.edit_area.textCursor()
                 # start_sel = my_text_cursor.selectionStart()
 
                 # first I search for the tool
-                found_tool = self.edit_area.find('T%d' % tool_no, flags)
+                found_tool = self.edit_area.find("T%d" % tool_no, flags)
                 if found_tool is False:
                     continue
 
@@ -454,7 +474,7 @@ class AppGCodeEditor(QtCore.QObject):
                 start_sel = my_text_cursor.selectionStart()
 
                 # I search for the next find of M6 (which belong to the next tool
-                m6 = self.edit_area.find('M6', flags)
+                m6 = self.edit_area.find("M6", flags)
                 if m6 is False:
                     # this mean that we are in the last tool, we take all to the end
                     self.edit_area.moveCursor(QtGui.QTextCursor.End)
@@ -543,7 +563,7 @@ class AppGCodeEditor(QtCore.QObject):
         # self.ui.buttonPreview.setEnabled(enable)
 
         self.buttonSave.setStyleSheet("QPushButton {color: red;}")
-        self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as_red.png'))
+        self.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + "/save_as_red.png"))
 
     def insert_gcode(self):
         """
@@ -571,7 +591,7 @@ class AppGCodeEditor(QtCore.QObject):
 
         # then append the text from GCode to the text editor
         self.ui.gcode_editor_tab.load_text(gcode_text, move_to_start=True, clear_text=True)
-        self.app.inform.emit('[success] %s...' % _('Loaded Machine Code into Code Editor'))
+        self.app.inform.emit("[success] %s..." % _("Loaded Machine Code into Code Editor"))
 
     def update_fcgcode(self, edited_obj):
         """
@@ -584,7 +604,9 @@ class AppGCodeEditor(QtCore.QObject):
         self.deactivate()
 
         self.ui.gcode_editor_tab.buttonSave.setStyleSheet("")
-        self.ui.gcode_editor_tab.buttonSave.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
+        self.ui.gcode_editor_tab.buttonSave.setIcon(
+            QtGui.QIcon(self.app.resource_location + "/save_as.png")
+        )
 
     def on_open_gcode(self):
         """
@@ -592,25 +614,30 @@ class AppGCodeEditor(QtCore.QObject):
         :return:
         :rtype:
         """
-        _filter_ = "G-Code Files (*.nc);; G-Code Files (*.txt);; G-Code Files (*.tap);; G-Code Files (*.cnc);; " \
-                   "All Files (*.*)"
+        _filter_ = (
+            "G-Code Files (*.nc);; G-Code Files (*.txt);; G-Code Files (*.tap);; G-Code Files (*.cnc);; "
+            "All Files (*.*)"
+        )
 
         path, _f = QtWidgets.QFileDialog.getOpenFileName(
-            caption=_('Open file'), directory=self.app.get_last_folder(), filter=_filter_)
+            caption=_("Open file"), directory=self.app.get_last_folder(), filter=_filter_
+        )
 
         if path:
             file = QtCore.QFile(path)
             if file.open(QtCore.QIODevice.ReadOnly):
                 stream = QtCore.QTextStream(file)
                 self.code_edited = stream.readAll()
-                self.ui.gcode_editor_tab.load_text(self.code_edited, move_to_start=True, clear_text=True)
+                self.ui.gcode_editor_tab.load_text(
+                    self.code_edited, move_to_start=True, clear_text=True
+                )
                 file.close()
 
     def activate(self):
-        self.app.call_source = 'gcode_editor'
+        self.app.call_source = "gcode_editor"
 
     def deactivate(self):
-        self.app.call_source = 'app'
+        self.app.call_source = "app"
 
     def on_name_activate(self):
         self.edited_obj_name = self.ui.name_entry.get_value()
@@ -624,7 +651,7 @@ class AppGCodeEditorUI:
         self.decimals = self.app.decimals
 
         # ## Current application units in Upper Case
-        self.units = self.app.defaults['units'].upper()
+        self.units = self.app.defaults["units"].upper()
 
         # self.setSizePolicy(
         #     QtWidgets.QSizePolicy.MinimumExpanding,
@@ -653,13 +680,13 @@ class AppGCodeEditorUI:
         self.edit_box.addLayout(self.title_box)
 
         # ## Page Title icon
-        pixmap = QtGui.QPixmap(self.app.resource_location + '/flatcam_icon32.png')
+        pixmap = QtGui.QPixmap(self.app.resource_location + "/flatcam_icon32.png")
         self.icon = QtWidgets.QLabel()
         self.icon.setPixmap(pixmap)
         self.title_box.addWidget(self.icon, stretch=0)
 
         # ## Title label
-        self.title_label = QtWidgets.QLabel("<font size=5><b>%s</b></font>" % _('GCode Editor'))
+        self.title_label = QtWidgets.QLabel("<font size=5><b>%s</b></font>" % _("GCode Editor"))
         self.title_label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.title_box.addWidget(self.title_label, stretch=1)
 
@@ -684,7 +711,9 @@ class AppGCodeEditorUI:
 
         self.cnc_tools_table.setColumnCount(6)
         self.cnc_tools_table.setColumnWidth(0, 20)
-        self.cnc_tools_table.setHorizontalHeaderLabels(['#', _('Dia'), _('Offset'), _('Type'), _('TT'), ''])
+        self.cnc_tools_table.setHorizontalHeaderLabels(
+            ["#", _("Dia"), _("Offset"), _("Type"), _("TT"), ""]
+        )
         self.cnc_tools_table.setColumnHidden(5, True)
 
         # CNC Tools Table when made out of Excellon
@@ -695,7 +724,9 @@ class AppGCodeEditorUI:
 
         self.exc_cnc_tools_table.setColumnCount(6)
         self.exc_cnc_tools_table.setColumnWidth(0, 20)
-        self.exc_cnc_tools_table.setHorizontalHeaderLabels(['#', _('Dia'), _('Drills'), _('Slots'), '', _("Cut Z")])
+        self.exc_cnc_tools_table.setHorizontalHeaderLabels(
+            ["#", _("Dia"), _("Drills"), _("Slots"), "", _("Cut Z")]
+        )
         self.exc_cnc_tools_table.setColumnHidden(4, True)
 
         separator_line = QtWidgets.QFrame()
@@ -704,80 +735,77 @@ class AppGCodeEditorUI:
         self.edit_box.addWidget(separator_line)
 
         # Prepend text to GCode
-        prependlabel = QtWidgets.QLabel('%s 1:' % _('CNC Code Snippet'))
-        prependlabel.setToolTip(
-            _("Code snippet defined in Preferences.")
-        )
+        prependlabel = QtWidgets.QLabel("%s 1:" % _("CNC Code Snippet"))
+        prependlabel.setToolTip(_("Code snippet defined in Preferences."))
         self.edit_box.addWidget(prependlabel)
 
         self.prepend_text = FCTextArea()
         self.prepend_text.setPlaceholderText(
-            _("Type here any G-Code commands you would\n"
-              "like to insert at the cursor location.")
+            _("Type here any G-Code commands you would\n" "like to insert at the cursor location.")
         )
         self.edit_box.addWidget(self.prepend_text)
 
         # Insert Button
-        self.update_gcode_button = FCButton(_('Insert Code'))
+        self.update_gcode_button = FCButton(_("Insert Code"))
         # self.update_gcode_button.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
-        self.update_gcode_button.setToolTip(
-            _("Insert the code above at the cursor location.")
-        )
+        self.update_gcode_button.setToolTip(_("Insert the code above at the cursor location."))
         self.edit_box.addWidget(self.update_gcode_button)
 
         # Append text to GCode
-        appendlabel = QtWidgets.QLabel('%s 2:' % _('CNC Code Snippet'))
-        appendlabel.setToolTip(
-            _("Code snippet defined in Preferences.")
-        )
+        appendlabel = QtWidgets.QLabel("%s 2:" % _("CNC Code Snippet"))
+        appendlabel.setToolTip(_("Code snippet defined in Preferences."))
         self.edit_box.addWidget(appendlabel)
 
         self.append_text = FCTextArea()
         self.append_text.setPlaceholderText(
-            _("Type here any G-Code commands you would\n"
-              "like to insert at the cursor location.")
+            _("Type here any G-Code commands you would\n" "like to insert at the cursor location.")
         )
         self.edit_box.addWidget(self.append_text)
 
         # Insert Button
-        self.update_gcode_sec_button = FCButton(_('Insert Code'))
+        self.update_gcode_sec_button = FCButton(_("Insert Code"))
         # self.update_gcode_button.setIcon(QtGui.QIcon(self.app.resource_location + '/save_as.png'))
-        self.update_gcode_sec_button.setToolTip(
-            _("Insert the code above at the cursor location.")
-        )
+        self.update_gcode_sec_button.setToolTip(_("Insert the code above at the cursor location."))
         self.edit_box.addWidget(self.update_gcode_sec_button)
 
         layout.addStretch()
 
         # Editor
-        self.exit_editor_button = FCButton(_('Exit Editor'))
-        self.exit_editor_button.setIcon(QtGui.QIcon(self.app.resource_location + '/power16.png'))
-        self.exit_editor_button.setToolTip(
-            _("Exit from Editor.")
-        )
-        self.exit_editor_button.setStyleSheet("""
+        self.exit_editor_button = FCButton(_("Exit Editor"))
+        self.exit_editor_button.setIcon(QtGui.QIcon(self.app.resource_location + "/power16.png"))
+        self.exit_editor_button.setToolTip(_("Exit from Editor."))
+        self.exit_editor_button.setStyleSheet(
+            """
                                           QPushButton
                                           {
                                               font-weight: bold;
                                           }
-                                          """)
+                                          """
+        )
         layout.addWidget(self.exit_editor_button)
         # ############################ FINSIHED GUI ##################################################################
         # #############################################################################################################
 
     def confirmation_message(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%.*f, %.*f]' % (_("Edited value is out of range"),
-                                                                                  self.decimals,
-                                                                                  minval,
-                                                                                  self.decimals,
-                                                                                  maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%.*f, %.*f]"
+                % (_("Edited value is out of range"), self.decimals, minval, self.decimals, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
 
     def confirmation_message_int(self, accepted, minval, maxval):
         if accepted is False:
-            self.app.inform[str, bool].emit('[WARNING_NOTCL] %s: [%d, %d]' %
-                                            (_("Edited value is out of range"), minval, maxval), False)
+            self.app.inform[str, bool].emit(
+                "[WARNING_NOTCL] %s: [%d, %d]"
+                % (_("Edited value is out of range"), minval, maxval),
+                False,
+            )
         else:
-            self.app.inform[str, bool].emit('[success] %s' % _("Edited value is within limits."), False)
+            self.app.inform[str, bool].emit(
+                "[success] %s" % _("Edited value is within limits."), False
+            )
